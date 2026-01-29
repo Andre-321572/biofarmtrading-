@@ -149,7 +149,7 @@
                             <h3 class="font-bold text-gray-900 mb-4">Contact</h3>
                             <ul class="space-y-2 text-gray-500 text-sm">
                                 <li>📞 +228 90 00 00 00</li>
-                                <li>✉️ contact@biofarmtrading.tg</li>
+                                <li>✉️ kinu.joossi@gmail.com</li>
                             </ul>
                         </div>
                     </div>
