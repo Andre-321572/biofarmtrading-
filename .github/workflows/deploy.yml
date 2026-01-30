@@ -18,6 +18,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ./biofarmtrading/
           exclude: |
+            - 'vendor/*'
+            - 'vendor/**'
             - '**/.git/*'
             - '**/.git/**'
             - 'node_modules/*'
