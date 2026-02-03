@@ -132,18 +132,25 @@
                                 </tr>
                                 <tr class="bg-slate-50/30 border-b border-slate-100">
                                     @foreach($days as $day)
-                                        <th class="py-1.5 text-center w-8 border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">A.</th>
-                                        <th class="py-1.5 text-center w-8 border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">D.</th>
+                                        <th class="py-1.5 text-center w-12 border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">ARR.</th>
+                                        <th class="py-1.5 text-center w-12 border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">DÉP.</th>
                                     @endforeach
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($dayWorkers as $index => $worker)
                                     @php
-                                        // Count Morning (A) + Afternoon (D) presence
-                                        $presentSessions = $worker->attendances->where('status', 'present')->count();
-                                        // Each session (A or D) is 4 hours
-                                        $totalHours = $presentSessions * 4;
+                                        $totalMinutes = 0;
+                                        foreach($worker->attendances as $att) {
+                                            if ($att->arrival_time && $att->departure_time) {
+                                                $start = \Carbon\Carbon::parse($att->arrival_time);
+                                                $end = \Carbon\Carbon::parse($att->departure_time);
+                                                $totalMinutes += $end->diffInMinutes($start);
+                                            } elseif ($att->status === 'present') {
+                                                $totalMinutes += 240; // 4 hours per session mark if legacy
+                                            }
+                                        }
+                                        $totalHours = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
                                         <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $index + 1 }}</td>
@@ -151,26 +158,24 @@
                                         <td class="px-4 py-3 text-slate-500 font-bold italic border-r border-slate-100 sticky left-[12.5rem] bg-white group-hover:bg-slate-50 z-10">{{ $worker->first_name }}</td>
                                         
                                         @foreach($days as $day)
-                                            @foreach(['morning' => 'A', 'afternoon' => 'D'] as $sessionKey => $label)
-                                                @php
-                                                    $att = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', $sessionKey)->first();
-                                                    $status = $att ? $att->status : 'none';
-                                                @endphp
-                                                <td class="p-0 text-center h-12 w-8 cursor-pointer relative border-r border-slate-100 group-hover:border-slate-200 transition-all hover:bg-slate-100"
-                                                    onclick="cycleStatus(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', '{{ $sessionKey }}')">
-                                                    
-                                                    <div class="status-icon flex items-center justify-center h-full w-full" data-status="{{ $status }}">
-                                                         @if($status == 'present')
-                                                            <span class="text-green-600 font-black text-sm">✓</span>
-                                                        @elseif($status == 'absent')
-                                                            <span class="text-red-500 font-black text-sm">✕</span>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                            @endforeach
+                                            @php
+                                                $att = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', 'morning')->first();
+                                            @endphp
+                                            <td class="p-0 text-center h-12 w-12 border-r border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                                                <input type="time" 
+                                                    value="{{ $att && $att->arrival_time ? \Carbon\Carbon::parse($att->arrival_time)->format('H:i') : '' }}"
+                                                    onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'arrival_time')"
+                                                    class="w-full h-full border-none bg-transparent text-[10px] font-black p-0 text-center focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all">
+                                            </td>
+                                            <td class="p-0 text-center h-12 w-12 border-r border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                                                <input type="time" 
+                                                    value="{{ $att && $att->departure_time ? \Carbon\Carbon::parse($att->departure_time)->format('H:i') : '' }}"
+                                                    onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'departure_time')"
+                                                    class="w-full h-full border-none bg-transparent text-[10px] font-black p-0 text-center focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all">
+                                            </td>
                                         @endforeach
                                         
-                                        <td class="py-3 text-center font-black bg-slate-50/50 text-slate-700 border-r border-slate-100">{{ $totalHours }}h</td>
+                                        <td class="py-3 text-center font-black bg-slate-50/50 text-slate-700 border-r border-slate-100">{{ $totalHours }}</td>
 
                                         <td class="py-3 px-2 text-center group-hover:bg-slate-50/80 transition-all">
                                             <div class="flex items-center justify-center gap-1">
@@ -233,9 +238,13 @@
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($nightWorkers as $index => $worker)
                                     @php
-                                        // 4 hours per present day
-                                        $daysPresent = $worker->attendances->where('session', 'morning')->where('status', 'present')->count();
-                                        $totalHoursNight = $daysPresent * 4;
+                                        $totalMinutesNight = 0;
+                                        foreach($worker->attendances as $att) {
+                                            if ($att->status === 'present') {
+                                                $totalMinutesNight += 240; // 4 hours for night shift by default
+                                            }
+                                        }
+                                        $totalHoursNight = floor($totalMinutesNight / 60) . 'h' . ($totalMinutesNight % 60 > 0 ? sprintf('%02d', $totalMinutesNight % 60) : '');
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
                                         <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $index + 1 }}</td>
@@ -261,7 +270,7 @@
                                             </td>
                                         @endforeach
                                         
-                                        <td class="py-3 text-center font-black bg-slate-50/50 text-indigo-700 border-r border-slate-100">{{ $totalHoursNight }}h</td>
+                                        <td class="py-3 text-center font-black bg-slate-50/50 text-indigo-700 border-r border-slate-100">{{ $totalHoursNight }}</td>
 
                                         <td class="py-3 px-2 text-center group-hover:bg-slate-50/80 transition-all">
                                             <div class="flex items-center justify-center gap-1">

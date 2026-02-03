@@ -60,8 +60,14 @@ class AttendanceController extends Controller
 
         $data = [];
         if ($request->has('status')) $data['status'] = $request->status;
-        if ($request->has('arrival_time')) $data['arrival_time'] = $request->arrival_time;
-        if ($request->has('departure_time')) $data['departure_time'] = $request->departure_time;
+        if ($request->has('arrival_time')) {
+            $data['arrival_time'] = $request->arrival_time;
+            if ($request->arrival_time) $data['status'] = 'present';
+        }
+        if ($request->has('departure_time')) {
+            $data['departure_time'] = $request->departure_time;
+            if ($request->departure_time) $data['status'] = 'present';
+        }
 
         Attendance::updateOrCreate(
             [

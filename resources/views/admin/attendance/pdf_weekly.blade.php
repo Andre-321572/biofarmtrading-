@@ -86,16 +86,25 @@
                 </tr>
                 <tr>
                     @foreach($days as $day)
-                        <th class="col-session">A.</th>
-                        <th class="col-session">D.</th>
+                        <th class="col-session">Arr.</th>
+                        <th class="col-session">Dép.</th>
                     @endforeach
                 </tr>
             </thead>
             <tbody>
                 @foreach($dayWorkers as $index => $worker)
                     @php
-                        $presentSessions = $worker->attendances->where('status', 'present')->count();
-                        $totalHours = $presentSessions * 4;
+                        $totalMinutes = 0;
+                        foreach($worker->attendances as $att) {
+                            if ($att->arrival_time && $att->departure_time) {
+                                $start = \Carbon\Carbon::parse($att->arrival_time);
+                                $end = \Carbon\Carbon::parse($att->departure_time);
+                                $totalMinutes += $end->diffInMinutes($start);
+                            } elseif ($att->status === 'present') {
+                                $totalMinutes += 240; // Legacy 4h session
+                            }
+                        }
+                        $totalHoursText = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
                     @endphp
                     <tr>
                         <td>{{ $index + 1 }}</td>
@@ -103,21 +112,17 @@
                         <td class="col-prenom">{{ $worker->first_name }}</td>
                         
                         @foreach($days as $day)
-                            @foreach(['morning', 'afternoon'] as $session)
-                                @php
-                                    $att = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', $session)->first();
-                                    $status = $att ? $att->status : 'none';
-                                @endphp
-                                <td>
-                                    @if($status == 'present')
-                                        <span class="present">✓</span>
-                                    @elseif($status == 'absent')
-                                        <span class="absent">✕</span>
-                                    @endif
-                                </td>
-                            @endforeach
+                            @php
+                                $att = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', 'morning')->first();
+                            @endphp
+                            <td>
+                                {{ $att && $att->arrival_time ? \Carbon\Carbon::parse($att->arrival_time)->format('H:i') : '' }}
+                            </td>
+                            <td>
+                                {{ $att && $att->departure_time ? \Carbon\Carbon::parse($att->departure_time)->format('H:i') : '' }}
+                            </td>
                         @endforeach
-                        <td class="col-total">{{ $totalHours }}</td>
+                        <td class="col-total">{{ $totalHoursText }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -141,8 +146,13 @@
             <tbody>
                 @foreach($nightWorkers as $index => $worker)
                     @php
-                        $daysPresent = $worker->attendances->where('session', 'morning')->where('status', 'present')->count();
-                        $totalHours = $daysPresent * 4;
+                        $totalMinutesNight = 0;
+                        foreach($worker->attendances as $att) {
+                            if ($att->status === 'present') {
+                                $totalMinutesNight += 240; // 4 hours for night shift by default
+                            }
+                        }
+                        $totalHoursNightText = floor($totalMinutesNight / 60) . 'h' . ($totalMinutesNight % 60 > 0 ? sprintf('%02d', $totalMinutesNight % 60) : '');
                     @endphp
                     <tr>
                         <td>{{ $index + 1 }}</td>
@@ -162,7 +172,7 @@
                                 @endif
                             </td>
                         @endforeach
-                        <td class="col-total">{{ $totalHours }}</td>
+                        <td class="col-total">{{ $totalHoursNightText }}</td>
                     </tr>
                 @endforeach
             </tbody>
