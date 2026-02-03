@@ -10,6 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql
+          coverage: none
+
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --no-dev
+
       - name: sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -18,8 +28,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ./biofarmtrading/
           exclude: |
-            - 'vendor/*'
-            - 'vendor/**'
             - '**/.git/*'
             - '**/.git/**'
             - 'node_modules/*'
@@ -28,5 +36,6 @@ jobs:
             - 'phpunit.xml'
             - 'README.md'
             - 'tests/**'
+            - 'vendor.zip'
 
             
