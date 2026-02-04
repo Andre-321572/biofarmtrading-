@@ -127,7 +127,7 @@
                                             <span class="text-[9px] font-bold text-slate-400 opacity-60">{{ $day->format('d/m') }}</span>
                                         </th>
                                     @endforeach
-                                    <th rowspan="2" class="px-2 py-4 w-16 text-center text-slate-400 uppercase tracking-widest text-[9px] font-black border-r border-slate-100">Total H.</th>
+                                    <th rowspan="2" class="px-2 py-4 w-16 text-center text-slate-400 uppercase tracking-widest text-[9px] font-black border-r border-slate-100">HT</th>
                                     <th rowspan="2" class="px-2 py-4 w-16 text-center text-slate-400 uppercase tracking-widest text-[9px] font-black">Actions</th>
                                 </tr>
                                 <tr class="bg-slate-50/30 border-b border-slate-100">
@@ -145,9 +145,10 @@
                                             if ($att->arrival_time && $att->departure_time) {
                                                 $start = \Carbon\Carbon::parse($att->arrival_time);
                                                 $end = \Carbon\Carbon::parse($att->departure_time);
-                                                $totalMinutes += $end->diffInMinutes($start);
+                                                $duration = $end->diffInMinutes($start);
+                                                $totalMinutes += max(0, $duration - 120); // Soustraction des 2h de pause
                                             } elseif ($att->status === 'present') {
-                                                $totalMinutes += 240; // 4 hours per session mark if legacy
+                                                $totalMinutes += 240; 
                                             }
                                         }
                                         $totalHours = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
@@ -235,7 +236,7 @@
                                             <span class="text-[9px] font-bold text-slate-400 opacity-60">{{ $day->format('d/m') }}</span>
                                         </th>
                                     @endforeach
-                                    <th class="px-2 py-4 w-16 text-center text-slate-400 uppercase tracking-widest text-[9px] font-black border-r border-slate-100">Total H.</th>
+                                    <th class="px-2 py-4 w-16 text-center text-slate-400 uppercase tracking-widest text-[9px] font-black border-r border-slate-100">HT</th>
                                     <th class="px-2 py-4 w-16 text-center text-slate-400 uppercase tracking-widest text-[9px] font-black">Actions</th>
                                 </tr>
                             </thead>

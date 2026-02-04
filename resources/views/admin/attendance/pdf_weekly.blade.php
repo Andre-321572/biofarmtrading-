@@ -99,9 +99,10 @@
                             if ($att->arrival_time && $att->departure_time) {
                                 $start = \Carbon\Carbon::parse($att->arrival_time);
                                 $end = \Carbon\Carbon::parse($att->departure_time);
-                                $totalMinutes += $end->diffInMinutes($start);
+                                $duration = $end->diffInMinutes($start);
+                                $totalMinutes += max(0, $duration - 120); // Déduction 2h pause
                             } elseif ($att->status === 'present') {
-                                $totalMinutes += 240; // Legacy 4h session
+                                $totalMinutes += 240; 
                             }
                         }
                         $totalHoursText = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
