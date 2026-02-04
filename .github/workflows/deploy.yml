@@ -18,7 +18,7 @@ jobs:
           coverage: none
 
       - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --no-dev
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --no-dev --optimize-autoloader
 
       - name: sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
