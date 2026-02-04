@@ -164,12 +164,16 @@
                                             <td class="p-0 text-center h-12 w-12 border-r border-slate-100 bg-white hover:bg-slate-50 transition-colors">
                                                 <input type="time" 
                                                     value="{{ $att && $att->arrival_time ? \Carbon\Carbon::parse($att->arrival_time)->format('H:i') : '' }}"
+                                                    onfocus="this.showPicker()"
+                                                    onclick="this.showPicker()"
                                                     onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'arrival_time')"
                                                     class="w-full h-full border-none bg-white/50 text-xs font-black p-1 text-center focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all">
                                             </td>
                                             <td class="p-0 text-center h-12 w-12 border-r border-slate-100 bg-white hover:bg-slate-50 transition-colors">
                                                 <input type="time" 
                                                     value="{{ $att && $att->departure_time ? \Carbon\Carbon::parse($att->departure_time)->format('H:i') : '' }}"
+                                                    onfocus="this.showPicker()"
+                                                    onclick="this.showPicker()"
                                                     onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'departure_time')"
                                                     class="w-full h-full border-none bg-white/50 text-xs font-black p-1 text-center focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all">
                                             </td>

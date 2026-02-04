@@ -34,7 +34,7 @@ class AttendanceController extends Controller
         }
 
         $allWorkers = Worker::with(['attendances' => function($q) use ($startOfWeek, $endOfWeek) {
-            $q->whereBetween('date', [$startOfWeek, $endOfWeek]);
+            $q->whereBetween('date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')]);
         }])->orderBy('last_name')->get();
 
         $dayWorkers = $allWorkers->where('shift', 'day');
@@ -142,7 +142,7 @@ class AttendanceController extends Controller
         }
 
         $allWorkers = Worker::with(['attendances' => function($q) use ($startOfWeek, $endOfWeek) {
-            $q->whereBetween('date', [$startOfWeek, $endOfWeek]);
+            $q->whereBetween('date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')]);
         }])->orderBy('last_name')->get();
 
         $dayWorkers = $allWorkers->where('shift', 'day');
