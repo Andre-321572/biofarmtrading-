@@ -118,7 +118,7 @@
                                 <span class="text-lg font-bold tracking-tight text-gray-900">Bio Farm <span class="text-green-600">Trading</span></span>
                             </div>
                             <p class="text-gray-500 max-w-sm">
-                                Produits 100% naturels, sans conservateurs ni additifs. Transformés avec passion au Togo.
+                                Produits 100% Bio, sans conservateurs ni additifs. Transformés avec passion au Togo.
                             </p>
                         </div>
                         <div>

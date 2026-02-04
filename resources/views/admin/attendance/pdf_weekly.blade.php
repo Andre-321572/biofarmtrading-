@@ -95,32 +95,21 @@
                 @foreach($dayWorkers as $index => $worker)
                     @php
                         $totalMinutes = 0;
-                        $attendancesByDay = [];
-                        foreach($worker->attendances as $att) {
-                            if ($att->date) {
-                                $d = \Carbon\Carbon::parse($att->date)->format('Y-m-d');
-                                $attendancesByDay[$d][] = $att;
+                        foreach($days as $day) {
+                            $dateStr = $day->format('Y-m-d');
+                            $att = $worker->attendances->where('date', $dateStr)->first();
+                            if ($att && $att->arrival_time && $att->departure_time) {
+                                $start = \Carbon\Carbon::parse($dateStr . ' ' . $att->arrival_time);
+                                $end = \Carbon\Carbon::parse($dateStr . ' ' . $att->departure_time);
+                                if ($end->lessThan($start)) $end->addDay();
+                                
+                                $dayDuration = $end->diffInMinutes($start);
+                                $totalMinutes += max(0, $dayDuration - 120);
                             }
-                        }
-
-                        foreach($attendancesByDay as $dayDate => $dayAtts) {
-                            $dayMinutes = 0;
-                            foreach($dayAtts as $att) {
-                                if ($att->arrival_time && $att->departure_time) {
-                                    $start = \Carbon\Carbon::parse($dayDate . ' ' . $att->arrival_time);
-                                    $end = \Carbon\Carbon::parse($dayDate . ' ' . $att->departure_time);
-                                    if ($end->lessThan($start)) $end->addDay();
-                                    $dayMinutes += $end->diffInMinutes($start);
-                                }
-                            }
-                            if ($dayMinutes > 0) {
-                                $dayMinutes = max(0, $dayMinutes - 120);
-                            }
-                            $totalMinutes += $dayMinutes;
                         }
                         
-                        $h = floor(abs($totalMinutes) / 60);
-                        $m = abs($totalMinutes) % 60;
+                        $h = floor($totalMinutes / 60);
+                        $m = $totalMinutes % 60;
                         $totalHoursText = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
                     @endphp
                     <tr>
