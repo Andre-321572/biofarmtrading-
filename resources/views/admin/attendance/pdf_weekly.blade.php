@@ -107,7 +107,8 @@
                                 $end = \Carbon\Carbon::parse($dateStr . ' ' . $departureTime);
                                 if ($end->lessThan($start)) $end->addDay();
                                 
-                                $dayDuration = $end->diffInMinutes($start);
+                                // FIX: Correct order for positive duration
+                                $dayDuration = $start->diffInMinutes($end);
                                 $totalMinutes += max(0, $dayDuration - 120);
                             }
                         }

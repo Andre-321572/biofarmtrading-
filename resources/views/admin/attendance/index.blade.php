@@ -165,11 +165,12 @@
                                                 
                                                 if ($end->lessThan($start)) $end->addDay();
                                                 
-                                                $dayDuration = $end->diffInMinutes($start);
+                                                // FIX: Correct order for positive duration
+                                                $dayDuration = $start->diffInMinutes($end);
                                                 $dayHT = max(0, $dayDuration - 120);
                                                 $totalMinutes += $dayHT;
                                                 
-                                                $debugInfo[] = "$dateStr: RAW[{$rawArr}→{$rawDep}] PARSED[{$startTs}→{$endTs}] = {$dayDuration}min";
+                                                $debugInfo[] = "$dateStr: RAW[{$rawArr}→{$rawDep}] = {$dayDuration}min - 120 = {$dayHT}min";
                                             } else {
                                                 $debugInfo[] = "$dateStr: NO DATA";
                                             }
@@ -181,7 +182,7 @@
                                         
                                         // Debug: Show calculation details for first worker
                                         if ($index == 0) {
-                                            $totalHours .= ' [' . implode(' | ', $debugInfo) . ']';
+                                            $totalHours .= ' [✓ ' . implode(' | ', $debugInfo) . ' | TOTAL=' . $totalMinutes . 'min = ' . $totalHours . ']';
                                         }
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
