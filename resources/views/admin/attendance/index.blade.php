@@ -148,15 +148,19 @@
                                             $att = $worker->attendances->where('date', $dateStr)->first();
                                             
                                             if ($att && $att->arrival_time && $att->departure_time) {
-                                                $start = \Carbon\Carbon::parse($dateStr . ' ' . $att->arrival_time);
-                                                $end = \Carbon\Carbon::parse($dateStr . ' ' . $att->departure_time);
+                                                // Force proper time extraction from database format
+                                                $arrivalTime = \Carbon\Carbon::parse($att->arrival_time)->format('H:i:s');
+                                                $departureTime = \Carbon\Carbon::parse($att->departure_time)->format('H:i:s');
+                                                
+                                                $start = \Carbon\Carbon::parse($dateStr . ' ' . $arrivalTime);
+                                                $end = \Carbon\Carbon::parse($dateStr . ' ' . $departureTime);
                                                 if ($end->lessThan($start)) $end->addDay();
                                                 
                                                 $dayDuration = $end->diffInMinutes($start);
                                                 $dayHT = max(0, $dayDuration - 120);
                                                 $totalMinutes += $dayHT;
                                                 
-                                                $debugInfo[] = "$dateStr: {$att->arrival_time}-{$att->departure_time} = {$dayDuration}min - 120 = {$dayHT}min";
+                                                $debugInfo[] = "$dateStr: {$arrivalTime}-{$departureTime} = {$dayDuration}min - 120 = {$dayHT}min";
                                             } else {
                                                 $debugInfo[] = "$dateStr: NO DATA (att=" . ($att ? 'yes' : 'no') . ", arr=" . ($att?->arrival_time ?? 'null') . ", dep=" . ($att?->departure_time ?? 'null') . ")";
                                             }
