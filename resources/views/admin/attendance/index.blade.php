@@ -141,22 +141,35 @@
                                 @forelse($dayWorkers as $index => $worker)
                                     @php
                                         $totalMinutes = 0;
+                                        $debugInfo = [];
+                                        
                                         foreach($days as $day) {
                                             $dateStr = $day->format('Y-m-d');
                                             $att = $worker->attendances->where('date', $dateStr)->first();
+                                            
                                             if ($att && $att->arrival_time && $att->departure_time) {
                                                 $start = \Carbon\Carbon::parse($dateStr . ' ' . $att->arrival_time);
                                                 $end = \Carbon\Carbon::parse($dateStr . ' ' . $att->departure_time);
                                                 if ($end->lessThan($start)) $end->addDay();
                                                 
                                                 $dayDuration = $end->diffInMinutes($start);
-                                                $totalMinutes += max(0, $dayDuration - 120);
+                                                $dayHT = max(0, $dayDuration - 120);
+                                                $totalMinutes += $dayHT;
+                                                
+                                                $debugInfo[] = "$dateStr: {$att->arrival_time}-{$att->departure_time} = {$dayDuration}min - 120 = {$dayHT}min";
+                                            } else {
+                                                $debugInfo[] = "$dateStr: NO DATA (att=" . ($att ? 'yes' : 'no') . ", arr=" . ($att?->arrival_time ?? 'null') . ", dep=" . ($att?->departure_time ?? 'null') . ")";
                                             }
                                         }
                                         
                                         $h = floor($totalMinutes / 60);
                                         $m = $totalMinutes % 60;
                                         $totalHours = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
+                                        
+                                        // Debug: Show calculation details for first worker
+                                        if ($index == 0) {
+                                            $totalHours .= ' [DEBUG: ' . implode(' | ', $debugInfo) . ' | TOTAL=' . $totalMinutes . 'min]';
+                                        }
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
                                         <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $index + 1 }}</td>
