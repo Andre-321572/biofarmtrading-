@@ -141,49 +141,29 @@
                                 @forelse($dayWorkers as $index => $worker)
                                     @php
                                         $totalMinutes = 0;
-                                        $debugInfo = [];
                                         
                                         foreach($days as $day) {
                                             $dateStr = $day->format('Y-m-d');
                                             $att = $worker->attendances->where('date', $dateStr)->first();
                                             
                                             if ($att && $att->arrival_time && $att->departure_time) {
-                                                // Deep debug: Show raw values
-                                                $rawArr = $att->arrival_time;
-                                                $rawDep = $att->departure_time;
-                                                
-                                                // Force proper time extraction from database format
                                                 $arrivalTime = \Carbon\Carbon::parse($att->arrival_time)->format('H:i:s');
                                                 $departureTime = \Carbon\Carbon::parse($att->departure_time)->format('H:i:s');
                                                 
                                                 $start = \Carbon\Carbon::parse($dateStr . ' ' . $arrivalTime);
                                                 $end = \Carbon\Carbon::parse($dateStr . ' ' . $departureTime);
                                                 
-                                                // Debug timestamps
-                                                $startTs = $start->toDateTimeString();
-                                                $endTs = $end->toDateTimeString();
-                                                
                                                 if ($end->lessThan($start)) $end->addDay();
                                                 
-                                                // FIX: Correct order for positive duration
                                                 $dayDuration = $start->diffInMinutes($end);
                                                 $dayHT = max(0, $dayDuration - 120);
                                                 $totalMinutes += $dayHT;
-                                                
-                                                $debugInfo[] = "$dateStr: RAW[{$rawArr}→{$rawDep}] = {$dayDuration}min - 120 = {$dayHT}min";
-                                            } else {
-                                                $debugInfo[] = "$dateStr: NO DATA";
                                             }
                                         }
                                         
                                         $h = floor($totalMinutes / 60);
                                         $m = $totalMinutes % 60;
                                         $totalHours = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
-                                        
-                                        // Debug: Show calculation details for first worker
-                                        if ($index == 0) {
-                                            $totalHours .= ' [✓ ' . implode(' | ', $debugInfo) . ' | TOTAL=' . $totalMinutes . 'min = ' . $totalHours . ']';
-                                        }
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
                                         <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $index + 1 }}</td>
