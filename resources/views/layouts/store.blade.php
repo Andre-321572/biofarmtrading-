@@ -141,7 +141,7 @@
                                 </li>
                                 <li class="flex items-center gap-2">
                                      <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                                     100% Organique
+                                     100% Bio
                                 </li>
                             </ul>
                         </div>

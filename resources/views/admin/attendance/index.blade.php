@@ -141,25 +141,32 @@
                                 @forelse($dayWorkers as $index => $worker)
                                     @php
                                         $totalMinutes = 0;
-                                        $groupedAttendances = $worker->attendances->groupBy('date');
-                                        
-                                        foreach($groupedAttendances as $date => $attendances) {
+                                        $attendancesByDay = [];
+                                        foreach($worker->attendances as $att) {
+                                            if ($att->date) {
+                                                $d = \Carbon\Carbon::parse($att->date)->format('Y-m-d');
+                                                $attendancesByDay[$d][] = $att;
+                                            }
+                                        }
+
+                                        foreach($attendancesByDay as $dayDate => $dayAtts) {
                                             $dayMinutes = 0;
-                                            foreach($attendances as $att) {
+                                            foreach($dayAtts as $att) {
                                                 if ($att->arrival_time && $att->departure_time) {
-                                                    $start = \Carbon\Carbon::parse($att->date . ' ' . $att->arrival_time);
-                                                    $end = \Carbon\Carbon::parse($att->date . ' ' . $att->departure_time);
+                                                    $start = \Carbon\Carbon::parse($dayDate . ' ' . $att->arrival_time);
+                                                    $end = \Carbon\Carbon::parse($dayDate . ' ' . $att->departure_time);
                                                     if ($end->lessThan($start)) $end->addDay();
                                                     $dayMinutes += $end->diffInMinutes($start);
                                                 }
                                             }
                                             if ($dayMinutes > 0) {
-                                                $dayMinutes = max(0, $dayMinutes - 120); // 2h pause
+                                                $dayMinutes = max(0, $dayMinutes - 120);
                                             }
                                             $totalMinutes += $dayMinutes;
                                         }
-                                        $h = floor($totalMinutes / 60);
-                                        $m = $totalMinutes % 60;
+                                        
+                                        $h = floor(abs($totalMinutes) / 60);
+                                        $m = abs($totalMinutes) % 60;
                                         $totalHours = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
