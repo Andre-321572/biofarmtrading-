@@ -13,7 +13,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script src="{{ asset('js/admin-notifications.js') }}" defer></script>
+        @if(Auth::check() && Auth::user()->role === 'admin')
+            <script src="{{ asset('js/admin-notifications.js') }}" defer></script>
+        @endif
     </head>
     <body class="font-sans antialiased bg-[#F8FAFC] flex h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
         <!-- Mobile Sidebar Overlay -->
