@@ -141,7 +141,6 @@
                                 @forelse($dayWorkers as $index => $worker)
                                     @php
                                         $totalMinutes = 0;
-                                        // Group attendances by date to apply pause only once per day
                                         $groupedAttendances = $worker->attendances->groupBy('date');
                                         
                                         foreach($groupedAttendances as $date => $attendances) {
@@ -150,22 +149,18 @@
                                                 if ($att->arrival_time && $att->departure_time) {
                                                     $start = \Carbon\Carbon::parse($att->date . ' ' . $att->arrival_time);
                                                     $end = \Carbon\Carbon::parse($att->date . ' ' . $att->departure_time);
-                                                    
-                                                    // Handle crossing midnight
-                                                    if ($end->lessThan($start)) {
-                                                        $end->addDay();
-                                                    }
-                                                    
+                                                    if ($end->lessThan($start)) $end->addDay();
                                                     $dayMinutes += $end->diffInMinutes($start);
                                                 }
                                             }
-                                            
-                                            if ($dayMinutes > 0 && $worker->shift === 'day') {
-                                                $dayMinutes = max(0, $dayMinutes - 120); // 2h break for day workers
+                                            if ($dayMinutes > 0) {
+                                                $dayMinutes = max(0, $dayMinutes - 120); // 2h pause
                                             }
                                             $totalMinutes += $dayMinutes;
                                         }
-                                        $totalHours = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
+                                        $h = floor($totalMinutes / 60);
+                                        $m = $totalMinutes % 60;
+                                        $totalHours = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
                                         <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $index + 1 }}</td>

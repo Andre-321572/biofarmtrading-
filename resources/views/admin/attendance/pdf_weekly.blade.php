@@ -111,7 +111,9 @@
                             }
                             $totalMinutes += $dayMinutes;
                         }
-                        $totalHoursText = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
+                        $h = floor($totalMinutes / 60);
+                        $m = $totalMinutes % 60;
+                        $totalHoursText = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
                     @endphp
                     <tr>
                         <td>{{ $index + 1 }}</td>
