@@ -99,10 +99,7 @@
                             if ($att->arrival_time && $att->departure_time) {
                                 $start = \Carbon\Carbon::parse($att->arrival_time);
                                 $end = \Carbon\Carbon::parse($att->departure_time);
-                                $duration = $end->diffInMinutes($start);
-                                $totalMinutes += max(0, $duration - 120); // Déduction 2h pause
-                            } elseif ($att->status === 'present') {
-                                $totalMinutes += 240; 
+                                $totalMinutes += $end->diffInMinutes($start);
                             }
                         }
                         $totalHoursText = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
@@ -114,13 +111,18 @@
                         
                         @foreach($days as $day)
                             @php
-                                $att = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', 'morning')->first();
+                                $attM = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', 'morning')->first();
+                                $attS = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', 'afternoon')->first();
                             @endphp
                             <td>
-                                {{ $att && $att->arrival_time ? \Carbon\Carbon::parse($att->arrival_time)->format('H:i') : '' }}
-                            </td>
-                            <td>
-                                {{ $att && $att->departure_time ? \Carbon\Carbon::parse($att->departure_time)->format('H:i') : '' }}
+                                <div style="font-size: 6.5pt; border-bottom: 0.1pt solid #eee;">
+                                    {{ $attM && $attM->arrival_time ? \Carbon\Carbon::parse($attM->arrival_time)->format('H:i') : '--' }} - 
+                                    {{ $attM && $attM->departure_time ? \Carbon\Carbon::parse($attM->departure_time)->format('H:i') : '--' }}
+                                </div>
+                                <div style="font-size: 6.5pt;">
+                                    {{ $attS && $attS->arrival_time ? \Carbon\Carbon::parse($attS->arrival_time)->format('H:i') : '--' }} - 
+                                    {{ $attS && $attS->departure_time ? \Carbon\Carbon::parse($attS->departure_time)->format('H:i') : '--' }}
+                                </div>
                             </td>
                         @endforeach
                         <td class="col-total">{{ $totalHoursText }}</td>
