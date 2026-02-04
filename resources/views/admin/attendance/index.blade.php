@@ -141,13 +141,29 @@
                                 @forelse($dayWorkers as $index => $worker)
                                     @php
                                         $totalMinutes = 0;
-                                        foreach($worker->attendances as $att) {
-                                            if ($att->arrival_time && $att->departure_time) {
-                                                $start = \Carbon\Carbon::parse($att->arrival_time);
-                                                $end = \Carbon\Carbon::parse($att->departure_time);
-                                                $duration = $end->diffInMinutes($start);
-                                                $totalMinutes += max(0, $duration - 120); // Déduction des 2h de pause
+                                        // Group attendances by date to apply pause only once per day
+                                        $groupedAttendances = $worker->attendances->groupBy('date');
+                                        
+                                        foreach($groupedAttendances as $date => $attendances) {
+                                            $dayMinutes = 0;
+                                            foreach($attendances as $att) {
+                                                if ($att->arrival_time && $att->departure_time) {
+                                                    $start = \Carbon\Carbon::parse($att->date . ' ' . $att->arrival_time);
+                                                    $end = \Carbon\Carbon::parse($att->date . ' ' . $att->departure_time);
+                                                    
+                                                    // Handle crossing midnight
+                                                    if ($end->lessThan($start)) {
+                                                        $end->addDay();
+                                                    }
+                                                    
+                                                    $dayMinutes += $end->diffInMinutes($start);
+                                                }
                                             }
+                                            
+                                            if ($dayMinutes > 0 && $worker->shift === 'day') {
+                                                $dayMinutes = max(0, $dayMinutes - 120); // 2h break for day workers
+                                            }
+                                            $totalMinutes += $dayMinutes;
                                         }
                                         $totalHours = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
                                     @endphp
@@ -240,9 +256,12 @@
                                 @forelse($nightWorkers as $index => $worker)
                                     @php
                                         $totalMinutesNight = 0;
-                                        foreach($worker->attendances as $att) {
-                                            if ($att->status === 'present') {
-                                                $totalMinutesNight += 240; // 4 hours for night shift by default
+                                        $groupedAttendancesNight = $worker->attendances->groupBy('date');
+                                        foreach($groupedAttendancesNight as $date => $attendances) {
+                                            foreach($attendances as $att) {
+                                                if ($att->status === 'present') {
+                                                    $totalMinutesNight += 240; // 4 hours fixed for night shift status
+                                                }
                                             }
                                         }
                                         $totalHoursNight = floor($totalMinutesNight / 60) . 'h' . ($totalMinutesNight % 60 > 0 ? sprintf('%02d', $totalMinutesNight % 60) : '');

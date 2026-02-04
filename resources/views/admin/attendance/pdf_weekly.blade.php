@@ -95,13 +95,21 @@
                 @foreach($dayWorkers as $index => $worker)
                     @php
                         $totalMinutes = 0;
-                        foreach($worker->attendances as $att) {
-                            if ($att->arrival_time && $att->departure_time) {
-                                $start = \Carbon\Carbon::parse($att->arrival_time);
-                                $end = \Carbon\Carbon::parse($att->departure_time);
-                                $duration = $end->diffInMinutes($start);
-                                $totalMinutes += max(0, $duration - 120); // Déduction 2h pause
+                        $groupedAttendances = $worker->attendances->groupBy('date');
+                        foreach($groupedAttendances as $date => $attendances) {
+                            $dayMinutes = 0;
+                            foreach($attendances as $att) {
+                                if ($att->arrival_time && $att->departure_time) {
+                                    $start = \Carbon\Carbon::parse($att->date . ' ' . $att->arrival_time);
+                                    $end = \Carbon\Carbon::parse($att->date . ' ' . $att->departure_time);
+                                    if ($end->lessThan($start)) $end->addDay();
+                                    $dayMinutes += $end->diffInMinutes($start);
+                                }
                             }
+                            if ($dayMinutes > 0) {
+                                $dayMinutes = max(0, $dayMinutes - 120);
+                            }
+                            $totalMinutes += $dayMinutes;
                         }
                         $totalHoursText = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
                     @endphp
