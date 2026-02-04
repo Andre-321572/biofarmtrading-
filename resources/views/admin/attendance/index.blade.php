@@ -145,7 +145,8 @@
                                             if ($att->arrival_time && $att->departure_time) {
                                                 $start = \Carbon\Carbon::parse($att->arrival_time);
                                                 $end = \Carbon\Carbon::parse($att->departure_time);
-                                                $totalMinutes += $end->diffInMinutes($start);
+                                                $duration = $end->diffInMinutes($start);
+                                                $totalMinutes += max(0, $duration - 120); // Déduction des 2h de pause
                                             }
                                         }
                                         $totalHours = floor($totalMinutes / 60) . 'h' . ($totalMinutes % 60 > 0 ? sprintf('%02d', $totalMinutes % 60) : '');
@@ -157,38 +158,21 @@
                                         
                                         @foreach($days as $day)
                                             @php
-                                                $attMatin = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', 'morning')->first();
-                                                $attAprem = $worker->attendances->where('date', $day->format('Y-m-d'))->where('session', 'afternoon')->first();
+                                                $att = $worker->attendances->where('date', $day->format('Y-m-d'))->first();
                                             @endphp
-                                            <td colspan="2" class="p-0 border-r border-slate-100 bg-white">
-                                                <!-- Matin -->
-                                                <div class="flex border-b border-slate-50 items-center h-7 group/row">
-                                                    <span class="text-[7px] font-bold text-slate-300 px-1 select-none">M</span>
-                                                    <input type="time" 
-                                                        value="{{ $attMatin && $attMatin->arrival_time ? \Carbon\Carbon::parse($attMatin->arrival_time)->format('H:i') : '' }}"
-                                                        onfocus="this.showPicker()" onclick="this.showPicker()"
-                                                        onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'morning', 'arrival_time')"
-                                                        class="w-full h-full border-none bg-transparent text-[9px] font-black p-0 text-center focus:ring-1 focus:ring-green-500/20 focus:bg-white transition-all">
-                                                    <input type="time" 
-                                                        value="{{ $attMatin && $attMatin->departure_time ? \Carbon\Carbon::parse($attMatin->departure_time)->format('H:i') : '' }}"
-                                                        onfocus="this.showPicker()" onclick="this.showPicker()"
-                                                        onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'morning', 'departure_time')"
-                                                        class="w-full h-full border-none bg-transparent text-[9px] font-black p-0 text-center focus:ring-1 focus:ring-green-500/20 focus:bg-white transition-all border-l border-slate-50">
-                                                </div>
-                                                <!-- Après-midi -->
-                                                <div class="flex items-center h-7 group/row">
-                                                    <span class="text-[7px] font-bold text-slate-300 px-1 select-none">S</span>
-                                                    <input type="time" 
-                                                        value="{{ $attAprem && $attAprem->arrival_time ? \Carbon\Carbon::parse($attAprem->arrival_time)->format('H:i') : '' }}"
-                                                        onfocus="this.showPicker()" onclick="this.showPicker()"
-                                                        onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'afternoon', 'arrival_time')"
-                                                        class="w-full h-full border-none bg-transparent text-[9px] font-black p-0 text-center focus:ring-1 focus:ring-green-500/20 focus:bg-white transition-all">
-                                                    <input type="time" 
-                                                        value="{{ $attAprem && $attAprem->departure_time ? \Carbon\Carbon::parse($attAprem->departure_time)->format('H:i') : '' }}"
-                                                        onfocus="this.showPicker()" onclick="this.showPicker()"
-                                                        onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'afternoon', 'departure_time')"
-                                                        class="w-full h-full border-none bg-transparent text-[9px] font-black p-0 text-center focus:ring-1 focus:ring-green-500/20 focus:bg-white transition-all border-l border-slate-50">
-                                                </div>
+                                            <td class="p-0 text-center h-12 w-12 border-r border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                                                <input type="time" 
+                                                    value="{{ $att && $att->arrival_time ? \Carbon\Carbon::parse($att->arrival_time)->format('H:i') : '' }}"
+                                                    onfocus="this.showPicker()" onclick="this.showPicker()"
+                                                    onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'arrival_time')"
+                                                    class="w-full h-full border-none bg-white/50 text-xs font-black p-1 text-center focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all">
+                                            </td>
+                                            <td class="p-0 text-center h-12 w-12 border-r border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                                                <input type="time" 
+                                                    value="{{ $att && $att->departure_time ? \Carbon\Carbon::parse($att->departure_time)->format('H:i') : '' }}"
+                                                    onfocus="this.showPicker()" onclick="this.showPicker()"
+                                                    onchange="updateTime(this, '{{ $worker->id }}', '{{ $day->format('Y-m-d') }}', 'departure_time')"
+                                                    class="w-full h-full border-none bg-white/50 text-xs font-black p-1 text-center focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all">
                                             </td>
                                         @endforeach
                                         
@@ -377,13 +361,13 @@
         const updateUrl = "{{ route($prefix . 'attendance.update') }}";
         const csrfToken = "{{ csrf_token() }}";
 
-        function updateTime(input, workerId, date, session, field) {
+        function updateTime(input, workerId, date, field) {
             const val = input.value;
             
             fetch(updateUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                body: JSON.stringify({ worker_id: workerId, date: date, session: session, [field]: val })
+                body: JSON.stringify({ worker_id: workerId, date: date, session: 'morning', [field]: val })
             })
             .then(response => response.json())
             .then(data => {
