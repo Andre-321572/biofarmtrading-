@@ -118,9 +118,9 @@
                         <table class="w-full border-collapse text-[11px] font-medium leading-none min-w-[1000px]">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100 italic">
-                                    <th rowspan="2" class="px-2 py-4 w-10 text-center text-slate-400 border-r border-slate-100 sticky left-0 bg-slate-50/50 z-10">N°</th>
-                                    <th rowspan="2" class="px-4 py-4 text-left w-48 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-10 bg-slate-50/50 z-10">Nom</th>
-                                    <th rowspan="2" class="px-4 py-4 text-left w-56 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[12.5rem] bg-slate-50/50 z-10">Prénoms</th>
+                                    <th rowspan="2" class="px-2 py-4 w-10 text-center text-slate-400 border-r border-slate-100 sticky left-0 bg-slate-50 z-20">N°</th>
+                                    <th rowspan="2" class="px-4 py-4 text-left w-48 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-10 bg-slate-50 z-20">Nom</th>
+                                    <th rowspan="2" class="px-4 py-4 text-left w-56 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[14.5rem] bg-slate-50 z-20">Prénoms</th>
                                     @foreach($days as $day)
                                         <th colspan="2" class="px-1 py-3 text-center border-r border-slate-100 {{ $day->isToday() ? 'bg-green-50/50' : '' }}">
                                             <span class="block uppercase font-black text-slate-700 tracking-tighter">{{ $day->translatedFormat('l') }}</span>
@@ -155,7 +155,7 @@
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
                                         <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $index + 1 }}</td>
                                         <td class="px-4 py-3 font-black text-slate-800 uppercase tracking-tighter border-r border-slate-100 sticky left-10 bg-white group-hover:bg-slate-50 z-10">{{ $worker->last_name }}</td>
-                                        <td class="px-4 py-3 text-slate-500 font-bold italic border-r border-slate-100 sticky left-[12.5rem] bg-white group-hover:bg-slate-50 z-10">{{ $worker->first_name }}</td>
+                                        <td class="px-4 py-3 text-slate-500 font-bold italic border-r border-slate-100 sticky left-[14.5rem] bg-white group-hover:bg-slate-50 z-10">{{ $worker->first_name }}</td>
                                         
                                         @foreach($days as $day)
                                             @php
@@ -222,9 +222,9 @@
                         <table class="w-full border-collapse text-[11px] font-medium leading-none min-w-[1000px]">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100 italic">
-                                    <th class="px-2 py-4 w-10 text-center text-slate-400 border-r border-slate-100 sticky left-0 bg-slate-50/50 z-10">N°</th>
-                                    <th class="px-4 py-4 text-left w-48 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-10 bg-slate-50/50 z-10">Nom</th>
-                                    <th class="px-4 py-4 text-left w-56 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[12.5rem] bg-slate-50/50 z-10">Prénoms</th>
+                                    <th class="px-2 py-4 w-10 text-center text-slate-400 border-r border-slate-100 sticky left-0 bg-slate-50 z-20">N°</th>
+                                    <th class="px-4 py-4 text-left w-48 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-10 bg-slate-50 z-20">Nom</th>
+                                    <th class="px-4 py-4 text-left w-56 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[14.5rem] bg-slate-50 z-20">Prénoms</th>
                                     @foreach($days as $day)
                                         <th class="px-1 py-3 text-center border-r border-slate-100 {{ $day->isToday() ? 'bg-green-50/50' : '' }}">
                                             <span class="block uppercase font-black text-slate-700 tracking-tighter">{{ $day->translatedFormat('l') }}</span>
@@ -249,7 +249,7 @@
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
                                         <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $index + 1 }}</td>
                                         <td class="px-4 py-3 font-black text-slate-800 uppercase tracking-tighter border-r border-slate-100 sticky left-10 bg-white group-hover:bg-slate-50 z-10">{{ $worker->last_name }}</td>
-                                        <td class="px-4 py-3 text-slate-500 font-bold italic border-r border-slate-100 sticky left-[12.5rem] bg-white group-hover:bg-slate-50 z-10">{{ $worker->first_name }}</td>
+                                        <td class="px-4 py-3 text-slate-500 font-bold italic border-r border-slate-100 sticky left-[14.5rem] bg-white group-hover:bg-slate-50 z-10">{{ $worker->first_name }}</td>
                                         
                                         @foreach($days as $day)
                                             @php
