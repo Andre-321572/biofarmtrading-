@@ -148,21 +148,30 @@
                                             $att = $worker->attendances->where('date', $dateStr)->first();
                                             
                                             if ($att && $att->arrival_time && $att->departure_time) {
+                                                // Deep debug: Show raw values
+                                                $rawArr = $att->arrival_time;
+                                                $rawDep = $att->departure_time;
+                                                
                                                 // Force proper time extraction from database format
                                                 $arrivalTime = \Carbon\Carbon::parse($att->arrival_time)->format('H:i:s');
                                                 $departureTime = \Carbon\Carbon::parse($att->departure_time)->format('H:i:s');
                                                 
                                                 $start = \Carbon\Carbon::parse($dateStr . ' ' . $arrivalTime);
                                                 $end = \Carbon\Carbon::parse($dateStr . ' ' . $departureTime);
+                                                
+                                                // Debug timestamps
+                                                $startTs = $start->toDateTimeString();
+                                                $endTs = $end->toDateTimeString();
+                                                
                                                 if ($end->lessThan($start)) $end->addDay();
                                                 
                                                 $dayDuration = $end->diffInMinutes($start);
                                                 $dayHT = max(0, $dayDuration - 120);
                                                 $totalMinutes += $dayHT;
                                                 
-                                                $debugInfo[] = "$dateStr: {$arrivalTime}-{$departureTime} = {$dayDuration}min - 120 = {$dayHT}min";
+                                                $debugInfo[] = "$dateStr: RAW[{$rawArr}→{$rawDep}] PARSED[{$startTs}→{$endTs}] = {$dayDuration}min";
                                             } else {
-                                                $debugInfo[] = "$dateStr: NO DATA (att=" . ($att ? 'yes' : 'no') . ", arr=" . ($att?->arrival_time ?? 'null') . ", dep=" . ($att?->departure_time ?? 'null') . ")";
+                                                $debugInfo[] = "$dateStr: NO DATA";
                                             }
                                         }
                                         
@@ -172,7 +181,7 @@
                                         
                                         // Debug: Show calculation details for first worker
                                         if ($index == 0) {
-                                            $totalHours .= ' [DEBUG: ' . implode(' | ', $debugInfo) . ' | TOTAL=' . $totalMinutes . 'min]';
+                                            $totalHours .= ' [' . implode(' | ', $debugInfo) . ']';
                                         }
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
