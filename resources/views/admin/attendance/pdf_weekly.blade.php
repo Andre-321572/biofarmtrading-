@@ -167,11 +167,6 @@
 
         <div class="shift-title" style="background-color: #15803d; color: white; border-left: none; padding: 10px;">Équipe de Nuit</div>
         
-        <div style="margin-bottom: 10px; font-size: 9pt;">
-            <span style="font-weight: bold;">BIO FARM TRADING RCCM : TG-LOM 2019 B 1488</span><br>
-            <span style="color: #666;">NIF 1001469316 | Tél : (+228) 92 02 01 10</span>
-        </div>
-
         <table>
             <thead>
                 <tr>
