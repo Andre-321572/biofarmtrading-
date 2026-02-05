@@ -71,7 +71,7 @@
         <div class="green-line"></div>
     </div>
 
-    <div class="week-info">
+    <div class="week-info" style="text-transform: uppercase;">
         liste de pointage journalier {{ $startOfWeek->format('d') }} au {{ $endOfWeek->translatedFormat('d F Y') }}
     </div>
 
@@ -146,6 +146,25 @@
 
     @if($nightWorkers->count() > 0)
         <div class="page-break"></div>
+        
+        <!-- Full Header for Page 2 -->
+        <div class="header" style="text-align: left;">
+            <div style="display: table; width: 100%;">
+                <div style="display: table-cell; vertical-align: middle; width: 100px;">
+                    <img src="{{ public_path('images/biofarm_logo.jpg') }}" style="width: 80px; height: auto;">
+                </div>
+                <div style="display: table-cell; vertical-align: middle; text-align: center; padding-right: 100px;">
+                    <div class="title">BIO FARM TRADING</div>
+                    <div class="subtitle">Production - Transformation - Commercialisation des produits agricoles biologiques</div>
+                </div>
+            </div>
+            <div class="green-line"></div>
+        </div>
+
+        <div class="week-info" style="text-transform: uppercase;">
+            liste de pointage journalier {{ $startOfWeek->format('d') }} au {{ $endOfWeek->translatedFormat('d F Y') }}
+        </div>
+
         <div class="shift-title" style="background-color: #15803d; color: white; border-left: none; padding: 10px;">Équipe de Nuit</div>
         
         <div style="margin-bottom: 10px; font-size: 9pt;">
