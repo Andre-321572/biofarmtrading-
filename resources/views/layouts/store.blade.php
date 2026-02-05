@@ -12,6 +12,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#22c55e">
+    <link rel="apple-touch-icon" href="/images/logo.jpg">
+
     <!-- Tailwind & Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
@@ -43,9 +48,8 @@
             <div class="flex justify-between items-center h-20">
                 <!-- Logo: Always Visible -->
                 <div class="flex items-center">
-                    <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center space-x-3">
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Bio Farm Trading Logo" class="h-10 sm:h-12 w-auto">
-                        <span class="text-lg sm:text-xl font-bold tracking-tight text-gray-900">Bio Farm <span class="text-green-600">Trading</span></span>
+                    <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center">
+                        <img src="{{ asset('images/joossi_kinu_logo.png') }}" alt="Joossi x Kinu Logo" class="h-16 sm:h-20 w-auto object-contain">
                     </a>
                 </div>
 
@@ -113,9 +117,8 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                         <div class="col-span-1 md:col-span-2">
-                            <div class="flex items-center space-x-3 mb-4">
-                                <img src="{{ asset('images/logo.jpg') }}" alt="Bio Farm Trading Logo" class="h-10 w-auto">
-                                <span class="text-lg font-bold tracking-tight text-gray-900">Bio Farm <span class="text-green-600">Trading</span></span>
+                            <div class="flex items-center mb-4">
+                                <img src="{{ asset('images/joossi_kinu_logo.png') }}" alt="Joossi x Kinu Logo" class="h-16 w-auto">
                             </div>
                             <p class="text-gray-500 max-w-sm">
                                 Produits 100% Bio, sans conservateurs ni additifs. Transformés avec passion au Togo.
@@ -261,5 +264,15 @@
             </a>
         @endauth
     </div>
+    <!-- PWA Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service worker registered.', reg))
+                    .catch(err => console.log('Service worker registration failed:', err));
+            });
+        }
+    </script>
 </body>
 </html>
