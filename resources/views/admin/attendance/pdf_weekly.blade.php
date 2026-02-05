@@ -26,6 +26,10 @@
             font-size: 10pt;
         }
 
+        .page-break {
+            page-break-before: always;
+        }
+
         table { width: 100%; border-collapse: collapse; border: 1px solid #000; margin-bottom: 10px; }
         th, td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: middle; font-size: 8pt; }
         
@@ -141,7 +145,14 @@
     @endif
 
     @if($nightWorkers->count() > 0)
-        <div class="shift-title">Équipe de Nuit</div>
+        <div class="page-break"></div>
+        <div class="shift-title" style="background-color: #15803d; color: white; border-left: none; padding: 10px;">Équipe de Nuit</div>
+        
+        <div style="margin-bottom: 10px; font-size: 9pt;">
+            <span style="font-weight: bold;">BIO FARM TRADING RCCM : TG-LOM 2019 B 1488</span><br>
+            <span style="color: #666;">NIF 1001469316 | Tél : (+228) 92 02 01 10</span>
+        </div>
+
         <table>
             <thead>
                 <tr>
