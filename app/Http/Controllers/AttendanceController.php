@@ -69,7 +69,7 @@ class AttendanceController extends Controller
             if ($request->departure_time) $data['status'] = 'present';
         }
 
-        Attendance::updateOrCreate(
+        $att = Attendance::updateOrCreate(
             [
                 'worker_id' => $request->worker_id,
                 'date' => $request->date,
@@ -78,7 +78,62 @@ class AttendanceController extends Controller
             $data
         );
 
-        return response()->json(['success' => true]);
+        // Recalculate total hours for the worker for the week containing this date
+        $worker = Worker::with('attendances')->find($request->worker_id);
+        $date = Carbon::parse($request->date);
+        $startOfWeek = $date->copy()->startOfWeek();
+        $endOfWeek = $date->copy()->endOfWeek();
+
+        $weekAttendances = $worker->attendances()
+            ->whereBetween('date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')])
+            ->get();
+
+        $totalMinutes = 0;
+        
+        if ($worker->shift === 'night') {
+            // Night workers: 4 hours fixed per present day
+            foreach($weekAttendances as $wa) {
+                if ($wa->status === 'present') {
+                    $totalMinutes += 240;
+                }
+            }
+        } else {
+            // Day workers: (Duration - 2h pause) per day logic
+            $days = [];
+            $current = $startOfWeek->copy();
+            while ($current <= $endOfWeek) {
+                $days[] = $current->copy();
+                $current->addDay();
+            }
+
+            foreach($days as $day) {
+                $dateStr = $day->format('Y-m-d');
+                $dayAtt = $weekAttendances->where('date', $dateStr)->first();
+                
+                if ($dayAtt && $dayAtt->arrival_time && $dayAtt->departure_time) {
+                    $arrivalTime = Carbon::parse($dayAtt->arrival_time)->format('H:i:s');
+                    $departureTime = Carbon::parse($dayAtt->departure_time)->format('H:i:s');
+                    
+                    $start = Carbon::parse($dateStr . ' ' . $arrivalTime);
+                    $end = Carbon::parse($dateStr . ' ' . $departureTime);
+                    
+                    if ($end->lessThan($start)) $end->addDay();
+                    
+                    $dayDuration = $start->diffInMinutes($end);
+                    $totalMinutes += max(0, $dayDuration - 120);
+                }
+            }
+        }
+
+        $h = floor($totalMinutes / 60);
+        $m = $totalMinutes % 60;
+        $totalHours = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
+
+        return response()->json([
+            'success' => true, 
+            'total_hours' => $totalHours,
+            'worker_id' => $worker->id
+        ]);
     }
 
     /**

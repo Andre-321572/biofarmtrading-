@@ -190,7 +190,7 @@
                                             </td>
                                         @endforeach
                                         
-                                        <td class="py-3 text-center font-black bg-slate-50/50 text-slate-700 border-r border-slate-100">{{ $totalHours }}</td>
+                                        <td id="ht-{{ $worker->id }}" class="py-3 text-center font-black bg-slate-50/50 text-slate-700 border-r border-slate-100">{{ $totalHours }}</td>
 
                                         <td class="py-3 px-2 text-center group-hover:bg-slate-50/80 transition-all">
                                             <div class="flex items-center justify-center gap-1">
@@ -288,7 +288,7 @@
                                             </td>
                                         @endforeach
                                         
-                                        <td class="py-3 text-center font-black bg-slate-50/50 text-indigo-700 border-r border-slate-100">{{ $totalHoursNight }}</td>
+                                        <td id="ht-{{ $worker->id }}" class="py-3 text-center font-black bg-slate-50/50 text-indigo-700 border-r border-slate-100">{{ $totalHoursNight }}</td>
 
                                         <td class="py-3 px-2 text-center group-hover:bg-slate-50/80 transition-all">
                                             <div class="flex items-center justify-center gap-1">
@@ -389,6 +389,12 @@
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
+                    // Update HT cell automatically
+                    const htCell = document.getElementById(`ht-${workerId}`);
+                    if(htCell && data.total_hours !== undefined) {
+                        htCell.innerText = data.total_hours;
+                    }
+
                     // Optional: Visual feedback of success (green border?)
                     input.classList.remove('text-slate-600');
                     input.classList.add('text-green-600');
@@ -422,6 +428,15 @@
                 body: JSON.stringify({ worker_id: workerId, date: date, session: session, status: nextStatus })
             })
             .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Update HT cell automatically
+                    const htCell = document.getElementById(`ht-${workerId}`);
+                    if(htCell && data.total_hours !== undefined) {
+                        htCell.innerText = data.total_hours;
+                    }
+                }
+            })
             .catch(error => {
                 console.error('Error:', error);
                 updateVisual(iconDiv, currentStatus);
