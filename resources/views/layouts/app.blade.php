@@ -43,7 +43,7 @@
             <!-- Brand -->
             <div class="h-28 flex items-center px-6 border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
                 <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full">
-                    <img src="{{ asset('images/admin_sidebar_logo.jpg') }}" alt="Bio Farm Trading" class="h-20 w-auto object-contain rounded-lg">
+                    <img src="/images/admin_sidebar_logo.jpg" alt="Bio Farm Trading" class="h-20 w-auto object-contain rounded-xl bg-white p-1 shadow-sm" onerror="this.src='{{ asset('images/logo.jpg') }}'">
                 </a>
             </div>
 
