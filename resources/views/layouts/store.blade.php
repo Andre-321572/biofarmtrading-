@@ -48,8 +48,9 @@
             <div class="flex justify-between items-center h-20">
                 <!-- Logo: Always Visible -->
                 <div class="flex items-center">
-                    <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center">
-                        <img src="{{ asset('images/joossi_kinu_logo.jpg') }}" alt="Joossi x Kinu Logo" class="h-16 sm:h-20 w-auto object-contain">
+                    <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center space-x-3">
+                        <img src="{{ asset('images/logo.jpg') }}" alt="Bio Farm Trading Logo" class="h-10 sm:h-12 w-auto">
+                        <span class="text-lg sm:text-xl font-bold tracking-tight text-gray-900">Bio Farm <span class="text-green-600">Trading</span></span>
                     </a>
                 </div>
 
@@ -117,8 +118,9 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                         <div class="col-span-1 md:col-span-2">
-                            <div class="flex items-center mb-4">
-                                <img src="{{ asset('images/joossi_kinu_logo.jpg') }}" alt="Joossi x Kinu Logo" class="h-16 w-auto">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <img src="{{ asset('images/logo.jpg') }}" alt="Bio Farm Trading Logo" class="h-10 w-auto">
+                                <span class="text-lg font-bold tracking-tight text-gray-900">Bio Farm <span class="text-green-600">Trading</span></span>
                             </div>
                             <p class="text-gray-500 max-w-sm">
                                 Produits 100% Bio, sans conservateurs ni additifs. Transformés avec passion au Togo.
