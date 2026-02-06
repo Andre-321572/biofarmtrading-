@@ -8,12 +8,12 @@
     "description": "Joossi x Kinu - Fruits séchés et jus d'ananas 100% Bio",
     "icons": [
         {
-            "src": "/images/joossi_kinu_final.png",
+            "src": "/images/pwa_icon.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/images/joossi_kinu_final.png",
+            "src": "/images/pwa_icon.png",
             "sizes": "512x512",
             "type": "image/png"
         }

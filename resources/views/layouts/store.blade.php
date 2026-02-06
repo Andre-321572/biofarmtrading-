@@ -15,7 +15,7 @@
     <!-- PWA Support -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#22c55e">
-    <link rel="apple-touch-icon" href="/images/joossi_kinu_final.png">
+    <link rel="apple-touch-icon" href="/images/pwa_icon.png">
 
     <!-- Tailwind & Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
