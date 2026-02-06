@@ -15,6 +15,8 @@
     <!-- PWA Support -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#22c55e">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/pwa_icon.png') }}">
     <link rel="apple-touch-icon" href="/images/pwa_icon.png">
 
     <!-- Tailwind & Vite -->

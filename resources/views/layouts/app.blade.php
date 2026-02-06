@@ -10,7 +10,9 @@
         <!-- PWA Support -->
         <link rel="manifest" href="/manifest.json">
         <meta name="theme-color" content="#22c55e">
-        <link rel="apple-touch-icon" href="/images/logo.jpg">
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('images/pwa_icon.png') }}">
+        <link rel="apple-touch-icon" href="/images/pwa_icon.png">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
