@@ -213,7 +213,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
         <div class="relative">
             <div class="aspect-square rounded-[3rem] bg-white overflow-hidden shadow-2xl skew-y-3 border border-gray-50 flex items-center justify-center p-12">
-                 <img src="{{ asset('images/joossi_kinu_brand.png') }}" alt="Joossi x Kinu Logo" class="w-full h-auto transform -rotate-3">
+                 <img src="{{ asset('images/logo.jpg') }}" alt="Bio Farm Trading Logo" class="w-full h-auto transform -rotate-3">
             </div>
             <div class="absolute -bottom-10 -right-10 bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hidden md:block">
                 <p class="text-5xl font-black text-green-600 mb-2">100% Bio</p>
