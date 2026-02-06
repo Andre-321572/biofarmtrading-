@@ -49,7 +49,7 @@
                             <span class="text-xl font-bold text-white tracking-tight uppercase">Bio Farm <span class="text-green-500">Trading</span></span>
                         </div>
                     @else
-                        <img src="{{ asset('images/joossi_kinu_logo.png') }}" alt="Joossi x Kinu Logo" class="h-12 w-auto object-contain rounded-lg">
+                        <img src="{{ asset('images/joossi_kinu_logo.jpg') }}" alt="Joossi x Kinu Logo" class="h-12 w-auto object-contain rounded-lg">
                     @endif
                 </a>
             </div>

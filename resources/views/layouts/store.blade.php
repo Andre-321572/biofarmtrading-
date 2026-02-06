@@ -49,7 +49,7 @@
                 <!-- Logo: Always Visible -->
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center">
-                        <img src="{{ asset('images/joossi_kinu_logo.png') }}" alt="Joossi x Kinu Logo" class="h-16 sm:h-20 w-auto object-contain">
+                        <img src="{{ asset('images/joossi_kinu_logo.jpg') }}" alt="Joossi x Kinu Logo" class="h-16 sm:h-20 w-auto object-contain">
                     </a>
                 </div>
 
@@ -118,7 +118,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                         <div class="col-span-1 md:col-span-2">
                             <div class="flex items-center mb-4">
-                                <img src="{{ asset('images/joossi_kinu_logo.png') }}" alt="Joossi x Kinu Logo" class="h-16 w-auto">
+                                <img src="{{ asset('images/joossi_kinu_logo.jpg') }}" alt="Joossi x Kinu Logo" class="h-16 w-auto">
                             </div>
                             <p class="text-gray-500 max-w-sm">
                                 Produits 100% Bio, sans conservateurs ni additifs. Transformés avec passion au Togo.
