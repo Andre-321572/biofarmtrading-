@@ -15,6 +15,9 @@
     <!-- PWA Support -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#22c55e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JoossiKinu">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/pwa_icon.png') }}">
     <link rel="apple-touch-icon" href="/images/pwa_icon.png">
