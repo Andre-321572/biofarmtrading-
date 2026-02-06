@@ -7,15 +7,8 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- PWA Support -->
-        <link rel="manifest" href="{{ asset('manifest.json') }}">
-        <meta name="theme-color" content="#22c55e">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="JoossiKinu Admin">
-        <!-- Favicon -->
-        <link rel="icon" type="image/png" href="{{ asset('images/pwa_icon.png') }}">
-        <link rel="apple-touch-icon" href="/images/pwa_icon.png">
+        <!-- PWA Meta Tags -->
+        @laravelPWA
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -168,6 +161,14 @@
                 </div>
 
                 <div class="flex items-center gap-3 sm:gap-6">
+                    <!-- PWA Install Button -->
+                    <button id="install-pwa" class="hidden p-2 text-green-600 hover:bg-green-50 font-semibold rounded-lg transition-colors duration-200">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            <span class="hidden sm:inline">Installer</span>
+                        </span>
+                    </button>
+
                     <!-- Notifications -->
                     <button class="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +206,7 @@
         <script>
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register("{{ asset('sw.js') }}")
+                    navigator.serviceWorker.register("{{ asset('serviceworker.js') }}")
                         .then(reg => console.log('Service worker registered.', reg))
                         .catch(err => console.log('Service worker registration failed:', err));
                 });

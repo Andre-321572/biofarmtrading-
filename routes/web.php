@@ -83,5 +83,9 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+Route::get('/offline', function () {
+    return view('offline');
+});
+
 require __DIR__.'/auth.php';
 
