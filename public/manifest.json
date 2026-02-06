@@ -1,21 +1,21 @@
 {
-    "name": "Bio Farm Trading",
-    "short_name": "Bio Farm",
+    "name": "Joossi x Kinu",
+    "short_name": "Joossi Kinu",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#22c55e",
-    "description": "Système de gestion et boutique en ligne Bio Farm Trading",
+    "description": "Joossi x Kinu - Fruits séchés et jus d'ananas 100% Bio",
     "icons": [
         {
-            "src": "/images/logo.jpg",
+            "src": "/images/joossi_kinu_final.png",
             "sizes": "192x192",
-            "type": "image/jpeg"
+            "type": "image/png"
         },
         {
-            "src": "/images/logo.jpg",
+            "src": "/images/joossi_kinu_final.png",
             "sizes": "512x512",
-            "type": "image/jpeg"
+            "type": "image/png"
         }
     ]
 }
