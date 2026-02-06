@@ -22,6 +22,7 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
+        <script src="{{ asset('js/alpine.js') }}" defer></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @if(Auth::check() && Auth::user()->role === 'admin')
             <script src="{{ asset('js/admin-notifications.js') }}" defer></script>
@@ -199,7 +200,8 @@
                 </div>
             </main>
         </div>
-        <!-- PWA Registration -->
+        <!-- PWA Registration & Install -->
+        <script src="{{ asset('js/pwa-install.js') }}" defer></script>
         <script>
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {

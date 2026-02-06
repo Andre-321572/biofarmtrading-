@@ -22,7 +22,8 @@
     <link rel="icon" type="image/png" href="{{ asset('images/pwa_icon.png') }}">
     <link rel="apple-touch-icon" href="/images/pwa_icon.png">
 
-    <!-- Tailwind & Vite -->
+    <!-- Core Scripts -->
+    <script src="{{ asset('js/alpine.js') }}" defer></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Custom Style for Premium Look -->
@@ -269,7 +270,8 @@
             </a>
         @endauth
     </div>
-    <!-- PWA Registration -->
+    <!-- PWA Registration & Install -->
+    <script src="{{ asset('js/pwa-install.js') }}" defer></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
