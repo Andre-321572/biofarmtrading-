@@ -41,9 +41,9 @@
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
                class="fixed lg:static w-72 h-full bg-gray-900 text-white flex-shrink-0 flex flex-col transition-all duration-300 shadow-2xl z-40">
             <!-- Brand -->
-            <div class="h-20 flex items-center px-6 border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
-                <a href="{{ route('dashboard') }}" class="flex items-center">
-                    <img src="{{ asset('images/joossi_kinu_logo_white.png') }}" alt="Joossi x Kinu Logo" class="h-12 w-auto object-contain">
+            <div class="h-28 flex items-center px-6 border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
+                <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full">
+                    <img src="{{ asset('images/admin_sidebar_logo.jpg') }}" alt="Bio Farm Trading" class="h-20 w-auto object-contain rounded-lg">
                 </a>
             </div>
 
