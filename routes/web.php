@@ -7,13 +7,21 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/repair-database', function() {
+    $users = \App\Models\User::all(['id', 'email', 'role']);
     $u = \App\Models\User::where('email', 'arrivage@biofarm.com')->first();
+    $output = "Liste des utilisateurs sur le serveur :<br>";
+    foreach($users as $user) {
+        $output .= "- ID: {$user->id} | Email: {$user->email} | Role: {$user->role}<br>";
+    }
+    
     if($u) {
         $u->password = \Illuminate\Support\Facades\Hash::make('password123');
         $u->save();
-        return "Compte arrivage@biofarm.com mis à jour avec 'password123' !";
+        $output .= "<br><b>SUCCESS:</b> Mot de passe de arrivage@biofarm.com mis à jour à 'password123'.";
+    } else {
+        $output .= "<br><b>ERROR:</b> arrivage@biofarm.com non trouvé dans CETTE base de données.";
     }
-    return "Utilisateur non trouvé.";
+    return $output;
 });
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
