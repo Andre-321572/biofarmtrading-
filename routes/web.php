@@ -6,6 +6,16 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/repair-database', function() {
+    $u = \App\Models\User::where('email', 'arrivage@biofarm.com')->first();
+    if($u) {
+        $u->password = \Illuminate\Support\Facades\Hash::make('password123');
+        $u->save();
+        return "Compte arrivage@biofarm.com mis à jour avec 'password123' !";
+    }
+    return "Utilisateur non trouvé.";
+});
+
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/product/{product}/review', [\App\Http\Controllers\ReviewController::class, 'store'])->middleware(['auth', 'throttle:5,1'])->name('products.review.store');
