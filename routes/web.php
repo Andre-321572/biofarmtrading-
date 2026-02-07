@@ -27,6 +27,13 @@ Route::get('/repair-login', function() {
         $arrivage->save();
         $output .= "<br><b>UTILISATEUR MIS À JOUR :</b> Mot de passe de arrivage@biofarm.com réinitialisé à 'password123'.";
     }
+
+    $output .= "<br><br>--- Diagnostic Tables ---<br>";
+    $tables = ['arrivages', 'arrivage_details'];
+    foreach ($tables as $table) {
+        $exists = \Illuminate\Support\Facades\Schema::hasTable($table);
+        $output .= "Table '$table' : " . ($exists ? "✅ EXISTE" : "❌ MANQUANTE") . "<br>";
+    }
     
     return $output . "<br><br><a href='/login'>Aller à la page de connexion</a>";
 });
