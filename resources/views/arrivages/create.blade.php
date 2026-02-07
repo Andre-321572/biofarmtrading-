@@ -26,49 +26,47 @@
                 </div>
 
                 <!-- Keypad -->
-                <div class="p-6" style="background-color: #000000; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                <div class="p-6 pb-8" style="background-color: #000000; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(5, 64px); gap: 12px;">
                     <!-- Row 1 -->
                     <button type="button" @click="clearCalc()" class="col-span-2 text-black text-xl font-bold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #a5a5a5; height: 60px;">AC</button>
+                            style="background-color: #a5a5a5;">AC</button>
                     <button type="button" @click="backspaceCalc()" class="text-white text-xl font-bold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">⌫</button>
+                            style="background-color: #333333;">⌫</button>
                     <button type="button" @click="appendCalc('+')" class="text-white text-3xl font-bold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #ff9f0a; height: 60px;">+</button>
+                            style="background-color: #ff9f0a;">+</button>
 
                     <!-- Row 2 -->
                     <button type="button" @click="appendCalc('7')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">7</button>
+                            style="background-color: #333333;">7</button>
                     <button type="button" @click="appendCalc('8')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">8</button>
+                            style="background-color: #333333;">8</button>
                     <button type="button" @click="appendCalc('9')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">9</button>
-                    <div style="height: 60px;"></div> <!-- Spacer -->
+                            style="background-color: #333333;">9</button>
+                    <div class="row-span-3"></div> <!-- Empty space under PLUS if needed or just gap -->
 
                     <!-- Row 3 -->
                     <button type="button" @click="appendCalc('4')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">4</button>
+                            style="background-color: #333333;">4</button>
                     <button type="button" @click="appendCalc('5')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">5</button>
+                            style="background-color: #333333;">5</button>
                     <button type="button" @click="appendCalc('6')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">6</button>
-                    <div style="height: 60px;"></div> <!-- Spacer -->
+                            style="background-color: #333333;">6</button>
 
                     <!-- Row 4 -->
                     <button type="button" @click="appendCalc('1')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">1</button>
+                            style="background-color: #333333;">1</button>
                     <button type="button" @click="appendCalc('2')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">2</button>
+                            style="background-color: #333333;">2</button>
                     <button type="button" @click="appendCalc('3')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">3</button>
-                    <div style="height: 60px;"></div> <!-- Spacer -->
+                            style="background-color: #333333;">3</button>
 
                     <!-- Row 5 -->
                     <button type="button" @click="appendCalc('.')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">,</button>
+                            style="background-color: #333333;">,</button>
                     <button type="button" @click="appendCalc('0')" class="text-white text-2xl font-semibold rounded-full transition-all active:scale-95 flex items-center justify-center" 
-                            style="background-color: #333333; height: 60px;">0</button>
-                    <button type="button" @click="confirmCalc()" class="col-span-2 text-white text-lg font-bold rounded-full transition-all active:scale-95 flex items-center justify-center shadow-lg" 
-                            style="background-color: #ff9f0a; height: 60px;">
+                            style="background-color: #333333;">0</button>
+                    <button type="button" @click="confirmCalc()" class="col-span-2 text-white text-lg font-bold rounded-full transition-all active:scale-95 flex items-center justify-center" 
+                            style="background-color: #ff9f0a;">
                         VALIDER
                     </button>
                 </div>
