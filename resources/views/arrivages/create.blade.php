@@ -5,59 +5,70 @@
     
     <!-- Calculator Modal -->
     <div x-show="showCalculator" 
-         class="fixed inset-0 z-50 overflow-y-auto" 
+         class="fixed inset-0 z-[100] overflow-y-auto" 
          style="display: none;"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0">
+         @keydown.escape.window="showCalculator = false">
         
         <!-- Backdrop -->
-        <div class="fixed inset-0 bg-gray-900/75 transition-opacity" @click="showCalculator = false"></div>
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showCalculator = false"></div>
 
         <!-- Calculator Widget -->
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-2xl bg-[#1f1f1f] text-left shadow-xl transition-all sm:my-8 w-full max-w-sm border border-gray-700">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <div class="relative transform overflow-hidden rounded-[2.5rem] shadow-2xl transition-all w-full max-w-[320px] border border-white/10"
+                 style="background-color: #000000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
                 
                 <!-- Display -->
-                <div class="bg-[#1f1f1f] p-6 pb-2">
+                <div class="p-8 pb-4" style="background-color: #000000;">
                     <div class="text-right">
-                        <div class="text-gray-400 text-sm h-6 font-mono" x-text="calcExpression"></div>
-                        <div class="text-white text-5xl font-light tracking-tight mt-1" x-text="calcDisplay">0</div>
+                        <div class="text-gray-500 text-xs h-6 font-mono overflow-hidden whitespace-nowrap" x-text="calcExpression"></div>
+                        <div class="text-white text-5xl font-light tracking-tight mt-1 truncate" x-text="calcDisplay">0</div>
                     </div>
                 </div>
 
                 <!-- Keypad -->
-                <div class="grid grid-cols-4 gap-[1px] bg-[#1f1f1f] p-1">
+                <div class="grid grid-cols-4 gap-3 p-4" style="background-color: #000000;">
                     <!-- Row 1 -->
-                    <button @click="clearCalc()" class="col-span-2 bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-xl font-medium rounded-tl-lg m-px transition-colors">AC</button>
-                    <button @click="backspaceCalc()" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-xl font-medium m-px transition-colors">⌫</button>
-                    <button @click="appendCalc('+')" class="bg-[#ff9f0a] hover:bg-[#ffb23f] active:bg-[#d48406] text-white p-5 text-2xl font-medium rounded-tr-lg m-px transition-colors">+</button>
+                    <button type="button" @click="clearCalc()" class="col-span-2 text-black p-4 text-lg font-bold rounded-full transition-all active:scale-95" 
+                            style="background-color: #a5a5a5;">AC</button>
+                    <button type="button" @click="backspaceCalc()" class="text-white p-4 text-lg font-bold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">⌫</button>
+                    <button type="button" @click="appendCalc('+')" class="text-white p-4 text-3xl font-bold rounded-full transition-all active:scale-95" 
+                            style="background-color: #ff9f0a;">+</button>
 
                     <!-- Row 2 -->
-                    <button @click="appendCalc('7')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">7</button>
-                    <button @click="appendCalc('8')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">8</button>
-                    <button @click="appendCalc('9')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">9</button>
-                    <button disabled class="bg-[#1f1f1f] m-px"></button> <!-- Spacer -->
+                    <button type="button" @click="appendCalc('7')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">7</button>
+                    <button type="button" @click="appendCalc('8')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">8</button>
+                    <button type="button" @click="appendCalc('9')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">9</button>
+                    <div class="p-4"></div> <!-- Spacer -->
 
                     <!-- Row 3 -->
-                    <button @click="appendCalc('4')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">4</button>
-                    <button @click="appendCalc('5')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">5</button>
-                    <button @click="appendCalc('6')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">6</button>
-                    <button disabled class="bg-[#1f1f1f] m-px"></button> <!-- Spacer -->
+                    <button type="button" @click="appendCalc('4')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">4</button>
+                    <button type="button" @click="appendCalc('5')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">5</button>
+                    <button type="button" @click="appendCalc('6')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">6</button>
+                    <div class="p-4"></div> <!-- Spacer -->
 
                     <!-- Row 4 -->
-                    <button @click="appendCalc('1')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">1</button>
-                    <button @click="appendCalc('2')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">2</button>
-                    <button @click="appendCalc('3')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">3</button>
-                    <button disabled class="bg-[#1f1f1f] m-px"></button> <!-- Spacer -->
+                    <button type="button" @click="appendCalc('1')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">1</button>
+                    <button type="button" @click="appendCalc('2')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">2</button>
+                    <button type="button" @click="appendCalc('3')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">3</button>
+                    <div class="p-4"></div> <!-- Spacer -->
 
                     <!-- Row 5 -->
-                    <button @click="appendCalc('.')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium rounded-bl-lg m-px transition-colors">,</button>
-                    <button @click="appendCalc('0')" class="bg-[#333333] hover:bg-[#3f3f3f] active:bg-[#4d4d4d] text-white p-5 text-2xl font-medium m-px transition-colors">0</button>
-                    <button @click="confirmCalc()" class="col-span-2 bg-[#ff9f0a] hover:bg-[#ffb23f] active:bg-[#d48406] text-white p-5 text-xl font-medium rounded-br-lg m-px transition-colors">
+                    <button type="button" @click="appendCalc('.')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">,</button>
+                    <button type="button" @click="appendCalc('0')" class="text-white p-4 text-2xl font-semibold rounded-full transition-all active:scale-95" 
+                            style="background-color: #333333;">0</button>
+                    <button type="button" @click="confirmCalc()" class="col-span-2 text-white p-4 text-lg font-bold rounded-full transition-all active:scale-95 shadow-lg shadow-orange-500/20" 
+                            style="background-color: #ff9f0a;">
                         VALIDER
                     </button>
                 </div>
