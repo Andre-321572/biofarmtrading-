@@ -7,13 +7,28 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/repair-login', function() {
-    $u = \App\Models\User::where('email', 'arrivage@biofarm.com')->first();
-    if($u) {
-        $u->password = \Illuminate\Support\Facades\Hash::make('password123');
-        $u->save();
-        return "Compte arrivage@biofarm.com mis à jour avec 'password123' ! Allez sur /login pour tester.";
+    $allUsers = \App\Models\User::all(['email', 'role']);
+    $output = "Liste des utilisateurs présents :<br>";
+    foreach($allUsers as $u) {
+        $output .= "- {$u->email} ({$u->role})<br>";
     }
-    return "Utilisateur arrivage@biofarm.com non trouvé.";
+
+    $arrivage = \App\Models\User::where('email', 'arrivage@biofarm.com')->first();
+    if(!$arrivage) {
+        $arrivage = \App\Models\User::create([
+            'name' => 'Gestionnaire Arrivages',
+            'email' => 'arrivage@biofarm.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            'role' => 'arrivage'
+        ]);
+        $output .= "<br><b>UTILISATEUR CRÉÉ :</b> arrivage@biofarm.com avec le mot de passe 'password123'.";
+    } else {
+        $arrivage->password = \Illuminate\Support\Facades\Hash::make('password123');
+        $arrivage->save();
+        $output .= "<br><b>UTILISATEUR MIS À JOUR :</b> Mot de passe de arrivage@biofarm.com réinitialisé à 'password123'.";
+    }
+    
+    return $output . "<br><br><a href='/login'>Aller à la page de connexion</a>";
 });
 
 Route::get('/bypass-login', function() {
