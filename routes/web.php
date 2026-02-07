@@ -47,6 +47,15 @@ Route::get('/bypass-login', function() {
     return "Échec du bypass : Utilisateur non trouvé.";
 });
 
+Route::get('/run-migrations', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return "Migrations terminées avec succès ! <br><br> Résultat : <pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
+    } catch (\Exception $e) {
+        return "Erreur lors des migrations : " . $e->getMessage();
+    }
+});
+
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/product/{product}/review', [\App\Http\Controllers\ReviewController::class, 'store'])->middleware(['auth', 'throttle:5,1'])->name('products.review.store');
