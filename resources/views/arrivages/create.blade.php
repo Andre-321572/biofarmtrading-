@@ -13,59 +13,51 @@
         <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showCalculator = false"></div>
 
         <!-- Calculator Widget -->
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative transform overflow-hidden rounded-[45px] shadow-2xl transition-all w-full max-w-[360px] p-6 pb-10"
-                 style="background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl shadow-2xl transition-all sm:my-8 w-full max-w-sm border border-gray-700" 
+                 style="background-color: #1f1f1f;">
                 
                 <!-- Display -->
-                <div style="padding: 40px 10px 20px; text-align: right;">
-                    <div style="color: white; font-size: 90px; font-weight: 300; line-height: 1; letter-spacing: -2px;" x-text="calcDisplay">0</div>
+                <div class="p-6 pb-2" style="background-color: #1f1f1f;">
+                    <div class="text-right">
+                        <div style="color: #9ca3af; font-family: ui-monospace, monospace; font-size: 0.875rem; height: 1.5rem;" x-text="calcExpression"></div>
+                        <div style="color: #ffffff; font-size: 3rem; font-weight: 300; line-height: 1; margin-top: 0.25rem;" x-text="calcDisplay">0</div>
+                    </div>
                 </div>
 
                 <!-- Keypad -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background-color: #1f1f1f; padding: 20px;">
                     <!-- Row 1 -->
-                    <button type="button" @click="clearCalc()" 
-                            style="grid-column: span 2; background-color: #a5a5a5; color: black; font-size: 26px; font-weight: 500; border-radius: 40px; height: 70px; border: none; cursor: pointer; transition: filter 0.2s;"
-                            onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
-                        AC
-                    </button>
-                    <button type="button" @click="backspaceCalc()" 
-                            style="background-color: #333333; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: filter 0.2s;"
-                            onmouseover="this.style.filter='brightness(1.2)'" onmouseout="this.style.filter='none'">
-                        <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414A2 2 0 0010.828 19H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z"></path>
-                        </svg>
-                    </button>
-                    <button type="button" @click="appendCalc('+')" 
-                            style="background-color: #ff9f0a; color: white; font-size: 38px; font-weight: 400; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer; transition: filter 0.2s;"
-                            onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
-                        +
-                    </button>
+                    <button type="button" @click="clearCalc()" class="col-span-2 text-white font-bold transition-all active:scale-95" 
+                            style="background-color: #4b5563; border-radius: 12px; height: 60px; border: none; cursor: pointer;">AC</button>
+                    <button type="button" @click="backspaceCalc()" class="text-white font-bold transition-all active:scale-95" 
+                            style="background-color: #4b5563; border-radius: 12px; height: 60px; border: none; cursor: pointer;">⌫</button>
+                    <button type="button" @click="appendCalc('+')" class="text-white text-2xl font-bold transition-all active:scale-95" 
+                            style="background-color: #ff9f0a; border-radius: 12px; height: 60px; border: none; cursor: pointer;">+</button>
 
                     <!-- Row 2 -->
-                    <button type="button" @click="appendCalc('7')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">7</button>
-                    <button type="button" @click="appendCalc('8')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">8</button>
-                    <button type="button" @click="appendCalc('9')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">9</button>
-                    <div></div> <!-- Space under + -->
+                    <button type="button" @click="appendCalc('7')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">7</button>
+                    <button type="button" @click="appendCalc('8')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">8</button>
+                    <button type="button" @click="appendCalc('9')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">9</button>
+                    <div style="height: 60px;"></div>
 
                     <!-- Row 3 -->
-                    <button type="button" @click="appendCalc('4')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">4</button>
-                    <button type="button" @click="appendCalc('5')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">5</button>
-                    <button type="button" @click="appendCalc('6')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">6</button>
-                    <div></div>
+                    <button type="button" @click="appendCalc('4')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">4</button>
+                    <button type="button" @click="appendCalc('5')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">5</button>
+                    <button type="button" @click="appendCalc('6')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">6</button>
+                    <div style="height: 60px;"></div>
 
                     <!-- Row 4 -->
-                    <button type="button" @click="appendCalc('1')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">1</button>
-                    <button type="button" @click="appendCalc('2')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">2</button>
-                    <button type="button" @click="appendCalc('3')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">3</button>
-                    <div></div>
+                    <button type="button" @click="appendCalc('1')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">1</button>
+                    <button type="button" @click="appendCalc('2')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">2</button>
+                    <button type="button" @click="appendCalc('3')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">3</button>
+                    <div style="height: 60px;"></div>
 
                     <!-- Row 5 -->
-                    <button type="button" @click="appendCalc('.')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">,</button>
-                    <button type="button" @click="appendCalc('0')" style="background-color: #333333; color: white; font-size: 32px; font-weight: 500; border-radius: 50%; width: 70px; height: 70px; border: none; cursor: pointer;">0</button>
-                    <button type="button" @click="confirmCalc()" 
-                            style="grid-column: span 2; background-color: #ff9f0a; color: white; font-size: 22px; font-weight: 600; border-radius: 40px; height: 70px; border: none; cursor: pointer;">
+                    <button type="button" @click="appendCalc('.')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">,</button>
+                    <button type="button" @click="appendCalc('0')" class="text-white text-xl font-bold transition-all active:scale-95" style="background-color: #374151; border-radius: 12px; height: 60px; border: none; cursor: pointer;">0</button>
+                    <button type="button" @click="confirmCalc()" class="col-span-2 text-white font-black transition-all active:scale-95 shadow-lg shadow-orange-500/20" 
+                            style="background-color: #ff9f0a; border-radius: 12px; height: 60px; border: none; cursor: pointer;">
                         VALIDER
                     </button>
                 </div>
