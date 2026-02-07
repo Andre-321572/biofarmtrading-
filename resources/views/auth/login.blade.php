@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-8 text-center">
-        <h3 class="text-2xl font-bold text-gray-900 mb-2">Bon retour parmi nous !</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">Bon retour parmi nous ! v2</h3>
         <p class="text-gray-500">Connectez-vous à votre compte</p>
     </div>
 
