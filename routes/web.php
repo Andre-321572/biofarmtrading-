@@ -6,56 +6,6 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/repair-login', function() {
-    $allUsers = \App\Models\User::all(['email', 'role']);
-    $output = "Liste des utilisateurs présents :<br>";
-    foreach($allUsers as $u) {
-        $output .= "- {$u->email} ({$u->role})<br>";
-    }
-
-    $arrivage = \App\Models\User::where('email', 'arrivage@biofarm.com')->first();
-    if(!$arrivage) {
-        $arrivage = \App\Models\User::create([
-            'name' => 'Gestionnaire Arrivages',
-            'email' => 'arrivage@biofarm.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
-            'role' => 'arrivage'
-        ]);
-        $output .= "<br><b>UTILISATEUR CRÉÉ :</b> arrivage@biofarm.com avec le mot de passe 'password123'.";
-    } else {
-        $arrivage->password = \Illuminate\Support\Facades\Hash::make('password123');
-        $arrivage->save();
-        $output .= "<br><b>UTILISATEUR MIS À JOUR :</b> Mot de passe de arrivage@biofarm.com réinitialisé à 'password123'.";
-    }
-
-    $output .= "<br><br>--- Diagnostic Tables ---<br>";
-    $tables = ['arrivages', 'arrivage_details'];
-    foreach ($tables as $table) {
-        $exists = \Illuminate\Support\Facades\Schema::hasTable($table);
-        $output .= "Table '$table' : " . ($exists ? "✅ EXISTE" : "❌ MANQUANTE") . "<br>";
-    }
-    
-    return $output . "<br><br><a href='/login'>Aller à la page de connexion</a>";
-});
-
-Route::get('/bypass-login', function() {
-    $u = \App\Models\User::where('email', 'arrivage@biofarm.com')->first();
-    if($u) {
-        \Illuminate\Support\Facades\Auth::login($u);
-        return redirect('/arrivages');
-    }
-    return "Échec du bypass : Utilisateur non trouvé.";
-});
-
-Route::get('/run-migrations', function() {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "Migrations terminées avec succès ! <br><br> Résultat : <pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
-    } catch (\Exception $e) {
-        return "Erreur lors des migrations : " . $e->getMessage();
-    }
-});
-
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/product/{product}/review', [\App\Http\Controllers\ReviewController::class, 'store'])->middleware(['auth', 'throttle:5,1'])->name('products.review.store');
