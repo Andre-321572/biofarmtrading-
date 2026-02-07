@@ -1,0 +1,14 @@
+<br />
+<b>Fatal error</b>:  Uncaught Error: Call to a member function connection() on null in /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1980
+Stack trace:
+#0 /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1946): Illuminate\Database\Eloquent\Model::resolveConnection(NULL)
+#1 /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1713): Illuminate\Database\Eloquent\Model-&gt;getConnection()
+#2 /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1611): Illuminate\Database\Eloquent\Model-&gt;newBaseQueryBuilder()
+#3 /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1647): Illuminate\Database\Eloquent\Model-&gt;newModelQuery()
+#4 /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1600): Illuminate\Database\Eloquent\Model-&gt;newQueryWithoutScopes()
+#5 /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2540): Illuminate\Database\Eloquent\Model-&gt;newQuery()
+#6 /htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2556): Illuminate\Database\Eloquent\Model-&gt;__call('where', Array)
+#7 /htdocs/biofarmtrading/bootstrap/app.php(5): Illuminate\Database\Eloquent\Model::__callStatic('where', Array)
+#8 /htdocs/biofarmtrading.digitalforges.org/index.php(15): require_once('/htdocs/biofarm...')
+#9 {main}
+  thrown in <b>/htdocs/biofarmtrading/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php</b> on line <b>1980</b><br />

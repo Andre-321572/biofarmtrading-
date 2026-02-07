@@ -1,30 +1,5 @@
 <?php
 
-if (isset($_GET['repair'])) {
-    try {
-        $dbPath = __DIR__ . '/../database/database.sqlite';
-        $db = new PDO('sqlite:' . $dbPath);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        $stmt = $db->query("SELECT id, email FROM users");
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        echo "Base de données : $dbPath <br>";
-        echo "Utilisateurs trouvés : <br>";
-        foreach($users as $user) {
-            echo "- {$user['email']} <br>";
-        }
-        
-        $pass = password_hash('password123', PASSWORD_BCRYPT);
-        $stmt = $db->prepare("UPDATE users SET password = ? WHERE email = 'arrivage@biofarm.com'");
-        $stmt->execute([$pass]);
-        
-        die("<br><b>SUCCESS:</b> Mot de passe réinitialisé pour arrivage@biofarm.com (password123)");
-    } catch (Exception $e) {
-        die("ERREUR PDO: " . $e->getMessage());
-    }
-}
-
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
