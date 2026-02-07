@@ -49,6 +49,12 @@ return [
             '750x1334' => '/images/splash/splash-750x1334.png',
             '828x1792' => '/images/splash/splash-828x1792.png',
             '1125x2436' => '/images/splash/splash-1125x2436.png',
+            '1242x2208' => '/images/splash/splash-750x1334.png', // Fallback
+            '1242x2688' => '/images/splash/splash-1125x2436.png', // Fallback
+            '1536x2048' => '/images/splash/splash-1125x2436.png', // Fallback
+            '1668x2224' => '/images/splash/splash-1125x2436.png', // Fallback
+            '1668x2388' => '/images/splash/splash-1125x2436.png', // Fallback
+            '2048x2732' => '/images/splash/splash-1125x2436.png', // Fallback
         ],
         'custom' => []
     ]

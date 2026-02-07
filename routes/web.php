@@ -59,6 +59,16 @@ Route::middleware('auth')->group(function () {
         Route::delete('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'destroyWorker'])->name('workers.destroy');
     });
 
+    // Arrivage Routes
+    Route::middleware(['auth', 'arrivage'])->group(function () {
+        Route::get('/arrivages', [\App\Http\Controllers\ArrivageController::class, 'index'])->name('arrivages.index');
+        Route::get('/arrivages/create', [\App\Http\Controllers\ArrivageController::class, 'create'])->name('arrivages.create');
+        Route::post('/arrivages', [\App\Http\Controllers\ArrivageController::class, 'store'])->name('arrivages.store');
+        Route::get('/arrivages/{arrivage}', [\App\Http\Controllers\ArrivageController::class, 'show'])->name('arrivages.show');
+        Route::get('/arrivages/{arrivage}/pdf', [\App\Http\Controllers\ArrivageController::class, 'pdf'])->name('arrivages.pdf');
+        Route::get('/arrivages/{arrivage}/excel', [\App\Http\Controllers\ArrivageController::class, 'excel'])->name('arrivages.excel');
+    });
+
     // Manager Routes
     Route::middleware(['auth', 'manager'])->prefix('manager')->name('manager.')->group(function () {
         Route::get('/sales', [\App\Http\Controllers\Manager\SalesController::class, 'index'])->name('sales.index');

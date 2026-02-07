@@ -126,6 +126,15 @@
                             </x-nav-link-custom>
                         </li>
                     @endif
+
+                    @if(Auth::user()->role === 'arrivage')
+                        <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Gestion Arrivages</li>
+                        <li>
+                            <x-nav-link-custom href="{{ route('arrivages.index') }}" :active="request()->routeIs('arrivages.*')" icon="products">
+                                {{ __('Arrivages') }}
+                            </x-nav-link-custom>
+                        </li>
+                    @endif
                 </ul>
             </nav>
             
@@ -196,7 +205,11 @@
             <main class="flex-1 overflow-y-auto scroll-smooth">
                 <div class="p-4 sm:p-6 md:p-8">
                     <div class="max-w-[1600px] mx-auto w-full">
-                        {{ $slot }}
+                        @if(isset($slot))
+                            {{ $slot }}
+                        @else
+                            @yield('content')
+                        @endif
                     </div>
                 </div>
             </main>
