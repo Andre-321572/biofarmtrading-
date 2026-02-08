@@ -153,48 +153,42 @@
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-h-0 min-w-0 bg-[#F8FAFC]">
             <!-- Top Navbar -->
-            <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
+            <header class="h-16 sm:h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10 transition-all duration-300">
                 <div class="flex-1 flex items-center gap-4">
                     <!-- Mobile Toggle -->
-                    <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                    <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
 
                     @if(isset($header))
-                        {{ $header }}
+                        <div class="truncate max-w-[200px] sm:max-w-none">
+                            {{ $header }}
+                        </div>
                     @else
-                        <h1 class="text-lg sm:text-xl font-semibold text-gray-800 truncate">
-                            @yield('header_title', 'Tableau de bord')
+                        <h1 class="text-base sm:text-xl font-bold text-gray-900 truncate uppercase tracking-tight">
+                            @yield('header_title', 'Dashboard')
                         </h1>
                     @endif
                 </div>
 
-                <div class="flex items-center gap-3 sm:gap-6">
-                    <!-- PWA Install Button -->
-                    <button id="install-pwa" class="hidden p-2 text-green-600 hover:bg-green-50 font-semibold rounded-lg transition-colors duration-200">
-                        <span class="flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            <span class="hidden sm:inline">Installer</span>
-                        </span>
-                    </button>
-
+                <div class="flex items-center gap-2 sm:gap-6">
                     <!-- Notifications -->
-                    <button class="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200">
+                    <button class="relative p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all duration-200">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
-                        <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
                     </button>
 
-                    <div class="h-8 w-[1px] bg-gray-200 hidden sm:block"></div>
+                    <div class="h-6 w-[1px] bg-gray-200 hidden sm:block"></div>
 
                     <!-- User Profile -->
-                    <div class="flex items-center gap-3 pl-2">
+                    <div class="flex items-center gap-2 sm:gap-3 pl-1 sm:pl-2">
                         <div class="text-right hidden sm:block">
-                            <p class="text-sm font-bold text-gray-900 leading-none">{{ Auth::user()->name }}</p>
-                            <p class="text-[11px] text-gray-500 mt-1 uppercase tracking-wider font-semibold">{{ Auth::user()->role }}</p>
+                            <p class="text-xs font-black text-gray-900 leading-none uppercase">{{ Auth::user()->name }}</p>
+                            <p class="text-[9px] text-green-600 mt-1 uppercase tracking-widest font-bold font-mono">{{ Auth::user()->role }}</p>
                         </div>
-                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-green-100 border border-green-200 flex items-center justify-center text-green-700 font-bold shadow-sm flex-shrink-0">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200 flex items-center justify-center text-green-700 font-black shadow-sm flex-shrink-0 text-sm sm:text-base cursor-pointer hover:scale-105 transition-transform">
                             {{ substr(Auth::user()->name, 0, 1) }}
                         </div>
                     </div>
