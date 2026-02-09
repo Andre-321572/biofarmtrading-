@@ -143,32 +143,36 @@ class SalesController extends Controller
                 'delivery_address' => 'Vente au comptoir',
             ]);
 
-            foreach ($request->items as $item) {
-                if($item['quantity'] > 0) {
-                     $product = Product::findOrFail($item['product_id']);
+            foreach ($request->items as $itemData) {
+                if($itemData['quantity'] > 0) {
+                     $product = Product::findOrFail($itemData['product_id']);
+                     $unitType = $itemData['unit_type'] ?? 'carton';
+                     $price = ($unitType === 'detail' && $product->price_detail) ? $product->price_detail : $product->price;
+                     $quantityToDecrement = ($unitType === 'carton') ? ($product->units_per_case ?: 1) * $itemData['quantity'] : $itemData['quantity'];
                      
                      // Check Stock
                      $shopProduct = $product->shops()->where('shop_id', $shop->id)->first();
                      $currentStock = $shopProduct ? $shopProduct->pivot->quantity : 0;
 
-                     if ($currentStock < $item['quantity']) {
-                         throw new \Exception("Stock insuffisant pour " . $product->name);
+                     if ($currentStock < $quantityToDecrement) {
+                         throw new \Exception("Stock insuffisant pour " . $product->name . " (Requis: " . $quantityToDecrement . ", Dispo: " . $currentStock . ")");
                      }
 
                      // Decrement Stock
                      $product->shops()->updateExistingPivot($shop->id, [
-                         'quantity' => $currentStock - $item['quantity']
+                         'quantity' => $currentStock - $quantityToDecrement
                      ]);
 
                      // Add Order Item
-                     $subtotal = $product->price * $item['quantity'];
+                     $subtotal = $price * $itemData['quantity'];
                      $totalAmount += $subtotal;
 
                      \App\Models\OrderItem::create([
                          'order_id' => $order->id,
                          'product_id' => $product->id,
-                         'quantity' => $item['quantity'],
-                         'price' => $product->price
+                         'quantity' => $itemData['quantity'],
+                         'unit_type' => $unitType,
+                         'price' => $price
                      ]);
                 }
             }
@@ -205,7 +209,7 @@ class SalesController extends Controller
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
-        // Statistics per product for the month
+        // Statistics per product and unit_type for the month
         $productStats = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -214,10 +218,12 @@ class SalesController extends Controller
             ->whereYear('orders.created_at', $currentYear)
             ->select(
                 'products.name', 
+                'order_items.unit_type',
                 DB::raw('SUM(order_items.quantity) as total_qty'), 
                 DB::raw('SUM(order_items.quantity * order_items.price) as total_revenue')
             )
-            ->groupBy('products.id', 'products.name')
+            ->groupBy('products.id', 'products.name', 'order_items.unit_type')
+            ->orderBy('products.name')
             ->get();
 
         $monthTotal = $productStats->sum('total_revenue');
@@ -248,10 +254,12 @@ class SalesController extends Controller
             ->whereYear('orders.created_at', $currentYear)
             ->select(
                 'products.name', 
+                'order_items.unit_type',
                 DB::raw('SUM(order_items.quantity) as total_qty'), 
                 DB::raw('SUM(order_items.quantity * order_items.price) as total_revenue')
             )
-            ->groupBy('products.id', 'products.name')
+            ->groupBy('products.id', 'products.name', 'order_items.unit_type')
+            ->orderBy('products.name')
             ->get();
 
         $monthTotal = $productStats->sum('total_revenue');

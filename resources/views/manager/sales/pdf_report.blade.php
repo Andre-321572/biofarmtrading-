@@ -34,24 +34,24 @@
         <thead>
             <tr>
                 <th>Produit</th>
-                <th class="text-right">Quantité Vendue</th>
-                <th class="text-right">Chiffre d'Affaires</th>
+                <th>Type</th>
+                <th class="text-right">Quantité</th>
+                <th class="text-right">Montant</th>
             </tr>
         </thead>
         <tbody>
             @foreach($productStats as $stat)
                 <tr>
                     <td>{{ $stat->name }}</td>
-                    <td class="text-right">{{ $stat->total_qty }}</td>
-                    <td class="text-right">{{ number_format($stat->total_revenue, 0, ',', ' ') }} FCFA</td>
+                    <td>{{ $stat->unit_type === 'detail' ? 'Détail' : 'Gros' }}</td>
+                    <td class="text-right">{{ number_format($stat->total_qty, 0) }}</td>
+                    <td class="text-right">{{ number_format($stat->total_revenue, 0, ',', ' ') }} F</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr class="total-row">
-                <td>TOTAL</td>
-                <!-- Sum qty if needed, or leave empty -->
-                <td class="text-right">-</td>
+                <td colspan="3">TOTAL GÉNÉRAL</td>
                 <td class="text-right">{{ number_format($monthTotal, 0, ',', ' ') }} FCFA</td>
             </tr>
         </tfoot>
