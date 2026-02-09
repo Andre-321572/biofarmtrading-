@@ -96,14 +96,13 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($dayWorkers as $index => $worker)
+                @foreach($dayWorkers as $worker)
                     @php
                         $totalMinutes = 0;
                         foreach($days as $day) {
                             $dateStr = $day->format('Y-m-d');
                             $att = $worker->attendances->where('date', $dateStr)->first();
                             if ($att && $att->arrival_time && $att->departure_time) {
-                                // Force proper time extraction from database format
                                 $arrivalTime = \Carbon\Carbon::parse($att->arrival_time)->format('H:i:s');
                                 $departureTime = \Carbon\Carbon::parse($att->departure_time)->format('H:i:s');
                                 
@@ -111,7 +110,6 @@
                                 $end = \Carbon\Carbon::parse($dateStr . ' ' . $departureTime);
                                 if ($end->lessThan($start)) $end->addDay();
                                 
-                                // FIX: Correct order for positive duration
                                 $dayDuration = $start->diffInMinutes($end);
                                 $totalMinutes += max(0, $dayDuration - 120);
                             }
@@ -122,7 +120,7 @@
                         $totalHoursText = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
                     @endphp
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $loop->iteration }}</td>
                         <td class="col-name">{{ $worker->last_name }}</td>
                         <td class="col-prenom">{{ $worker->first_name }}</td>
                         
@@ -180,7 +178,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($nightWorkers as $index => $worker)
+                @foreach($nightWorkers as $worker)
                     @php
                         $totalMinutesNight = 0;
                         foreach($worker->attendances as $att) {
@@ -191,7 +189,7 @@
                         $totalHoursNightText = floor($totalMinutesNight / 60) . 'h' . ($totalMinutesNight % 60 > 0 ? sprintf('%02d', $totalMinutesNight % 60) : '');
                     @endphp
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $loop->iteration }}</td>
                         <td class="col-name">{{ $worker->last_name }}</td>
                         <td class="col-prenom">{{ $worker->first_name }}</td>
                         
