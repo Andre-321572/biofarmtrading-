@@ -99,7 +99,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-xl border border-gray-100">
                     <div>
                         <x-input-label for="chauffeur" value="Nom du Chauffeur *" class="text-gray-700 font-semibold mb-1" />
-                        <x-text-input id="chauffeur" name="chauffeur" type="text" class="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm" required autofocus />
+                        <select id="chauffeur" name="chauffeur" class="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm" required autofocus>
+                            <option value="" disabled selected>Choisir un chauffeur...</option>
+                            <option value="Mr YAO">Mr YAO</option>
+                            <option value="Mr VICTOR">Mr VICTOR</option>
+                            <option value="Mr PROMISE">Mr PROMISE</option>
+                        </select>
                         <x-input-error class="mt-2" :messages="$errors->get('chauffeur')" />
                     </div>
 
