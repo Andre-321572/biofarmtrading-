@@ -121,9 +121,7 @@
     <table class="info-grid">
         <tr>
             <td class="info-label">Préfecture / Zone</td>
-            <td class="info-value">{{ $arrivage->zone_provenance }}</td>
-            <td class="info-label">OP</td>
-            <td class="info-value">-</td>
+            <td class="info-value" colspan="3">{{ $arrivage->zone_provenance }}</td>
         </tr>
         <tr>
             <td class="info-label">Chauffeur</td>
