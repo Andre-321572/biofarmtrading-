@@ -4,85 +4,99 @@
     <meta charset="utf-8">
     <title>Arrivage #{{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }}</title>
     <style>
-        @page { margin: 1cm; }
+        @page { margin: 0.5cm 1cm; }
         body { 
             font-family: 'Helvetica', sans-serif; 
-            font-size: 9px; 
+            font-size: 8.5px; 
             color: #333;
-            line-height: 1.3;
+            line-height: 1.2;
         }
-        .header-container { width: 100%; margin-bottom: 20px; position: relative; }
+        
+        /* Header Section */
+        .header-container { width: 100%; margin-bottom: 5px; position: relative; height: 80px; }
         .logo-box { position: absolute; left: 0; top: 0; }
-        .logo { width: 80px; }
-        .header-center { text-align: center; }
-        .company-name { font-size: 20px; font-weight: 900; letter-spacing: 5px; margin-bottom: 2px; }
-        .company-desc { font-size: 8px; color: #666; margin-bottom: 10px; }
+        .logo { width: 75px; } /* Logo without circle as requested */
+        .header-center { text-align: center; width: 100%; }
+        .company-name { font-size: 22px; font-weight: 1000; letter-spacing: 4px; margin-bottom: 0px; margin-top: 5px; color: #1a1a1a; }
+        .company-desc { font-size: 7.5px; color: #555; margin-bottom: 8px; font-style: italic; }
         .document-title { 
-            font-size: 14px; 
+            font-size: 13px; 
             font-weight: bold; 
-            border-top: 2px solid #333; 
-            border-bottom: 2px solid #333;
-            padding: 5px 0;
-            margin: 10px 0;
+            border-top: 1.5px solid #000; 
+            border-bottom: 1.5px solid #000;
+            padding: 4px 0;
+            margin: 5px auto;
+            width: 70%;
             text-transform: uppercase;
         }
         .bon-info { position: absolute; right: 0; top: 0; text-align: right; }
-        .bon-label { font-size: 8px; color: #999; font-weight: bold; }
-        .bon-number { font-size: 14px; font-weight: 900; }
+        .bon-label { font-size: 7px; color: #999; font-weight: bold; text-transform: uppercase; }
+        .bon-number { font-size: 15px; font-weight: 900; margin-bottom: 5px; }
+        .bon-date { font-size: 10px; font-weight: bold; }
 
-        .info-grid { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        /* Info Grid */
+        .info-grid { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 1.5px solid #333; }
         .info-grid td { 
-            border: 1px solid #ccc; 
-            padding: 4px 8px; 
-            width: 25%;
+            border: 1px solid #999; 
+            padding: 3px 6px; 
         }
-        .info-label { font-weight: bold; text-transform: uppercase; font-size: 8px; background-color: #f5f5f5; width: 15%; }
-        .info-value { font-weight: bold; color: #000; }
+        .info-label { font-weight: bold; text-transform: uppercase; font-size: 7.5px; background-color: #f0f0f0; width: 18%; }
+        .info-value { font-weight: bold; color: #000; font-size: 9px; width: 32%; }
 
+        /* Table Title */
         .weight-log-title { 
-            background-color: #2c3e50; 
+            background-color: #34495e; 
             color: white; 
             text-align: center; 
             font-weight: bold; 
-            padding: 6px; 
-            letter-spacing: 10px;
+            padding: 5px; 
+            letter-spacing: 8px;
             text-transform: uppercase;
-            font-size: 11px;
+            font-size: 10px;
+            margin-bottom: 0px;
         }
 
-        .weight-table { width: 100%; border-collapse: collapse; }
+        /* Weight Table */
+        .weight-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .weight-table th { 
-            background-color: #f5f5f5; 
-            border: 1px solid #2c3e50; 
+            background-color: #f2f2f2; 
+            border: 1px solid #34495e; 
             padding: 4px; 
             font-size: 8px;
             text-align: center;
+            text-transform: uppercase;
         }
         .weight-table td { 
             border: 1px solid #ddd; 
-            padding: 3px 6px; 
+            padding: 2.5px 5px; 
             text-align: center;
             height: 14px;
         }
-        .weight-table .index-col { font-weight: bold; color: #2c3e50; background-color: #f9f9f9; border-left: 2px solid #2c3e50; }
-        .weight-table .total-row td { 
-            background-color: #2c3e50; 
+        .weight-table .index-col { font-weight: bold; color: #2980b9; background-color: #fbfbfb; border-left: 1px solid #ccc; width: 15%; }
+        .weight-table .poids-col { width: 18.3%; font-weight: bold; }
+        
+        /* Total Row */
+        .total-row td { 
+            background-color: #34495e; 
             color: white; 
             font-weight: bold; 
-            border-bottom: 3px solid #2c3e50;
+            border: 1px solid #34495e;
+            padding: 4px;
         }
 
-        .footer-summary { width: 100%; margin-top: 15px; border-collapse: collapse; }
-        .summary-box { border: 2px solid #2c3e50; padding: 10px; margin-top: 10px; font-weight: bold; }
-        .summary-label { text-transform: uppercase; font-size: 11px; }
-        .summary-value { font-size: 16px; float: right; }
+        /* Summary Footer */
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 5px; border: 2px solid #34495e; }
+        .summary-label { background-color: #f8f8f8; padding: 8px; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 70%; border-right: 1px solid #34495e; }
+        .summary-value { padding: 8px; font-weight: 1000; font-size: 14px; text-align: right; background-color: #fff; }
 
-        .signature-table { width: 100%; margin-top: 30px; }
-        .signature-box { width: 48%; border: 1px solid #ccc; height: 100px; padding: 5px; position: relative; }
-        .signature-title { font-weight: bold; text-transform: uppercase; font-size: 8px; }
-        .signature-line { border-bottom: 1px dotted #ccc; margin-top: 60px; text-align: center; font-size: 7px; color: #999; }
+        /* Signature Section */
+        .signature-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        .signature-box { width: 48%; border: 1px solid #ccc; height: 80px; padding: 5px; vertical-align: top; }
+        .signature-title { font-weight: bold; text-transform: uppercase; font-size: 8px; color: #333; }
+        .signature-placeholder { margin-top: 55px; border-top: 1px dotted #999; text-align: center; font-size: 7px; color: #aaa; padding-top: 2px; }
 
-        .small-footer { text-align: center; margin-top: 40px; font-size: 7px; color: #888; border-top: 0.5px solid #eee; padding-top: 5px; }
+        /* Bottom Footer */
+        .small-footer { text-align: center; margin-top: 25px; font-size: 7px; color: #888; border-top: 0.5px solid #ddd; padding-top: 5px; }
     </style>
 </head>
 <body>
@@ -99,73 +113,86 @@
         <div class="bon-info">
             <div class="bon-label">BON N°</div>
             <div class="bon-number">#{{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }}</div>
-            <div class="bon-label" style="margin-top:5px">DATE</div>
-            <div class="info-value">{{ $arrivage->date_arrivage->format('d/m/Y') }}</div>
+            <div class="bon-label">DATE</div>
+            <div class="bon-date">{{ $arrivage->date_arrivage->format('d/m/Y') }}</div>
         </div>
     </div>
 
     <table class="info-grid">
         <tr>
-            <td class="info-label">Préfecture</td>
+            <td class="info-label">Préfecture / Zone</td>
             <td class="info-value">{{ $arrivage->zone_provenance }}</td>
             <td class="info-label">OP</td>
             <td class="info-value">-</td>
         </tr>
         <tr>
-            <td class="info-label">Zone</td>
-            <td class="info-value">{{ $arrivage->zone_provenance }}</td>
-            <td class="info-label">Matricule</td>
+            <td class="info-label">Chauffeur</td>
+            <td class="info-value">{{ $arrivage->chauffeur }}</td>
+            <td class="info-label">Matricule Camion</td>
             <td class="info-value">{{ $arrivage->matricule_camion }}</td>
         </tr>
         <tr>
-            <td class="info-label">Chauffeur</td>
-            <td class="info-value">{{ $arrivage->chauffeur }}</td>
             <td class="info-label">Fruit</td>
             <td class="info-value">
                 @if($arrivage->total_ananas > 0)
                     Ananas {{ $arrivage->total_ananas_cayenne > 0 ? 'Cayenne' : ($arrivage->total_ananas_braza > 0 ? 'Braza' : '') }}
                 @elseif($arrivage->total_papaye > 0)
                     Papaye
+                @else
+                    -
                 @endif
             </td>
+            <td class="info-label" style="background-color:#fff; border:none"></td>
+            <td class="info-value" style="border:none"></td>
         </tr>
     </table>
 
     <div class="weight-log-title">Relevé de Poids</div>
 
+    @php 
+        $allFilledWeights = $arrivage->details->where('poids', '>', 0)->values();
+        $count = $allFilledWeights->count();
+        $rowsPerCol = ceil($count / 3);
+        if ($rowsPerCol < 10) $rowsPerCol = 10; // Minimum rows for better look if few data
+    @endphp
+
     <table class="weight-table">
         <thead>
             <tr>
-                <th width="5%">N°</th><th width="28.3%">Poids kg</th>
-                <th width="5%">N°</th><th width="28.3%">Poids kg</th>
-                <th width="5%">N°</th><th width="28.3%">Poids kg</th>
+                <th width="33.33%" colspan="2">Colonnes 1</th>
+                <th width="33.33%" colspan="2">Colonnes 2</th>
+                <th width="33.34%" colspan="2">Colonnes 3</th>
+            </tr>
+            <tr>
+                <th width="8%">N°</th><th width="25.33%">Poids kg</th>
+                <th width="8%">N°</th><th width="25.33%">Poids kg</th>
+                <th width="8%">N°</th><th width="25.34%">Poids kg</th>
             </tr>
         </thead>
         <tbody>
-            @php 
-                $allWeights = $arrivage->details->pluck('poids')->toArray();
-                $rows = 67; // Pour atteindre 200 cases (67x3 = 201)
-            @endphp
-            @for($i = 0; $i < $rows; $i++)
+            @for($i = 0; $i < $rowsPerCol; $i++)
             <tr>
-                {{-- Col 1 --}}
-                <td class="index-col">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</td>
-                <td>{{ isset($allWeights[$i]) ? number_format($allWeights[$i], 2) : '—' }}</td>
+                {{-- Column 1 --}}
+                @php $idx1 = $i; @endphp
+                <td class="index-col">{{ isset($allFilledWeights[$idx1]) ? str_pad($idx1 + 1, 2, '0', STR_PAD_LEFT) : '' }}</td>
+                <td class="poids-col">{{ isset($allFilledWeights[$idx1]) ? number_format($allFilledWeights[$idx1]->poids, 2) : '—' }}</td>
                 
-                {{-- Col 2 --}}
-                <td class="index-col">{{ $i + 68 }}</td>
-                <td>{{ isset($allWeights[$i + 67]) ? number_format($allWeights[$i + 67], 2) : '—' }}</td>
+                {{-- Column 2 --}}
+                @php $idx2 = $i + $rowsPerCol; @endphp
+                <td class="index-col">{{ isset($allFilledWeights[$idx2]) ? str_pad($idx2 + 1, 2, '0', STR_PAD_LEFT) : '' }}</td>
+                <td class="poids-col">{{ isset($allFilledWeights[$idx2]) ? number_format($allFilledWeights[$idx2]->poids, 2) : '—' }}</td>
                 
-                {{-- Col 3 --}}
-                <td class="index-col">{{ $i + 135 }}</td>
-                <td>{{ isset($allWeights[$i + 134]) ? number_format($allWeights[$i + 134], 2) : '—' }}</td>
+                {{-- Column 3 --}}
+                @php $idx3 = $i + (2 * $rowsPerCol); @endphp
+                <td class="index-col">{{ isset($allFilledWeights[$idx3]) ? str_pad($idx3 + 1, 2, '0', STR_PAD_LEFT) : '' }}</td>
+                <td class="poids-col">{{ isset($allFilledWeights[$idx3]) ? number_format($allFilledWeights[$idx3]->poids, 2) : '—' }}</td>
             </tr>
             @endfor
+            
             @php
-                // Calculs des colonnes pour le pied de tableau
-                $sum1 = collect($allWeights)->slice(0, 67)->sum();
-                $sum2 = collect($allWeights)->slice(67, 67)->sum();
-                $sum3 = collect($allWeights)->slice(134, 66)->sum();
+                $sum1 = $allFilledWeights->slice(0, $rowsPerCol)->sum('poids');
+                $sum2 = $allFilledWeights->slice($rowsPerCol, $rowsPerCol)->sum('poids');
+                $sum3 = $allFilledWeights->slice(2 * $rowsPerCol)->sum('poids');
             @endphp
             <tr class="total-row">
                 <td>T</td><td>{{ number_format($sum1, 2) }}</td>
@@ -175,28 +202,30 @@
         </tbody>
     </table>
 
-    <div class="summary-box">
-        <span class="summary-label">Poids Total de l'Arrivage :</span>
-        <span class="summary-value">{{ number_format($arrivage->total_general, 2) }} kg</span>
-    </div>
+    <table class="summary-table">
+        <tr>
+            <td class="summary-label">Poids Total de l'Arrivage :</td>
+            <td class="summary-value">{{ number_format($arrivage->total_general, 2) }} kg</td>
+        </tr>
+    </table>
 
     <table class="signature-table">
         <tr>
-            <td class="signature-box" style="border-right: none;">
+            <td class="signature-box">
                 <div class="signature-title">A2C SAM / Responsable</div>
-                <div class="signature-line">Signature & Cachet</div>
+                <div class="signature-placeholder">Signature & Cachet</div>
             </td>
             <td style="width: 4%;"></td>
             <td class="signature-box">
                 <div class="signature-title">Le Producteur / Livreur</div>
-                <div class="signature-line">Signature</div>
+                <div class="signature-placeholder">Signature</div>
             </td>
         </tr>
     </table>
 
     <div class="small-footer">
         BIO FARM TRADING - NIF 1002966783 - Tél : (+229) 97562640 / 97264340 - Capital 51 000 000 FCFA - www.biofarmtrading.com<br>
-        Document généré le {{ now()->format('d/m/Y à H:i') }} - Bon N° {{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }} - {{ count($allWeights) }} case(s) saisie(s)
+        Document généré le {{ now()->format('d/m/Y à H:i') }} - Bon N° {{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }} - {{ $count }} case(s) saisie(s)
     </div>
 
 </body>
