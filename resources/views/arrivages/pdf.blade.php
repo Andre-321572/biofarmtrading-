@@ -157,11 +157,6 @@
     <table class="weight-table">
         <thead>
             <tr>
-                <th width="33.33%" colspan="2">Colonnes 1</th>
-                <th width="33.33%" colspan="2">Colonnes 2</th>
-                <th width="33.34%" colspan="2">Colonnes 3</th>
-            </tr>
-            <tr>
                 <th width="8%">N°</th><th width="25.33%">Poids kg</th>
                 <th width="8%">N°</th><th width="25.33%">Poids kg</th>
                 <th width="8%">N°</th><th width="25.34%">Poids kg</th>
