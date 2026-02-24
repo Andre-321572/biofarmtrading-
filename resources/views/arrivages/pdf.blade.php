@@ -202,20 +202,6 @@
         </tr>
     </table>
 
-    <table class="signature-table">
-        <tr>
-            <td class="signature-box">
-                <div class="signature-title">A2C SAM / Responsable</div>
-                <div class="signature-placeholder">Signature & Cachet</div>
-            </td>
-            <td style="width: 4%;"></td>
-            <td class="signature-box">
-                <div class="signature-title">Le Producteur / Livreur</div>
-                <div class="signature-placeholder">Signature</div>
-            </td>
-        </tr>
-    </table>
-
     <div class="small-footer">
         BIO FARM TRADING - NIF 1002966783 - Tél : (+229) 97562640 / 97264340 - Capital 51 000 000 FCFA - www.biofarmtrading.com<br>
         Document généré le {{ now()->format('d/m/Y à H:i') }} - Bon N° {{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }} - {{ $count }} case(s) saisie(s)
