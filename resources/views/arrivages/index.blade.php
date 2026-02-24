@@ -9,7 +9,7 @@
             <div class="flex-1 min-w-0">
                 <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate flex items-center gap-3">
                     <span class="p-2 bg-green-100 rounded-lg text-green-600">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <i class="fa-solid fa-boxes-stacked text-2xl"></i>
                     </span>
                     Mes Arrivages
                 </h2>
@@ -19,7 +19,7 @@
             </div>
             <div class="mt-4 flex md:mt-0 md:ml-4">
                 <a href="{{ route('arrivages.create') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-[1.02]">
-                    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <i class="fa-solid fa-plus mr-2 -ml-1"></i>
                     Nouvel Arrivage
                 </a>
             </div>
@@ -29,12 +29,12 @@
         @if(session('success'))
             <div x-data="{ show: true }" x-show="show" x-transition.opacity.duration.300ms class="rounded-xl bg-green-50 p-4 border border-green-200 mb-6 flex items-start">
                 <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <i class="fa-solid fa-circle-check text-green-400 text-lg"></i>
                 </div>
                 <div class="ml-3 w-full flex justify-between">
                     <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
                     <button @click="show = false" class="ml-auto text-green-500 hover:text-green-700">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
             </div>
@@ -90,11 +90,11 @@
                                             {{ $arrivage->date_arrivage->format('d/m/Y') }}
                                         </span>
                                         <span class="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                            <i class="fa-solid fa-user text-[10px]"></i>
                                             {{ $arrivage->chauffeur }}
                                         </span>
                                         <span class="text-xs text-gray-400 flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <i class="fa-solid fa-truck text-[10px]"></i>
                                             {{ $arrivage->matricule_camion }} • {{ $arrivage->zone_provenance }}
                                         </span>
                                     </div>
@@ -127,19 +127,19 @@
                                         <a href="{{ route('arrivages.show', $arrivage) }}" 
                                            class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group-hover:bg-white" 
                                            title="Voir détails">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            <i class="fa-solid fa-eye"></i>
                                         </a>
 
                                         <a href="{{ route('arrivages.pdf', $arrivage) }}" 
                                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors group-hover:bg-white"
                                            title="Télécharger PDF">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                            <i class="fa-solid fa-file-pdf"></i>
                                         </a>
 
                                         <a href="{{ route('arrivages.excel', $arrivage) }}" 
                                            class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors group-hover:bg-white"
                                            title="Exporter Excel">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                            <i class="fa-solid fa-file-excel"></i>
                                         </a>
                                     </div>
                                 </td>

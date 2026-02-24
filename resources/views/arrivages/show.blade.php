@@ -8,17 +8,17 @@
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
                 <a href="{{ route('arrivages.index') }}" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <i class="fa-solid fa-circle-arrow-left text-2xl"></i>
                 </a>
                 Détails de l'Arrivage #{{ $arrivage->id }}
             </h2>
             <div class="flex gap-3">
                 <a href="{{ route('arrivages.pdf', $arrivage) }}" class="inline-flex items-center px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    <i class="fa-solid fa-file-pdf mr-2 text-lg"></i>
                     Télécharger PDF
                 </a>
                 <a href="{{ route('arrivages.excel', $arrivage) }}" class="inline-flex items-center px-4 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-colors font-medium text-sm">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <i class="fa-solid fa-file-excel mr-2 text-lg"></i>
                     Télécharger Excel
                 </a>
             </div>
@@ -103,7 +103,7 @@
                     @if($arrivage->total_ananas > 0)
                     <div class="bg-blue-50/50 rounded-xl p-5 border border-blue-100">
                         <h4 class="text-blue-800 font-bold mb-3 flex items-center gap-2">
-                            <span>🍍</span> ANANAS
+                            <i class="fa-solid fa-apple-whole"></i> ANANAS
                         </h4>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between text-blue-600">
@@ -126,7 +126,7 @@
                     @if($arrivage->total_papaye > 0)
                     <div class="bg-orange-50/50 rounded-xl p-5 border border-orange-100">
                         <h4 class="text-orange-800 font-bold mb-3 flex items-center gap-2">
-                            <span>🥭</span> PAPAYE
+                            <i class="fa-solid fa-leaf"></i> PAPAYE
                         </h4>
                         <div class="flex flex-col justify-end h-full">
                             <div class="flex justify-between text-orange-900 font-bold text-lg">
