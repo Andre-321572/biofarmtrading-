@@ -133,7 +133,7 @@
     </table>
 
     <div class="totals">
-        <h3 style="margin-top: 0;">Récapitulatif</h3>
+        <h3 style="margin-top: 0;">Récapitulatif des Poids</h3>
         
         <!-- Section ANANAS -->
         @if($arrivage->total_ananas > 0)
