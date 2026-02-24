@@ -91,7 +91,7 @@
 
         /* Signature Section */
         .signature-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-        .signature-box { width: 48%; border: 1px solid #ccc; height: 80px; padding: 5px; vertical-align: top; }
+        .signature-box { width: 48%; border: none; height: 80px; padding: 5px; vertical-align: top; }
         .signature-title { font-weight: bold; text-transform: uppercase; font-size: 8px; color: #333; }
         .signature-placeholder { margin-top: 55px; border-top: 1px dotted #999; text-align: center; font-size: 7px; color: #aaa; padding-top: 2px; }
 
