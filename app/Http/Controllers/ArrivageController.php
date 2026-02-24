@@ -33,10 +33,9 @@ class ArrivageController extends Controller
             'matricule_camion' => 'required|string|max:255',
             'date_arrivage' => 'required|date',
             'zone_provenance' => 'required|string|max:255',
-            'details' => 'required|array|min:1',
-            'details.*.fruit' => 'required|string|in:ananas,papaye',
-            'details.*.variete' => 'nullable|string',
-            'details.*.poids' => 'required|numeric|min:0.01',
+            'fruit_type' => 'required|string|in:ananas_cayenne,ananas_braza,papaye',
+            'poids' => 'required|array',
+            'poids.*' => 'numeric|min:0',
         ]);
 
         $arrivage = Arrivage::create([
@@ -47,12 +46,26 @@ class ArrivageController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        foreach ($validated['details'] as $detail) {
-            $arrivage->details()->create([
-                'fruit' => $detail['fruit'],
-                'variete' => $detail['variete'] ?? 'non_applicable',
-                'poids' => $detail['poids'],
-            ]);
+        // Déterminer le fruit et la variété en fonction du type global
+        $fruit = 'ananas';
+        $variete = 'cayenne_lisse';
+
+        if ($validated['fruit_type'] === 'ananas_braza') {
+            $variete = 'braza';
+        } elseif ($validated['fruit_type'] === 'papaye') {
+            $fruit = 'papaye';
+            $variete = 'non_applicable';
+        }
+
+        // Enregistrer seulement les poids > 0
+        foreach ($validated['poids'] as $p) {
+            if ($p > 0) {
+                $arrivage->details()->create([
+                    'fruit' => $fruit,
+                    'variete' => $variete,
+                    'poids' => $p,
+                ]);
+            }
         }
 
         return redirect()->route('arrivages.index')->with('success', 'Arrivage enregistré avec succès.');
