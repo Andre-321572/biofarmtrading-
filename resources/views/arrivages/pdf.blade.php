@@ -61,19 +61,20 @@
         .weight-table th { 
             background-color: #f2f2f2; 
             border: 1px solid #34495e; 
-            padding: 4px; 
-            font-size: 8px;
+            padding: 3px; 
+            font-size: 7.5px;
             text-align: center;
             text-transform: uppercase;
         }
         .weight-table td { 
             border: 1px solid #ddd; 
-            padding: 2.5px 5px; 
+            padding: 2px 3px; 
             text-align: center;
-            height: 14px;
+            height: 12px;
+            font-size: 8px;
         }
-        .weight-table .index-col { font-weight: bold; color: #2980b9; background-color: #fbfbfb; border-left: 1px solid #ccc; width: 15%; }
-        .weight-table .poids-col { width: 18.3%; font-weight: bold; }
+        .weight-table .index-col { font-weight: bold; color: #2980b9; background-color: #fbfbfb; border-left: 1px solid #ccc; width: 6%; }
+        .weight-table .poids-col { width: 14%; font-weight: bold; }
         
         /* Total Row */
         .total-row td { 
@@ -81,7 +82,7 @@
             color: white; 
             font-weight: bold; 
             border: 1px solid #34495e;
-            padding: 4px;
+            padding: 3px;
         }
 
         /* Summary Footer */
@@ -142,47 +143,37 @@
     @php 
         $allFilledWeights = $arrivage->details->where('poids', '>', 0)->values();
         $count = $allFilledWeights->count();
-        $rowsPerCol = ceil($count / 3);
+        $numCols = 5;
+        $rowsPerCol = ceil($count / $numCols);
         if ($rowsPerCol < 10) $rowsPerCol = 10; // Minimum rows for better look if few data
     @endphp
 
     <table class="weight-table">
         <thead>
             <tr>
-                <th width="8%">N°</th><th width="25.33%">Poids kg</th>
-                <th width="8%">N°</th><th width="25.33%">Poids kg</th>
-                <th width="8%">N°</th><th width="25.34%">Poids kg</th>
+                @for($c = 0; $c < $numCols; $c++)
+                <th width="6%">N°</th><th width="14%">Poids</th>
+                @endfor
             </tr>
         </thead>
         <tbody>
             @for($i = 0; $i < $rowsPerCol; $i++)
             <tr>
-                {{-- Column 1 --}}
-                @php $idx1 = $i; @endphp
-                <td class="index-col">{{ isset($allFilledWeights[$idx1]) ? str_pad($idx1 + 1, 2, '0', STR_PAD_LEFT) : '' }}</td>
-                <td class="poids-col">{{ isset($allFilledWeights[$idx1]) ? number_format($allFilledWeights[$idx1]->poids, 2) : '—' }}</td>
-                
-                {{-- Column 2 --}}
-                @php $idx2 = $i + $rowsPerCol; @endphp
-                <td class="index-col">{{ isset($allFilledWeights[$idx2]) ? str_pad($idx2 + 1, 2, '0', STR_PAD_LEFT) : '' }}</td>
-                <td class="poids-col">{{ isset($allFilledWeights[$idx2]) ? number_format($allFilledWeights[$idx2]->poids, 2) : '—' }}</td>
-                
-                {{-- Column 3 --}}
-                @php $idx3 = $i + (2 * $rowsPerCol); @endphp
-                <td class="index-col">{{ isset($allFilledWeights[$idx3]) ? str_pad($idx3 + 1, 2, '0', STR_PAD_LEFT) : '' }}</td>
-                <td class="poids-col">{{ isset($allFilledWeights[$idx3]) ? number_format($allFilledWeights[$idx3]->poids, 2) : '—' }}</td>
+                @for($c = 0; $c < $numCols; $c++)
+                    @php $idx = $i + ($c * $rowsPerCol); @endphp
+                    <td class="index-col">{{ isset($allFilledWeights[$idx]) ? str_pad($idx + 1, 3, '0', STR_PAD_LEFT) : '' }}</td>
+                    <td class="poids-col">{{ isset($allFilledWeights[$idx]) ? number_format($allFilledWeights[$idx]->poids, 2) : '—' }}</td>
+                @endfor
             </tr>
             @endfor
             
-            @php
-                $sum1 = $allFilledWeights->slice(0, $rowsPerCol)->sum('poids');
-                $sum2 = $allFilledWeights->slice($rowsPerCol, $rowsPerCol)->sum('poids');
-                $sum3 = $allFilledWeights->slice(2 * $rowsPerCol)->sum('poids');
-            @endphp
             <tr class="total-row">
-                <td>T</td><td>{{ number_format($sum1, 2) }}</td>
-                <td>T</td><td>{{ number_format($sum2, 2) }}</td>
-                <td>T</td><td>{{ number_format($sum3, 2) }}</td>
+                @for($c = 0; $c < $numCols; $c++)
+                    @php
+                        $sum = $allFilledWeights->slice($c * $rowsPerCol, $rowsPerCol)->sum('poids');
+                    @endphp
+                    <td>T</td><td>{{ number_format($sum, 2) }}</td>
+                @endfor
             </tr>
         </tbody>
     </table>
