@@ -3,36 +3,7 @@
 @section('content')
 <div class="min-h-screen bg-slate-100 py-5" x-data="arrivageForm()" @keydown.escape.window="showCalculator=false">
 
-{{-- CALCULATRICE --}}
-<div x-show="showCalculator" x-cloak class="fixed inset-0 z-[200] flex items-center justify-center">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showCalculator=false"></div>
-    <div class="relative w-68 rounded-3xl overflow-hidden shadow-2xl" style="background:#1c1c1e;width:260px">
-        <div class="px-4 pt-4 pb-2">
-            <div class="text-right">
-                <p class="font-mono text-xs h-4 truncate" style="color:#636366" x-text="expr"></p>
-                <p class="font-light text-white mt-0.5 truncate" style="font-size:2.6rem;line-height:1.1" x-text="disp"></p>
-                <p class="text-xs mt-1 font-bold" style="color:#30d158" x-show="idx!==null"
-                   x-text="'Case '+String((idx||0)+1).padStart(3,'0')+' — Groupe '+(Math.floor((idx||0)/50)+1)"></p>
-            </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;background:#000;padding:12px;border-radius:0 0 1.5rem 1.5rem">
-            <button type="button" @click="clr()" style="grid-column:span 2;background:#a5a5a5;color:#000;font-size:18px;font-weight:700;border-radius:50px;height:52px;border:none;cursor:pointer">AC</button>
-            <button type="button" @click="back()" style="background:#3a3a3c;color:#fff;border-radius:50%;width:52px;height:52px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:auto">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <button type="button" @click="app('+')" style="background:#ff9f0a;color:#fff;font-size:24px;border-radius:50%;width:52px;height:52px;border:none;cursor:pointer;margin:auto">+</button>
-            @foreach([7,8,9,null,4,5,6,null,1,2,3,null] as $n)
-                @if($n!==null)<button type="button" @click="app('{{$n}}')" style="background:#3a3a3c;color:#fff;font-size:20px;border-radius:50%;width:52px;height:52px;border:none;cursor:pointer;margin:auto">{{$n}}</button>
-                @else<div></div>@endif
-            @endforeach
-            <button type="button" @click="app('.')" style="background:#3a3a3c;color:#fff;font-size:20px;border-radius:50%;width:52px;height:52px;border:none;cursor:pointer;margin:auto">,</button>
-            <button type="button" @click="app('0')" style="background:#3a3a3c;color:#fff;font-size:20px;border-radius:50%;width:52px;height:52px;border:none;cursor:pointer;margin:auto">0</button>
-            <button type="button" @click="ok()" style="grid-column:span 2;background:#30d158;color:#000;font-size:14px;font-weight:800;border-radius:50px;height:52px;border:none;cursor:pointer">
-                VALIDER <i class="fa-solid fa-check ml-1"></i>
-            </button>
-        </div>
-    </div>
-</div>
+{{-- CALCULATRICE SUPPRIMÉE COMME DEMANDÉ --}}
 
 <div class="max-w-6xl mx-auto px-4">
 
@@ -81,7 +52,7 @@
             <div class="flex items-center gap-5 shrink-0">
                 <div class="text-right">
                     <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
-                    <p class="text-xl font-black text-slate-900">#{{ optional(\App\Models\Arrivage::orderBy('id','desc')->first())->id + 1 ?? 1 }}</p>
+                    <p class="text-lg font-black text-slate-900" x-text="bonRef">#</p>
                 </div>
                 <div class="text-right">
                     <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Date</p>
@@ -97,29 +68,19 @@
             <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200 border-b border-slate-200">
                 <div class="flex min-h-[36px]">
                     <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Chauffeur</span>
-                    <select name="chauffeur" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required>
-                        <option value="" disabled selected>— Sélectionner —</option>
-                        @foreach(['Mr YAO','Mr VICTOR','Mr PROMISE'] as $c)
-                        <option value="{{ $c }}">{{ $c }}</option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="chauffeur" list="list-chauffeurs" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required placeholder="Saisir ou choisir">
                 </div>
                 <div class="flex min-h-[36px]">
                     <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Matricule</span>
-                    <input type="text" name="matricule_camion" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent uppercase" required placeholder="AB-1234-CD">
+                    <input type="text" name="matricule_camion" list="list-matricules" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent uppercase" required placeholder="Saisir ou choisir">
                 </div>
                 <div class="flex min-h-[36px]">
                     <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Zone</span>
-                    <input type="text" name="zone_provenance" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required>
+                    <input type="text" name="zone_provenance" list="list-zones" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required placeholder="Saisir ou choisir">
                 </div>
                 <div class="flex min-h-[36px]">
                     <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Fruit</span>
-                    <select name="fruit_type" x-model="globalFruit" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required>
-                        <option value="" disabled selected>— Sélectionner —</option>
-                        <option value="ananas_cayenne">Ananas Cayenne</option>
-                        <option value="ananas_braza">Ananas Braza</option>
-                        <option value="papaye">Papaye</option>
-                    </select>
+                    <input type="text" name="fruit_type" x-model="globalFruit" list="list-fruits" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required placeholder="Saisir ou choisir">
                 </div>
             </div>
         </div>
@@ -192,13 +153,11 @@
                                 {{ str_pad($absIdx+1,3,'0',STR_PAD_LEFT) }}
                             </div>
                             <div class="flex items-center">
-                                <input type="text"
-                                       :value="poids[{{ $absIdx }}]>0?poids[{{ $absIdx }}].toFixed(2):''"
-                                       @click="openCalc({{ $absIdx }})"
-                                       class="w-full text-center text-[10px] font-bold border-0 focus:ring-0 bg-transparent cursor-pointer py-1.5 px-1"
-                                       :class="poids[{{ $absIdx }}]>0?'text-slate-800':'text-slate-200'"
-                                       style="caret-color:transparent"
-                                       placeholder="·" readonly>
+                                <input type="number" step="0.01" min="0"
+                                       x-model.number="poids[{{ $absIdx }}]"
+                                       class="w-full text-center text-[10px] font-bold border-0 focus:ring-1 focus:ring-green-400 bg-transparent py-1.5 px-1 rounded"
+                                       :class="poids[{{ $absIdx }}]>0?'text-slate-800 bg-green-50':'text-slate-200'"
+                                       placeholder="0.00">
                             </div>
                         </div>
                         @endfor
@@ -252,6 +211,42 @@
 
     </form>
 </div>
+
+{{-- DATALISTS POUR LES SÉLECTIONS --}}
+<datalist id="list-chauffeurs">
+    <option value="SOUMAGBO Yao">
+    <option value="AGBADZI Komi Victor">
+    <option value="AMEGBETO K. Promise">
+    <option value="MORKLEY Komi">
+</datalist>
+
+<datalist id="list-matricules">
+    <option value="BL 7151">
+    <option value="BL 7238">
+    <option value="BD 2671">
+    <option value="BH 5895">
+    <option value="bh 5588">
+    <option value="EL 2473">
+</datalist>
+
+<datalist id="list-zones">
+    <option value="Avé">
+    <option value="Zio">
+    <option value="Vo">
+    <option value="Danyi">
+    <option value="Kloto Agou">
+    <option value="Haho">
+    <option value="Bas-mono">
+</datalist>
+
+<datalist id="list-fruits">
+    <option value="Ananas Cayenne">
+    <option value="Ananas Braza">
+    <option value="Papaye">
+    <option value="Banane">
+    <option value="Mangue">
+</datalist>
+
 </div>
 
 <script>
@@ -264,40 +259,23 @@ function arrivageForm() {
         globalFruit: '',
         poids: Array(200).fill(0),
 
-        openCalc(i) {
-            this.idx = i;
-            this.disp = this.poids[i] > 0 ? String(this.poids[i]) : '0';
-            this.expr = '';
-            this.showCalculator = true;
-        },
-
-        app(v) {
-            if (v === '+') {
-                this.expr = this.disp + '+';
-                this.disp = '0';
-                return;
+        get bonRef() {
+            let id = {{ optional(\App\Models\Arrivage::orderBy('id','desc')->first())->id + 1 ?? 1 }};
+            let f = (this.globalFruit || '').toLowerCase().trim();
+            let code = 'DIV';
+            if (f.includes('ananas')) code = 'ANAS';
+            else if (f.includes('papaye')) code = 'PAP';
+            else if (f.includes('banane')) code = 'BAN';
+            else if (f.includes('mangue')) code = 'MAN';
+            else if (f) {
+                // Prend les 3 premieres lettres du fruit si non connu
+                code = f.substring(0, 3).toUpperCase();
             }
-            this.disp = (this.disp === '0' && v !== '.') ? v : this.disp + v;
+            return String(id).padStart(3, '0') + '/' + code + '/' + new Date().getFullYear();
         },
 
-        clr() { this.disp = '0'; this.expr = ''; },
-
-        back() {
-            this.disp = this.disp.length > 1 ? this.disp.slice(0, -1) : '0';
-        },
-
-        ok() {
-            let e = (this.expr + this.disp).replace(/,/g, '.');
-            if (/[+\-]$/.test(e)) e = e.slice(0, -1);
-            try {
-                const r = new Function('return ' + e)();
-                if (!isNaN(r) && isFinite(r) && r >= 0) {
-                    const a = [...this.poids];
-                    a[this.idx] = parseFloat(r.toFixed(2));
-                    this.poids = a;
-                }
-            } catch (_) {}
-            this.showCalculator = false;
+        openCalc(i) {
+            // Désactivé
         },
 
         clearAll() {

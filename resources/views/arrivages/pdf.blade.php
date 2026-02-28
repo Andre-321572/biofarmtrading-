@@ -108,11 +108,9 @@
         <div class="header-center">
             <div class="company-name">BIO FARM TRADING</div>
             <div class="company-desc">Production-Commercialisation de produits agricoles biologiques - Conseils - Formations en Agrobusiness</div>
-            <div class="document-title">Bon d'Arrivage N° {{ str_pad($arrivage->id, 10, '0', STR_PAD_LEFT) }}</div>
+            <div class="document-title">Bon d'Arrivage N° {{ $arrivage->bon_ref }}</div>
         </div>
         <div class="bon-info">
-            <div class="bon-label">BON N°</div>
-            <div class="bon-number">#{{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }}</div>
             <div class="bon-label">DATE</div>
             <div class="bon-date">{{ $arrivage->date_arrivage->format('d/m/Y') }}</div>
         </div>
@@ -132,13 +130,7 @@
         <tr>
             <td class="info-label">Fruit</td>
             <td class="info-value">
-                @if($arrivage->total_ananas > 0)
-                    Ananas {{ $arrivage->total_ananas_cayenne > 0 ? 'Cayenne' : ($arrivage->total_ananas_braza > 0 ? 'Braza' : '') }}
-                @elseif($arrivage->total_papaye > 0)
-                    Papaye
-                @else
-                    -
-                @endif
+                {{ $arrivage->fruit_label }}
             </td>
             <td class="info-label" style="background-color:#fff; border:none"></td>
             <td class="info-value" style="border:none"></td>
@@ -203,9 +195,8 @@
     </table>
 
     <div class="small-footer">
-        BIO FARM TRADING - NIF 1002966783 - Tél : (+229) 97562640 / 97264340 - Capital 51 000 000 FCFA - www.biofarmtrading.com<br>
-        Document généré le {{ now()->format('d/m/Y à H:i') }} - Bon N° {{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }} - {{ $count }} case(s) saisie(s)
+        BIO FARM TRADING - NIF 1002966783 - Tél : (+229) 97562640 / 97264340 - www.biofarmtrading.com<br>
+        Document généré le {{ now()->format('d/m/Y à H:i') }}
     </div>
-
 </body>
 </html>

@@ -10,7 +10,7 @@
                 <a href="{{ route('arrivages.index') }}" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <i class="fa-solid fa-circle-arrow-left text-2xl"></i>
                 </a>
-                Détails de l'Arrivage #{{ $arrivage->id }}
+                Détails de l'Arrivage #{{ $arrivage->bon_ref }}
             </h2>
             <div class="flex gap-3">
                 <a href="{{ route('arrivages.pdf', $arrivage) }}" class="inline-flex items-center px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm">

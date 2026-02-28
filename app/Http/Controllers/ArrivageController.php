@@ -33,9 +33,9 @@ class ArrivageController extends Controller
             'matricule_camion' => 'required|string|max:255',
             'date_arrivage' => 'required|date',
             'zone_provenance' => 'required|string|max:255',
-            'fruit_type' => 'required|string|in:ananas_cayenne,ananas_braza,papaye',
+            'fruit_type' => 'required|string|max:255',
             'poids' => 'required|array',
-            'poids.*' => 'numeric|min:0',
+            'poids.*' => 'nullable|numeric|min:0',
         ]);
 
         $arrivage = Arrivage::create([
@@ -47,12 +47,14 @@ class ArrivageController extends Controller
         ]);
 
         // Déterminer le fruit et la variété en fonction du type global
-        $fruit = 'ananas';
-        $variete = 'cayenne_lisse';
+        $fruit_type = strtolower($validated['fruit_type']);
+        $fruit = $fruit_type;
+        $variete = 'normale';
 
-        if ($validated['fruit_type'] === 'ananas_braza') {
-            $variete = 'braza';
-        } elseif ($validated['fruit_type'] === 'papaye') {
+        if (str_contains($fruit_type, 'ananas')) {
+            $fruit = 'ananas';
+            $variete = str_contains($fruit_type, 'braza') ? 'braza' : 'cayenne_lisse';
+        } elseif (str_contains($fruit_type, 'papaye')) {
             $fruit = 'papaye';
             $variete = 'non_applicable';
         }

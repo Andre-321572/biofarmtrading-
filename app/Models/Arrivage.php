@@ -59,6 +59,37 @@ class Arrivage extends Model
             ->sum('poids');
     }
 
+    public function getFruitLabelAttribute()
+    {
+        $firstDetail = $this->details()->first();
+        if (!$firstDetail) return '-';
+        
+        $fruit = $firstDetail->fruit;
+        $variete = $firstDetail->variete;
+        
+        if ($fruit === 'ananas') {
+            return 'Ananas ' . ($variete === 'braza' ? 'Braza' : 'Cayenne');
+        }
+        
+        return ucfirst($fruit);
+    }
+
+    public function getBonRefAttribute()
+    {
+        $firstDetail = $this->details->first();
+        $fruit_c = $firstDetail ? strtoupper($firstDetail->fruit) : 'DIV';
+        
+        if (str_contains($fruit_c, 'ANANAS')) $fruit_c = 'ANAS';
+        elseif (str_contains($fruit_c, 'PAPAYE')) $fruit_c = 'PAP';
+        elseif (str_contains($fruit_c, 'BANANE')) $fruit_c = 'BAN';
+        elseif (str_contains($fruit_c, 'MANGUE')) $fruit_c = 'MAN';
+        else $fruit_c = substr($fruit_c, 0, 3);
+        
+        $year = $this->date_arrivage ? $this->date_arrivage->format('Y') : date('Y');
+        
+        return str_pad($this->id, 3, '0', STR_PAD_LEFT) . '/' . $fruit_c . '/' . $year;
+    }
+
     // Total général (pour information)
     public function getTotalGeneralAttribute()
     {

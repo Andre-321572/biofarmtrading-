@@ -77,8 +77,8 @@
                                 <!-- ID -->
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-gray-100 rounded-lg text-gray-500 font-bold text-sm group-hover:bg-green-100 group-hover:text-green-700 transition-colors">
-                                            #{{ $arrivage->id }}
+                                        <div class="px-2 py-1 flex-shrink-0 flex items-center justify-center bg-gray-100 rounded-lg text-gray-500 font-bold text-xs group-hover:bg-green-100 group-hover:text-green-700 transition-colors uppercase">
+                                            {{ $arrivage->bon_ref }}
                                         </div>
                                     </div>
                                 </td>
