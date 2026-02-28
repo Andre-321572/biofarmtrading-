@@ -41,23 +41,25 @@
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" style="font-family:'Courier New',monospace">
 
         {{-- HEADER DOCUMENT --}}
-        <div class="flex items-center gap-4 px-5 py-3 border-b-2 border-slate-800 bg-slate-50">
-            <div class="w-14 h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white flex items-center justify-center shrink-0">
-                <img src="{{ asset('images/logo.jpg') }}" class="w-12 h-12 object-contain" onerror="this.style.display='none'">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-5 py-4 border-b-2 border-slate-800 bg-slate-50">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="w-12 h-12 flex-shrink-0 sm:w-14 sm:h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white flex items-center justify-center">
+                    <img src="{{ asset('images/logo.jpg') }}" class="w-10 h-10 sm:w-12 sm:h-12 object-contain" onerror="this.style.display='none'">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm sm:text-lg font-black tracking-widest text-slate-900 uppercase truncate">Bio Farm Trading</p>
+                    <p class="text-[9px] sm:text-xs text-slate-500 whitespace-normal sm:truncate leading-tight">Production · Commercialisation de produits agricoles biologiques</p>
+                </div>
             </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-lg font-black tracking-widest text-slate-900 uppercase truncate">Bio Farm Trading</p>
-                <p class="text-xs text-slate-500 truncate">Production · Commercialisation de produits agricoles biologiques</p>
-            </div>
-            <div class="flex items-center gap-5 shrink-0">
-                <div class="text-right">
+            <div class="flex items-center justify-between md:justify-end gap-5 flex-shrink-0 border-t border-slate-200 md:border-0 pt-3 md:pt-0">
+                <div class="text-left md:text-right">
                     <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
-                    <p class="text-lg font-black text-slate-900" x-text="bonRef">#</p>
+                    <p class="text-base sm:text-lg font-black text-slate-900" x-text="bonRef">#</p>
                 </div>
                 <div class="text-right">
                     <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Date</p>
                     <input type="date" name="date_arrivage" value="{{ date('Y-m-d') }}"
-                           class="text-sm font-black text-slate-900 border-0 border-b-2 border-slate-300 bg-transparent focus:border-green-600 focus:ring-0 p-0 w-32" required>
+                           class="text-sm font-black text-slate-900 border-0 border-b-2 border-slate-300 bg-transparent focus:border-green-600 focus:ring-0 p-0 w-28 sm:w-32 text-right md:text-left" required>
                 </div>
             </div>
         </div>
@@ -65,34 +67,34 @@
         {{-- INFOS GÉNÉRALES --}}
         <div class="border-b border-slate-300">
             {{-- Ligne 1 --}}
-            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200 border-b border-slate-200">
-                <div class="flex min-h-[36px]">
-                    <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Chauffeur</span>
-                    <input type="text" name="chauffeur" list="list-chauffeurs" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required placeholder="Saisir ou choisir">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-200 border-b border-slate-200">
+                <div class="flex min-h-[40px] bg-white">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight">Chauffeur</span>
+                    <input type="text" name="chauffeur" list="list-chauffeurs" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir">
                 </div>
-                <div class="flex min-h-[36px]">
-                    <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Matricule</span>
-                    <input type="text" name="matricule_camion" list="list-matricules" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent uppercase" required placeholder="Saisir ou choisir">
+                <div class="flex min-h-[40px] bg-white">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight">Matricule</span>
+                    <input type="text" name="matricule_camion" list="list-matricules" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent uppercase w-full" required placeholder="Saisir ou choisir">
                 </div>
-                <div class="flex min-h-[36px]">
-                    <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Zone</span>
-                    <input type="text" name="zone_provenance" list="list-zones" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required placeholder="Saisir ou choisir">
+                <div class="flex min-h-[40px] bg-white">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight">Zone</span>
+                    <input type="text" name="zone_provenance" list="list-zones" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir">
                 </div>
-                <div class="flex min-h-[36px]">
-                    <span class="bg-slate-100 border-r border-slate-200 px-2 py-1 text-[9px] font-bold uppercase text-slate-500 w-24 flex items-center shrink-0 leading-tight">Fruit</span>
-                    <input type="text" name="fruit_type" x-model="globalFruit" list="list-fruits" class="flex-1 px-2 text-xs font-semibold border-0 focus:ring-0 bg-transparent" required placeholder="Saisir ou choisir">
+                <div class="flex min-h-[40px] bg-white">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight">Fruit</span>
+                    <input type="text" name="fruit_type" x-model="globalFruit" list="list-fruits" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir">
                 </div>
             </div>
         </div>
 
         {{-- BARRE STATS GLOBALE --}}
-        <div class="flex items-center justify-between px-4 py-1.5 bg-slate-800">
-            <div class="text-xs text-slate-300 font-mono flex items-center gap-3">
+        <div class="flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3 px-4 py-3 sm:py-2 bg-slate-800">
+            <div class="text-sm text-slate-300 font-mono flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 <span>Cases : <span class="font-black text-white" x-text="filled()"></span>/200</span>
                 <span class="opacity-30">|</span>
                 <span>Total : <span class="font-black text-green-400" x-text="totalG().toFixed(2)+' kg'"></span></span>
             </div>
-            <button type="button" @click="clearAll()" class="text-xs text-red-400 hover:text-red-300 transition flex items-center gap-2">
+            <button type="button" @click="clearAll()" class="text-sm text-red-400 hover:text-red-300 transition flex items-center justify-center gap-2 w-full sm:w-auto bg-slate-700/50 sm:bg-transparent py-2 sm:py-0 rounded-lg sm:rounded-none">
                 <i class="fa-solid fa-trash-can"></i> Tout effacer
             </button>
         </div>
@@ -134,8 +136,8 @@
             </button>
 
             {{-- GRILLE 50 CASES --}}
-            <div x-show="open" x-collapse class="{{ $g['light'] }} p-3">
-                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+            <div x-show="open" x-collapse class="{{ $g['light'] }} p-2 sm:p-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
 
                     @for($col=0; $col<5; $col++)
                     @php $colOffset = $offset + $col*10; @endphp
@@ -148,14 +150,14 @@
                         @php $absIdx = $colOffset + $row; @endphp
                         <div class="grid grid-cols-2 border-b border-slate-100 hover:bg-slate-50 group transition-colors"
                              :class="poids[{{ $absIdx }}]>0?'{{ $g['light'] }}':''">
-                            <div class="py-1.5 text-center text-[9px] font-bold border-r border-slate-200 flex items-center justify-center transition-colors"
+                            <div class="py-1 text-center text-[10px] font-bold border-r border-slate-200 flex items-center justify-center transition-colors"
                                  :class="poids[{{ $absIdx }}]>0?'{{ $g['text'] }}':'text-slate-300'">
                                 {{ str_pad($absIdx+1,3,'0',STR_PAD_LEFT) }}
                             </div>
                             <div class="flex items-center">
                                 <input type="number" step="0.01" min="0"
                                        x-model.number="poids[{{ $absIdx }}]"
-                                       class="w-full text-center text-[10px] font-bold border-0 focus:ring-1 focus:ring-green-400 bg-transparent py-1.5 px-1 rounded"
+                                       class="w-full text-center text-xs sm:text-[10px] font-bold border-0 focus:ring-1 focus:ring-green-400 bg-transparent py-2.5 sm:py-1.5 px-1 rounded"
                                        :class="poids[{{ $absIdx }}]>0?'text-slate-800 bg-green-50':'text-slate-200'"
                                        placeholder="0.00">
                             </div>
@@ -197,12 +199,12 @@
 
     </div>
 
-    <div class="mt-4 flex items-center justify-between">
-        <p class="text-xs text-slate-400">Cliquez sur une case pour saisir le poids</p>
-        <div class="flex gap-3">
-            <a href="{{ route('arrivages.index') }}" class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">Annuler</a>
+    <div class="mt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-slate-400 text-center sm:text-left w-full sm:w-auto">Cliquez sur une case pour saisir le poids</p>
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <a href="{{ route('arrivages.index') }}" class="px-4 py-3 sm:py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition text-center w-full sm:w-auto">Annuler</a>
             <button type="button" @click="submitForm()"
-                    class="inline-flex items-center gap-2 px-5 py-2 bg-green-600 rounded-xl text-sm font-bold text-white hover:bg-green-700 shadow transition focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 sm:py-2.5 bg-green-600 rounded-xl text-sm font-bold text-white hover:bg-green-700 shadow transition focus:ring-2 focus:ring-green-500 focus:ring-offset-2 w-full sm:w-auto">
                 <i class="fa-solid fa-check"></i>
                 Enregistrer
             </button>
