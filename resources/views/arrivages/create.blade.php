@@ -126,15 +126,15 @@
                 </div>
 
                 {{-- PH --}}
-                <div class="flex min-h-[40px] bg-white border-l border-slate-200">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-16 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">PH</span>
-                    <input type="text" name="ph" class="flex-1 px-3 py-2 text-sm sm:text-xs font-black border-0 focus:ring-0 bg-transparent w-full" placeholder="0.0">
+                <div class="flex min-h-[40px] bg-white relative">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">PH</span>
+                    <input type="text" name="ph" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" placeholder="Ex: 4.5" autocomplete="off">
                 </div>
 
                 {{-- Brix --}}
-                <div class="flex min-h-[40px] bg-white border-l border-slate-200">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-16 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Brix</span>
-                    <input type="text" name="brix" class="flex-1 px-3 py-2 text-sm sm:text-xs font-black border-0 focus:ring-0 bg-transparent w-full" placeholder="0.0 %">
+                <div class="flex min-h-[40px] bg-white relative">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Brix</span>
+                    <input type="text" name="brix" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" placeholder="Ex: 12.5 %" autocomplete="off">
                 </div>
             </div>
         </div>
