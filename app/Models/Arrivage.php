@@ -11,6 +11,8 @@ class Arrivage extends Model
         'matricule_camion',
         'date_arrivage',
         'zone_provenance',
+        'ph',
+        'brix',
         'user_id'
     ];
 

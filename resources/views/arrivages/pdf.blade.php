@@ -133,8 +133,10 @@
             <td class="info-value">
                 {{ $arrivage->fruit_label }}
             </td>
-            <td class="info-label" style="background-color:#fff; border:none"></td>
-            <td class="info-value" style="border:none"></td>
+            <td class="info-label">QUALITÉ (PH / BRIX)</td>
+            <td class="info-value">
+                PH: {{ $arrivage->ph ?? '-' }} &nbsp;&nbsp; | &nbsp;&nbsp; BRIX: {{ $arrivage->brix ? $arrivage->brix . '%' : '-' }}
+            </td>
         </tr>
     </table>
 

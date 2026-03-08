@@ -34,6 +34,8 @@ class ArrivageController extends Controller
             'date_arrivage' => 'required|date',
             'zone_provenance' => 'required|string|max:255',
             'fruit_type' => 'required|string|max:255',
+            'ph' => 'nullable|string|max:20',
+            'brix' => 'nullable|string|max:20',
             'poids' => 'required|array',
             'poids.*' => 'nullable|numeric|min:0',
         ]);
@@ -43,6 +45,8 @@ class ArrivageController extends Controller
             'matricule_camion' => $validated['matricule_camion'],
             'date_arrivage' => $validated['date_arrivage'],
             'zone_provenance' => $validated['zone_provenance'],
+            'ph' => $validated['ph'],
+            'brix' => $validated['brix'],
             'user_id' => Auth::id(),
         ]);
 

@@ -26,7 +26,7 @@
 
         <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
             <!-- Info Banner -->
-            <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Transport</p>
                     <div class="mt-1 flex items-center gap-2">
@@ -34,12 +34,26 @@
                         <span class="px-2 py-0.5 rounded-md bg-gray-200 text-gray-600 text-xs font-mono">{{ $arrivage->matricule_camion }}</span>
                     </div>
                 </div>
-                <div class="md:text-right">
+                <div>
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Provenance & Date</p>
                     <div class="mt-1">
                         <span class="font-medium text-gray-900">{{ $arrivage->zone_provenance }}</span>
                         <span class="text-gray-400 mx-2">•</span>
                         <span class="text-gray-600">{{ $arrivage->date_arrivage->format('d/m/Y') }}</span>
+                    </div>
+                </div>
+                <div class="md:text-right">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Qualité</p>
+                    <div class="mt-1 flex items-center md:justify-end gap-3">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 uppercase font-bold">PH</span>
+                            <span class="font-bold text-gray-900">{{ $arrivage->ph ?? '-' }}</span>
+                        </div>
+                        <div class="w-px h-8 bg-gray-200"></div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 uppercase font-bold">BRIX</span>
+                            <span class="font-bold text-green-600">{{ $arrivage->brix ? $arrivage->brix . ' %' : '-' }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

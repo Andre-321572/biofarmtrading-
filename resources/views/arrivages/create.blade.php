@@ -67,7 +67,7 @@
         {{-- INFOS GÉNÉRALES --}}
         <div class="border-b border-slate-300">
             {{-- Ligne 1 --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-200 border-b border-slate-200">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-[1px] bg-slate-200 border-b border-slate-200">
                 
                 {{-- Chauffeur --}}
                 <div class="flex min-h-[40px] bg-white relative" x-data="{ open: false, val: '', opts: ['SOUMAGBO Yao', 'AGBADZI Komi Victor', 'AMEGBETO K. Promise', 'MORKLEY Komi'] }" @click.away="open = false" :class="open ? 'z-50' : 'z-10'">
@@ -123,6 +123,18 @@
                             </template>
                         </ul>
                     </div>
+                </div>
+
+                {{-- PH --}}
+                <div class="flex min-h-[40px] bg-white border-l border-slate-200">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-16 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">PH</span>
+                    <input type="text" name="ph" class="flex-1 px-3 py-2 text-sm sm:text-xs font-black border-0 focus:ring-0 bg-transparent w-full" placeholder="0.0">
+                </div>
+
+                {{-- Brix --}}
+                <div class="flex min-h-[40px] bg-white border-l border-slate-200">
+                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-16 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Brix</span>
+                    <input type="text" name="brix" class="flex-1 px-3 py-2 text-sm sm:text-xs font-black border-0 focus:ring-0 bg-transparent w-full" placeholder="0.0 %">
                 </div>
             </div>
         </div>
