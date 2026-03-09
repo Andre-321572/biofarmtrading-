@@ -32,17 +32,16 @@
         .document-title { 
             font-size: 13px; 
             font-weight: bold; 
-            border-top: 1.5px solid #000; 
-            border-bottom: 1.5px solid #000;
             padding: 4px 0;
-            margin: 5px auto;
-            width: 70%;
+            margin: 2px auto;
+            width: 90%;
             text-transform: uppercase;
         }
         .bon-info { position: absolute; right: 0; top: 0; text-align: right; }
-        .bon-label { font-size: 7px; color: #999; font-weight: bold; text-transform: uppercase; }
-        .bon-number { font-size: 15px; font-weight: 900; margin-bottom: 5px; }
-        .bon-date { font-size: 10px; font-weight: bold; }
+        .bon-label { font-size: 8px; color: #999; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+        .bon-date { font-size: 11px; font-weight: 1000; color: #000; }
+
+        .header-separator { border-top: 1.5px solid #000; margin: 2px 0; width: 100%; }
 
         /* Info Grid */
         .info-grid { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 1.5px solid #333; }
@@ -60,10 +59,11 @@
             text-align: center; 
             font-weight: bold; 
             padding: 5px; 
-            letter-spacing: 8px;
+            letter-spacing: 12px;
             text-transform: uppercase;
             font-size: 10px;
             margin-bottom: 0px;
+            padding-left: 12px; /* Center compensation for letter spacing */
         }
 
         /* Weight Table */
@@ -96,9 +96,9 @@
         }
 
         /* Summary Footer */
-        .summary-table { width: 100%; border-collapse: collapse; margin-top: 5px; border: 2px solid #34495e; }
-        .summary-label { background-color: #f8f8f8; padding: 8px; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 70%; border-right: 1px solid #34495e; }
-        .summary-value { padding: 8px; font-weight: 1000; font-size: 14px; text-align: right; background-color: #fff; }
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 10px; border: 2.5px solid #34495e; }
+        .summary-label { background-color: #f8f8f8; padding: 10px; font-weight: bold; text-transform: uppercase; font-size: 11px; width: 65%; border-right: 1px solid #34495e; color: #333; }
+        .summary-value { padding: 10px; font-weight: 1000; font-size: 16px; text-align: right; background-color: #fff; color: #000; }
 
         /* Signature Section */
         .signature-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
@@ -134,14 +134,16 @@
         </table>
     </div>
 
-    <div class="header-container">
+    <div class="header-container" style="height: 100px;">
         <div class="logo-box">
             <img src="{{ public_path('images/logo.jpg') }}" class="logo">
         </div>
         <div class="header-center">
             <div class="company-name">BIO FARM TRADING</div>
             <div class="company-desc">Production-Transformation-Commercialisation de produits agricoles biologiques</div>
-            <div class="document-title">Bon d'Arrivage N° {{ $arrivage->bon_ref }}</div>
+            <div class="header-separator"></div>
+            <div class="document-title">BON D'ARRIVAGE N° {{ $arrivage->bon_ref }}</div>
+            <div class="header-separator"></div>
         </div>
         <div class="bon-info">
             <div class="bon-label">DATE</div>
@@ -214,7 +216,7 @@
 
     <table class="summary-table">
         <tr>
-            <td class="summary-label">Poids Total de l'Arrivage :</td>
+            <td class="summary-label">POIDS TOTAL DE L'ARRIVAGE :</td>
             <td class="summary-value">{{ number_format($arrivage->total_general, 2) }} kg</td>
         </tr>
     </table>
