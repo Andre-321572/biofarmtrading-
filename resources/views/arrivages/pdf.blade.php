@@ -105,10 +105,10 @@
         .signature-box { width: 48%; border: none; height: 80px; padding: 5px; vertical-align: top; }
         .header-container { width: 100%; margin-bottom: 5px; position: relative; height: 80px; margin-top: 5px; }
         .footer-table { width: 100%; border-collapse: collapse; }
-        .footer-left-info { width: 70%; font-size: 7.5px; line-height: 1.3; color: #000; font-weight: bold; text-align: center; }
-        .footer-right-certif { width: 30%; font-size: 7px; vertical-align: middle; border-left: 1px solid #ddd; padding-left: 10px; }
-        .certif-box { display: inline-block; vertical-align: middle; width: 35px; border: 0.5px solid #999; padding: 2px; background: white; text-align: center; margin-right: 5px; }
-        .certif-text { display: inline-block; vertical-align: middle; font-weight: bold; line-height: 1.1; text-align: left; }
+        .footer-left-info { width: 70%; font-size: 8px; line-height: 1.3; color: #000; font-family: 'Times', 'serif'; text-align: center; }
+        .footer-right-certif { width: 30%; font-size: 7.5px; vertical-align: middle; border-left: 1px solid #999; padding-left: 10px; font-family: 'Times', 'serif'; }
+        .certif-box { display: inline-block; vertical-align: middle; width: 35px; border: 0.5px solid #000; padding: 2px; background: white; text-align: center; margin-right: 5px; }
+        .certif-text { display: inline-block; vertical-align: middle; font-weight: normal; line-height: 1.1; text-align: left; }
     </style>
 </head>
 <body>
@@ -116,13 +116,13 @@
         <table class="footer-table">
             <tr>
                 <td class="footer-left-info">
-                    BIO FARM TRADING RCCM : TG-LOM 2019 B 1488 ; NIF 1001469316 ; Capital 10 000 000 de FCFA.<br>
+                    BIO FARM TRADING RCCM : TG-LOM 2019 B 1488 : NIF 1001469316 : Capital 10 000 000 de FCFA.<br>
                     Noépé_Baka Kondji. Rue derière EPP Noépé Tél.: (+228) 92 02 01 10 .<br>
                     E-mail: tbiofarm@gmail.com //// www.biofarmtogo.com
                 </td>
                 <td class="footer-right-certif">
                     <div class="certif-box">
-                        <img src="{{ public_path('images/logo.jpg') }}" style="width: 25px;">
+                        <!-- Euro-leaf logo placeholder -->
                     </div>
                     <div class="certif-text">
                         Produits bios Certifiés Par<br>
