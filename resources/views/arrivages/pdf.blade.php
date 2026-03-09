@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Arrivage #{{ str_pad($arrivage->id, 7, '0', STR_PAD_LEFT) }}</title>
     <style>
-        @page { margin: 0.5cm 1cm; }
+        @page { margin: 0.5cm 1cm 2cm 1cm; }
         body { 
             font-family: 'Helvetica', sans-serif; 
             font-size: 8.5px; 
@@ -12,8 +12,18 @@
             line-height: 1.2;
         }
         
-        /* Header Section */
-        .header-container { width: 100%; margin-bottom: 5px; position: relative; height: 80px; }
+        /* Fixed Footer */
+        .footer-bar { 
+            position: fixed; 
+            bottom: -1cm; 
+            left: 0; 
+            right: 0; 
+            background: #f8f8f8; 
+            border-top: 1.5px solid #000; 
+            padding: 5px 15px; 
+            height: 45px;
+            text-align: center;
+        }
         .logo-box { position: absolute; left: 0; top: 0; }
         .logo { width: 75px; } /* Logo without circle as requested */
         .header-center { text-align: center; width: 100%; }
@@ -93,28 +103,36 @@
         /* Signature Section */
         .signature-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
         .signature-box { width: 48%; border: none; height: 80px; padding: 5px; vertical-align: top; }
-        .signature-title { font-weight: bold; text-transform: uppercase; font-size: 8px; color: #333; }
-        .signature-placeholder { margin-top: 55px; border-top: 1px dotted #999; text-align: center; font-size: 7px; color: #aaa; padding-top: 2px; }
-
-        /* Modernized Footer */
-        .footer-bar { 
-            position: fixed; 
-            bottom: 0.2cm; 
-            left: 0; 
-            right: 0; 
-            background: #f8f8f8; 
-            border-top: 1.5px solid #000; 
-            padding: 5px 15px; 
-            height: 45px;
-        }
+        .header-container { width: 100%; margin-bottom: 5px; position: relative; height: 80px; margin-top: 5px; }
         .footer-table { width: 100%; border-collapse: collapse; }
         .footer-left-info { width: 70%; font-size: 7.5px; line-height: 1.3; color: #000; font-weight: bold; text-align: center; }
         .footer-right-certif { width: 30%; font-size: 7px; vertical-align: middle; border-left: 1px solid #ddd; padding-left: 10px; }
         .certif-box { display: inline-block; vertical-align: middle; width: 35px; border: 0.5px solid #999; padding: 2px; background: white; text-align: center; margin-right: 5px; }
-        .certif-text { display: inline-block; vertical-align: middle; font-weight: bold; line-height: 1.1; }
+        .certif-text { display: inline-block; vertical-align: middle; font-weight: bold; line-height: 1.1; text-align: left; }
     </style>
 </head>
 <body>
+    <div class="footer-bar">
+        <table class="footer-table">
+            <tr>
+                <td class="footer-left-info">
+                    BIO FARM TRADING RCCM : TG-LOM 2019 B 1488 ; NIF 1001469316 ; Capital 10 000 000 de FCFA.<br>
+                    Noépé_Baka Kondji. Rue derière EPP Noépé Tél.: (+228) 92 02 01 10 .<br>
+                    E-mail: tbiofarm@gmail.com //// www.biofarmtogo.com
+                </td>
+                <td class="footer-right-certif">
+                    <div class="certif-box">
+                        <img src="{{ public_path('images/logo.jpg') }}" style="width: 25px;">
+                    </div>
+                    <div class="certif-text">
+                        Produits bios Certifiés Par<br>
+                        Ecocert S.A.S<br>
+                        TG - BIO - 154
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 
     <div class="header-container">
         <div class="logo-box">
@@ -201,26 +219,5 @@
         </tr>
     </table>
 
-    <div class="footer-bar">
-        <table class="footer-table">
-            <tr>
-                <td class="footer-left-info">
-                    BIO FARM TRADING RCCM : TG-LOM 2019 B 1488 ; NIF 1001469316 ; Capita 10 000 000 de FCFA.<br>
-                    Noépé_Baka Kondji. Rue derière EPP Noépé Tél.: (+228) 92 02 01 10 .<br>
-                    E-mail: tbiofarm@gmail.com //// www.biofarmtogo.com
-                </td>
-                <td class="footer-right-certif">
-                    <div class="certif-box">
-                        <img src="{{ public_path('images/logo.jpg') }}" style="width: 25px; filter: grayscale(100%)">
-                    </div>
-                    <div class="certif-text">
-                        Produits bios Certifiés Par<br>
-                        Ecocert S.A.S<br>
-                        TG - BIO - 154
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
 </body>
 </html>
