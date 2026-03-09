@@ -70,59 +70,27 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-[1px] bg-slate-200 border-b border-slate-200">
                 
                 {{-- Chauffeur --}}
-                <div class="flex min-h-[40px] bg-white relative" x-data="{ open: false, val: '', opts: ['SOUMAGBO Yao', 'AGBADZI Komi Victor', 'AMEGBETO K. Promise', 'MORKLEY Komi'] }" @click.away="open = false" :class="open ? 'z-50' : 'z-10'">
+                <div class="flex min-h-[40px] bg-white relative">
                     <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Chauffeur</span>
-                    <input type="text" name="chauffeur" x-model="val" @focus="open = true" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
-                    <button type="button" @click="open = !open" class="px-3 text-slate-400 hover:text-slate-600 outline-none bg-white"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-                    <div x-show="open" style="display:none;" class="absolute top-[100%] left-0 right-0 bg-white border border-slate-200 shadow-xl rounded-b-lg max-h-48 overflow-y-auto mt-[1px]">
-                        <ul class="py-1">
-                            <template x-for="opt in opts.filter(o => o.toLowerCase().includes(val.toLowerCase()))">
-                                <li @click="val = opt; open = false" class="px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-green-50 hover:text-green-700 cursor-pointer" x-text="opt"></li>
-                            </template>
-                        </ul>
-                    </div>
+                    <input type="text" list="list_chauffeurs" name="chauffeur" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
                 </div>
 
                 {{-- Matricule --}}
-                <div class="flex min-h-[40px] bg-white relative" x-data="{ open: false, val: '', opts: ['BL 7151', 'BL 7238', 'BD 2671', 'BH 5895', 'BH 5588', 'EL 2473'] }" @click.away="open = false" :class="open ? 'z-50' : 'z-10'">
+                <div class="flex min-h-[40px] bg-white relative">
                     <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Matricule</span>
-                    <input type="text" name="matricule_camion" x-model="val" @focus="open = true" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent uppercase w-full" required placeholder="Saisir ou choisir" autocomplete="off">
-                    <button type="button" @click="open = !open" class="px-3 text-slate-400 hover:text-slate-600 outline-none bg-white"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-                    <div x-show="open" style="display:none;" class="absolute top-[100%] left-0 right-0 bg-white border border-slate-200 shadow-xl rounded-b-lg max-h-48 overflow-y-auto mt-[1px]">
-                        <ul class="py-1">
-                            <template x-for="opt in opts.filter(o => o.toLowerCase().includes(val.toLowerCase()))">
-                                <li @click="val = opt; open = false" class="px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-green-50 hover:text-green-700 cursor-pointer uppercase" x-text="opt"></li>
-                            </template>
-                        </ul>
-                    </div>
+                    <input type="text" list="list_matricules" name="matricule_camion" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent uppercase w-full" required placeholder="Saisir ou choisir" autocomplete="off">
                 </div>
 
                 {{-- Zone --}}
-                <div class="flex min-h-[40px] bg-white relative" x-data="{ open: false, val: '', opts: ['Avé', 'Zio', 'Vo', 'Danyi', 'Kloto Agou', 'Haho', 'Bas-mono'] }" @click.away="open = false" :class="open ? 'z-50' : 'z-10'">
+                <div class="flex min-h-[40px] bg-white relative">
                     <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Zone</span>
-                    <input type="text" name="zone_provenance" x-model="val" @focus="open = true" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
-                    <button type="button" @click="open = !open" class="px-3 text-slate-400 hover:text-slate-600 outline-none bg-white"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-                    <div x-show="open" style="display:none;" class="absolute top-[100%] left-0 right-0 bg-white border border-slate-200 shadow-xl rounded-b-lg max-h-48 overflow-y-auto mt-[1px]">
-                        <ul class="py-1">
-                            <template x-for="opt in opts.filter(o => o.toLowerCase().includes(val.toLowerCase()))">
-                                <li @click="val = opt; open = false" class="px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-green-50 hover:text-green-700 cursor-pointer" x-text="opt"></li>
-                            </template>
-                        </ul>
-                    </div>
+                    <input type="text" list="list_zones" name="zone_provenance" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
                 </div>
 
                 {{-- Fruit --}}
-                <div class="flex min-h-[40px] bg-white relative" x-data="{ open: false, opts: ['Ananas Cayenne', 'Ananas Braza', 'Papaye', 'Banane', 'Mangue'] }" @click.away="open = false" :class="open ? 'z-50' : 'z-10'">
+                <div class="flex min-h-[40px] bg-white relative">
                     <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Fruit</span>
-                    <input type="text" name="fruit_type" x-model="globalFruit" @focus="open = true" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
-                    <button type="button" @click="open = !open" class="px-3 text-slate-400 hover:text-slate-600 outline-none bg-white"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-                    <div x-show="open" style="display:none;" class="absolute top-[100%] left-0 right-0 bg-white border border-slate-200 shadow-xl rounded-b-lg max-h-48 overflow-y-auto mt-[1px]">
-                        <ul class="py-1">
-                            <template x-for="opt in opts.filter(o => o.toLowerCase().includes(globalFruit.toLowerCase()))">
-                                <li @click="globalFruit = opt; open = false" class="px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-green-50 hover:text-green-700 cursor-pointer" x-text="opt"></li>
-                            </template>
-                        </ul>
-                    </div>
+                    <input type="text" list="list_fruits" name="fruit_type" x-model="globalFruit" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
                 </div>
 
                 {{-- PH --}}
@@ -138,6 +106,38 @@
                 </div>
             </div>
         </div>
+
+        {{-- DATALISTS --}}
+        <datalist id="list_chauffeurs">
+            <option value="SOUMAGBO Yao">
+            <option value="AGBADZI Komi Victor">
+            <option value="AMEGBETO K. Promise">
+            <option value="MORKLEY Komi">
+        </datalist>
+        <datalist id="list_matricules">
+            <option value="BL 7151">
+            <option value="BL 7238">
+            <option value="BD 2671">
+            <option value="BH 5895">
+            <option value="BH 5588">
+            <option value="EL 2473">
+        </datalist>
+        <datalist id="list_zones">
+            <option value="Avé">
+            <option value="Zio">
+            <option value="Vo">
+            <option value="Danyi">
+            <option value="Kloto Agou">
+            <option value="Haho">
+            <option value="Bas-mono">
+        </datalist>
+        <datalist id="list_fruits">
+            <option value="Ananas Cayenne">
+            <option value="Ananas Braza">
+            <option value="Papaye">
+            <option value="Banane">
+            <option value="Mangue">
+        </datalist>
 
         {{-- BARRE STATS GLOBALE --}}
         <div class="flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3 px-4 py-3 sm:py-2 bg-slate-800">
