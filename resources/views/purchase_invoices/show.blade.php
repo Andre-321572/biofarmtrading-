@@ -6,21 +6,21 @@
     <div class="max-w-6xl mx-auto px-4">
 
         {{-- TOP BAR --}}
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center shadow">
                     <i class="fa-solid fa-file-invoice-dollar text-white text-sm"></i>
                 </div>
                 <div>
-                    <h1 class="text-base font-black text-slate-800 leading-none">Détails de la Facture</h1>
-                    <p class="text-xs text-slate-400">Réf : {{ $purchaseInvoice->bon_no }}</p>
+                    <h1 class="text-sm sm:text-base font-black text-slate-800 leading-none uppercase">Détails Facture</h1>
+                    <p class="text-[10px] sm:text-xs text-slate-400">Réf : {{ $purchaseInvoice->bon_no }}</p>
                 </div>
             </div>
-            <div class="flex gap-3">
-                <a href="{{ route('purchase_invoices.pdf', $purchaseInvoice) }}" class="px-3 py-1.5 bg-red-600 rounded-lg text-xs font-bold text-white hover:bg-red-700 shadow shadow-red-200 transition">
+            <div class="flex gap-2 w-full sm:w-auto">
+                <a href="{{ route('purchase_invoices.pdf', $purchaseInvoice) }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-red-600 rounded-lg text-xs font-bold text-white hover:bg-red-700 transition shadow-sm">
                     <i class="fa-solid fa-file-pdf mr-1.5"></i>PDF
                 </a>
-                <a href="{{ route('purchase_invoices.index') }}" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 shadow-sm transition">
+                <a href="{{ route('purchase_invoices.index') }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 transition shadow-sm">
                     <i class="fa-solid fa-arrow-left mr-1.5"></i>Retour
                 </a>
             </div>
@@ -29,24 +29,24 @@
         <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" style="font-family:'Courier New',monospace">
             
             {{-- HEADER DOCUMENT --}}
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 border-b-2 border-slate-800 bg-slate-50">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white flex items-center justify-center">
-                        <img src="{{ asset('images/logo.jpg') }}" class="w-12 h-12 object-contain" onerror="this.style.display='none'">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-5 py-4 border-b-2 border-slate-800 bg-slate-50">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-12 h-12 flex-shrink-0 sm:w-14 sm:h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white flex items-center justify-center">
+                        <img src="{{ asset('images/logo.jpg') }}" class="w-10 h-10 sm:w-12 sm:h-12 object-contain" onerror="this.style.display='none'">
                     </div>
-                    <div>
-                        <p class="text-lg font-black tracking-widest text-slate-900 uppercase">SAM TOGO</p>
-                        <p class="text-[10px] text-slate-500 uppercase font-bold">Bio Farm Trading - Production & Commercialisation</p>
+                    <div class="min-w-0">
+                        <p class="text-xs sm:text-lg font-black tracking-widest text-slate-900 uppercase truncate">BIO FARM TRADING</p>
+                        <p class="text-[8px] sm:text-[10px] text-slate-500 uppercase font-bold leading-tight">Production & Commercialisation</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-8">
-                    <div class="text-right">
-                        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
-                        <p class="text-xl font-black text-slate-900">{{ $purchaseInvoice->bon_no }}</p>
+                <div class="flex items-center justify-between md:justify-end gap-4 sm:gap-8 flex-shrink-0 border-t border-slate-200 md:border-0 pt-3 md:pt-0">
+                    <div class="text-left md:text-right">
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
+                        <p class="text-xs sm:text-xl font-black text-slate-900 leading-none">{{ $purchaseInvoice->bon_no }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Date</p>
-                        <p class="text-base font-black text-slate-900">{{ $purchaseInvoice->date_invoice->format('d/m/Y') }}</p>
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Date</p>
+                        <p class="text-xs sm:text-base font-black text-slate-900 leading-none">{{ $purchaseInvoice->date_invoice->format('d/m/Y') }}</p>
                     </div>
                 </div>
             </div>
@@ -189,16 +189,16 @@
             </div>
 
             {{-- SIGNATURES --}}
-            <div class="border-t border-slate-200 grid grid-cols-2 divide-x divide-slate-200">
+            <div class="border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 bg-slate-50">
                 <div class="px-5 py-4">
-                    <p class="text-[9px] font-bold uppercase text-slate-500">A2C SAM / Responsable</p>
-                    <div class="border-b border-dotted border-slate-300 mt-7 mb-1"></div>
-                    <p class="text-[8px] text-slate-400 text-center uppercase">Signature & Cachet</p>
+                    <p class="text-[9px] font-bold uppercase text-slate-500 mb-6 font-mono">Responsable Bio Farm</p>
+                    <div class="border-b border-dotted border-slate-300 mb-1"></div>
+                    <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Cachet & Signature</p>
                 </div>
                 <div class="px-5 py-4 text-right">
-                    <p class="text-[9px] font-bold uppercase text-slate-500">Le Producteur</p>
-                    <div class="border-b border-dotted border-slate-300 mt-7 mb-1"></div>
-                    <p class="text-[8px] text-slate-400 text-center uppercase">Signature</p>
+                    <p class="text-[9px] font-bold uppercase text-slate-500 mb-6 font-mono">Le Producteur / Opérateur</p>
+                    <div class="border-b border-dotted border-slate-300 mb-1"></div>
+                    <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Signature</p>
                 </div>
             </div>
 

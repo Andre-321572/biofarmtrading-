@@ -5,21 +5,21 @@
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Page Header -->
-        <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex-1 min-w-0">
-                <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate flex items-center gap-3">
-                    <span class="p-2 bg-green-100 rounded-lg text-green-600">
-                        <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+                <h2 class="text-xl sm:text-2xl font-bold leading-7 text-gray-900 flex items-center gap-3">
+                    <span class="p-2 bg-green-100 rounded-lg text-green-600 hidden sm:inline-block">
+                        <i class="fa-solid fa-boxes-stacked text-xl"></i>
                     </span>
                     Mes Arrivages
                 </h2>
-                <p class="mt-1 text-sm text-gray-500 pl-16">
-                    Gérez et suivez l'historique de vos réceptions de marchandises.
+                <p class="mt-1 text-xs sm:text-sm text-gray-500 sm:pl-16">
+                    Historique des réceptions de marchandises.
                 </p>
             </div>
-            <div class="mt-4 flex md:mt-0 md:ml-4">
-                <a href="{{ route('arrivages.create') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-[1.02]">
-                    <i class="fa-solid fa-plus mr-2 -ml-1"></i>
+            <div class="flex">
+                <a href="{{ route('arrivages.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-all duration-200">
+                    <i class="fa-solid fa-plus mr-2"></i>
                     Nouvel Arrivage
                 </a>
             </div>
@@ -53,18 +53,18 @@
                                 <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     Date & Info
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <th scope="col" class="hidden sm:table-cell px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     <span class="flex items-center justify-end gap-1">
                                         <span class="w-2 h-2 rounded-full bg-blue-500"></span> Ananas
                                     </span>
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <th scope="col" class="hidden sm:table-cell px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     <span class="flex items-center justify-end gap-1">
                                         <span class="w-2 h-2 rounded-full bg-orange-500"></span> Papaye
                                     </span>
                                 </th>
                                 <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                    Total Général
+                                    Total
                                 </th>
                                 <th scope="col" class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     Actions
@@ -101,14 +101,14 @@
                                 </td>
 
                                 <!-- Total Ananas -->
-                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-right">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-bold bg-blue-50 text-blue-700 border border-blue-100">
                                         {{ number_format($arrivage->total_ananas, 2) }} kg
                                     </span>
                                 </td>
 
                                 <!-- Total Papaye -->
-                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-right">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-bold bg-orange-50 text-orange-700 border border-orange-100">
                                         {{ number_format($arrivage->total_papaye, 2) }} kg
                                     </span>

@@ -37,24 +37,24 @@
             <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" style="font-family:'Courier New',monospace">
                 
                 {{-- HEADER DOCUMENT --}}
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 border-b-2 border-slate-800 bg-slate-50">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white flex items-center justify-center">
-                            <img src="{{ asset('images/logo.jpg') }}" class="w-12 h-12 object-contain" onerror="this.style.display='none'">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-5 py-4 border-b-2 border-slate-800 bg-slate-50">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white flex items-center justify-center shrink-0">
+                            <img src="{{ asset('images/logo.jpg') }}" class="w-10 h-10 sm:w-12 sm:h-12 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div>
-                            <p class="text-lg font-black tracking-widest text-slate-900 uppercase">BIO FARM TRADING</p>
-                            <p class="text-[10px] text-slate-500 uppercase font-bold">Bio Farm Trading - Production & Commercialisation</p>
+                        <div class="min-w-0">
+                            <p class="text-sm sm:text-lg font-black tracking-widest text-slate-900 uppercase truncate">BIO FARM TRADING</p>
+                            <p class="text-[8px] sm:text-[10px] text-slate-500 uppercase font-bold leading-tight">Production & Commercialisation</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-8">
-                        <div class="text-right">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
-                            <input type="text" name="bon_no" value="#{{ $nextBonNo }}" class="text-xl font-black text-slate-900 border-0 bg-transparent p-0 w-32 text-right focus:ring-0">
+                    <div class="flex items-center justify-between md:justify-end gap-5 flex-shrink-0 border-t border-slate-200 md:border-0 pt-3 md:pt-0">
+                        <div class="text-left md:text-right">
+                            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
+                            <input type="text" name="bon_no" value="#{{ $nextBonNo }}" class="text-base sm:text-xl font-black text-slate-900 border-0 bg-transparent p-0 w-24 sm:w-32 md:text-right focus:ring-0">
                         </div>
                         <div class="text-right">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Date</p>
-                            <input type="date" name="date_invoice" value="{{ date('Y-m-d') }}" class="text-base font-black text-slate-900 border-0 border-b-2 border-slate-300 bg-transparent focus:border-indigo-600 focus:ring-0 p-0 w-32 text-right" required>
+                            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Date</p>
+                            <input type="date" name="date_invoice" value="{{ date('Y-m-d') }}" class="text-sm font-black text-slate-900 border-0 border-b-2 border-slate-300 bg-transparent focus:border-indigo-600 focus:ring-0 p-0 w-28 sm:w-32 text-right" required>
                         </div>
                     </div>
                 </div>
@@ -66,9 +66,9 @@
                 {{-- FORM GRID --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 bg-slate-200 gap-[1px]">
                     {{-- Zone --}}
-                    <div class="flex bg-white border-b border-slate-100">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">ZONE</label>
-                        <input type="text" name="zone" list="zones_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Sélectionner ou saisir une zone...">
+                    <div class="flex bg-white">
+                        <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">ZONE</label>
+                        <input type="text" name="zone" list="zones_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                         <datalist id="zones_list">
                             <option value="Avé">
                             <option value="Zio">
@@ -81,14 +81,14 @@
                         </datalist>
                     </div>
                     {{-- Producteur --}}
-                    <div class="flex bg-white border-b border-slate-100">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">PRODUCTEUR</label>
-                        <input type="text" name="producteur" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
+                    <div class="flex bg-white">
+                        <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">PRODUCTEUR</label>
+                        <input type="text" name="producteur" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                     </div>
                     {{-- Chauffeur --}}
-                    <div class="flex bg-white border-b border-slate-100">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">CHAUFFEUR</label>
-                        <input type="text" name="chauffeur" list="chauffeurs_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Sélectionner ou saisir un chauffeur...">
+                    <div class="flex bg-white">
+                        <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">CHAUFFEUR</label>
+                        <input type="text" name="chauffeur" list="chauffeurs_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                         <datalist id="chauffeurs_list">
                             <option value="SOUMAGBO Yao">
                             <option value="AGBADZI Komi Victor">
@@ -97,9 +97,9 @@
                         </datalist>
                     </div>
                     {{-- Matricule --}}
-                    <div class="flex bg-white border-b border-slate-100">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-44 flex items-center border-r border-slate-100 leading-tight">MATRICULE</label>
-                        <input type="text" name="code_parcelle_matricule" list="matricules_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0 uppercase" placeholder="Sélectionner ou saisir un matricule...">
+                    <div class="flex bg-white">
+                        <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100 uppercase">MATRICULE</label>
+                        <input type="text" name="code_parcelle_matricule" list="matricules_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0 uppercase" placeholder="...">
                         <datalist id="matricules_list">
                             <option value="BL 7151">
                             <option value="BL 7238">
@@ -111,8 +111,8 @@
                     </div>
                     {{-- Fruit --}}
                     <div class="flex bg-white">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">FRUIT</label>
-                        <input type="text" name="fruit" list="fruits_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Sélectionner ou saisir un fruit...">
+                        <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">FRUIT</label>
+                        <input type="text" name="fruit" list="fruits_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                         <datalist id="fruits_list">
                             <option value="Ananas Cayenne">
                             <option value="Ananas Braza">
@@ -123,9 +123,9 @@
                     </div>
                     {{-- Calibre --}}
                     <div class="flex bg-white">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">CALIBRE FRUIT</label>
-                        <select name="calibre" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0 cursor-pointer">
-                            <option value="">Sélectionner le calibre...</option>
+                        <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">CALIBRE</label>
+                        <select name="calibre" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0 cursor-pointer">
+                            <option value="">...</option>
                             <option value="Petit fruit">Petit fruit</option>
                             <option value="Gros fruit">Gros fruit</option>
                         </select>
@@ -198,31 +198,31 @@
 
                 {{-- TOTALS SECTION --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 bg-slate-200 gap-[1px] border-t-2 border-slate-800">
-                    {{-- Left Column --}}
+                    {{-- Left Column (Prices) --}}
                     <div class="flex flex-col divide-y divide-slate-100 bg-white">
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">POIDS TOTAL</label>
-                            <div class="flex-1 px-4 text-right font-black text-slate-900" x-text="totalWeight().toFixed(2) + ' kg'"></div>
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">POIDS TOTAL</label>
+                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-slate-900 text-sm" x-text="totalWeight().toFixed(2) + ' kg'"></div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">P.U</label>
-                            <div class="flex-1 flex items-center px-4">
-                                <input type="number" name="pu" x-model.number="pu" class="w-full py-1 text-right font-black text-slate-900 border-0 focus:ring-0" placeholder="0">
-                                <span class="ml-2 text-[10px] font-bold text-slate-400 whitespace-nowrap">FCFA/kg</span>
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">P.U</label>
+                            <div class="flex-1 flex items-center px-3 sm:px-4">
+                                <input type="number" name="pu" x-model.number="pu" class="w-full py-1 text-right font-black text-slate-900 border-0 focus:ring-0 text-sm" placeholder="0">
+                                <span class="ml-2 text-[10px] font-bold text-slate-400 whitespace-nowrap">FCFA</span>
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">MONTANT TOTAL</label>
-                            <div class="flex-1 px-4 text-right font-black text-green-700" x-text="formatCurrency(montantTotal()) + ' FCFA'"></div>
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 uppercase">MONTANT TOTAL</label>
+                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-green-700 text-sm" x-text="formatCurrency(montantTotal()) + ' FCFA'"></div>
                         </div>
                         <div class="flex items-center bg-green-50">
-                            <label class="bg-green-100/50 px-4 py-3 text-[10px] font-black uppercase text-green-800 w-48 border-r border-green-200">NET À PAYER</label>
-                            <div class="flex-1 px-4 text-right font-black text-green-600 text-xl" x-text="formatCurrency(netAPayer()) + ' FCFA'"></div>
+                            <label class="bg-green-100/50 px-3 sm:px-4 py-3 text-[9px] sm:text-[10px] font-black uppercase text-green-800 w-28 sm:w-48 border-r border-green-200 shrink-0">NET À PAYER</label>
+                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-green-600 text-lg sm:text-xl" x-text="formatCurrency(netAPayer()) + ' FCFA'"></div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">PRIME BIO/KG</label>
-                            <div class="flex-1 px-4">
-                                <input type="number" name="prime_bio_kg" x-model.number="primeBio" class="w-full py-1 text-right font-bold text-indigo-600 border-0 focus:ring-0" placeholder="...">
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">PRIME BIO/KG</label>
+                            <div class="flex-1 px-3 sm:px-4">
+                                <input type="number" name="prime_bio_kg" x-model.number="primeBio" class="w-full py-1 text-right font-bold text-indigo-600 border-0 focus:ring-0 text-sm" placeholder="...">
                             </div>
                         </div>
                     </div>
@@ -230,45 +230,45 @@
                     {{-- Right Column (Credits) --}}
                     <div class="flex flex-col divide-y divide-slate-100 bg-white">
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">Poids Avarié</label>
-                            <div class="flex-1 flex items-center px-4">
-                                <input type="number" name="poids_avarie" x-model.number="poidsAvarie" class="w-full py-1 text-right font-bold text-red-600 border-0 focus:ring-0" placeholder="0">
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">Poids Avarié</label>
+                            <div class="flex-1 flex items-center px-3 sm:px-4">
+                                <input type="number" name="poids_avarie" x-model.number="poidsAvarie" class="w-full py-1 text-right font-bold text-red-600 border-0 focus:ring-0 text-sm" placeholder="0">
                                 <span class="ml-2 text-[10px] font-bold text-slate-400">FCFA</span>
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100 leading-tight">Poids marchand (Poids net)</label>
-                            <div class="flex-1 flex items-center px-4">
-                                <input type="number" name="poids_marchand" x-model.number="poidsMarchand" class="w-full py-1 text-right font-bold text-red-600 border-0 focus:ring-0" placeholder="0">
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">Poids marchand</label>
+                            <div class="flex-1 flex items-center px-3 sm:px-4">
+                                <input type="number" name="poids_marchand" x-model.number="poidsMarchand" class="w-full py-1 text-right font-bold text-red-600 border-0 focus:ring-0 text-sm" placeholder="0">
                                 <span class="ml-2 text-[10px] font-bold text-slate-400">FCFA</span>
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">TOTAL CRÉDIT</label>
-                            <div class="flex-1 px-4 text-right font-black text-red-600" x-text="formatCurrency(totalCredit()) + ' FCFA'"></div>
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">TOTAL CRÉDIT</label>
+                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-red-600 text-sm" x-text="formatCurrency(totalCredit()) + ' FCFA'"></div>
                         </div>
-                        <div class="flex flex-col px-4 py-2 bg-slate-50 border-b border-slate-200">
+                        <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
-                            <textarea name="net_payer_lettre" rows="2" x-text="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none" readonly placeholder="Calcul automatique..."></textarea>
+                            <textarea name="net_payer_lettre" rows="2" x-text="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100 leading-tight">MONTANT TOTAL DE LA PRIME</label>
-                            <div class="flex-1 px-4 text-right font-black text-indigo-600" x-text="formatCurrency(totalPrime()) + ' FCFA'"></div>
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">TOTAL PRIME</label>
+                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-indigo-600 text-sm" x-text="formatCurrency(totalPrime()) + ' FCFA'"></div>
                         </div>
                     </div>
                 </div>
 
                 {{-- SIGNATURES --}}
-                <div class="border-t border-slate-200 grid grid-cols-2 divide-x divide-slate-200">
+                <div class="border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 bg-slate-50">
                     <div class="px-5 py-4">
-                        <p class="text-[9px] font-bold uppercase text-slate-500">A2C SAM / Responsable</p>
-                        <div class="border-b border-dotted border-slate-300 mt-7 mb-1"></div>
-                        <p class="text-[8px] text-slate-400 text-center uppercase">Signature & Cachet</p>
+                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-6">Responsable Bio Farm</p>
+                        <div class="border-b border-dotted border-slate-300 mb-1"></div>
+                        <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Cachet & Signature</p>
                     </div>
                     <div class="px-5 py-4 text-right">
-                        <p class="text-[9px] font-bold uppercase text-slate-500">Le Producteur</p>
-                        <div class="border-b border-dotted border-slate-300 mt-7 mb-1"></div>
-                        <p class="text-[8px] text-slate-400 text-center uppercase">Signature</p>
+                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-6">Le Producteur / Opérateur</p>
+                        <div class="border-b border-dotted border-slate-300 mb-1"></div>
+                        <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Signature</p>
                     </div>
                 </div>
 

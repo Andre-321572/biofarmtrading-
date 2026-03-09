@@ -67,36 +67,38 @@
                 <form action="{{ $workerStoreRoute }}" method="POST">
                     @csrf
                     <div class="p-8">
-                        <div class="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                             <template x-for="(row, index) in rows" :key="row.id">
-                                <div class="flex gap-4 items-center animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <div class="w-8 h-10 flex items-center justify-center text-[10px] font-black text-slate-300" x-text="index + 1"></div>
+                                <div class="flex flex-col md:flex-row gap-3 md:gap-4 p-4 md:p-0 bg-slate-50 md:bg-transparent rounded-2xl md:rounded-none border border-slate-100 md:border-0 relative animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div class="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-black md:static md:w-8 md:h-10 md:bg-transparent md:text-slate-300" x-text="index + 1"></div>
                                     <div class="flex-1">
-                                        <input type="text" :name="'workers['+index+'][last_name]'" placeholder="NOM" class="w-full h-12 rounded-2xl border-slate-200 bg-slate-50 text-xs font-black uppercase placeholder:text-slate-300 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all px-4" required>
+                                        <input type="text" :name="'workers['+index+'][last_name]'" placeholder="NOM" class="w-full h-11 md:h-12 rounded-xl md:rounded-2xl border-slate-200 bg-white md:bg-slate-50 text-xs font-black uppercase placeholder:text-slate-300 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all px-4" required>
                                     </div>
                                     <div class="flex-1">
-                                        <input type="text" :name="'workers['+index+'][first_name]'" placeholder="PRÉNOMS" class="w-full h-12 rounded-2xl border-slate-200 bg-slate-50 text-xs font-bold placeholder:text-slate-300 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all px-4" required>
+                                        <input type="text" :name="'workers['+index+'][first_name]'" placeholder="PRÉNOMS" class="w-full h-11 md:h-12 rounded-xl md:rounded-2xl border-slate-200 bg-white md:bg-slate-50 text-xs font-bold placeholder:text-slate-300 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all px-4" required>
                                     </div>
-                                    <div class="w-48">
-                                        <select :name="'workers['+index+'][shift]'" class="w-full h-12 rounded-2xl border-slate-200 bg-slate-50 text-xs font-black uppercase focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all cursor-pointer px-4">
+                                    <div class="w-full md:w-48">
+                                        <select :name="'workers['+index+'][shift]'" class="w-full h-11 md:h-12 rounded-xl md:rounded-2xl border-slate-200 bg-white md:bg-slate-50 text-xs font-black uppercase focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all cursor-pointer px-4">
                                             <option value="day">ÉQUIPE JOUR</option>
                                             <option value="night">ÉQUIPE NUIT</option>
                                         </select>
                                     </div>
-                                    <button x-show="rows.length > 1" @click="rows.splice(index, 1)" type="button" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                    </button>
+                                    <div class="flex justify-end">
+                                        <button x-show="rows.length > 1" @click="rows.splice(index, 1)" type="button" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
+                                            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </template>
                         </div>
                     </div>
 
-                    <div class="px-8 py-6 bg-slate-100/80 border-t border-slate-200 flex justify-between items-center bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                    <div class="px-4 md:px-8 py-6 bg-slate-100/80 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] gap-4">
                         <div class="flex items-center gap-2 text-slate-400">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                              <p class="text-[10px] font-black uppercase tracking-widest italic">Vérifiez les noms avant d'enregistrer</p>
                         </div>
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-2xl font-black text-[12px] tracking-[0.2em] shadow-[0_20px_50px_rgba(22,163,74,0.3)] transition-all hover:-translate-y-1 active:scale-95 flex items-center gap-4 border-b-4 border-green-800 group">
+                        <button type="submit" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-8 md:px-12 py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-[12px] tracking-[0.2em] shadow-[0_20px_50px_rgba(22,163,74,0.3)] transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-4 border-b-4 border-green-800 group">
                             <span>ENREGISTRER LA LISTE</span>
                             <div class="w-2 h-2 bg-white rounded-full animate-ping group-hover:block"></div>
                         </button>

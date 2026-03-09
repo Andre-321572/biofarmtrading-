@@ -5,21 +5,19 @@
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
         
         <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-3">
                 <a href="{{ route('arrivages.index') }}" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <i class="fa-solid fa-circle-arrow-left text-2xl"></i>
                 </a>
-                Détails de l'Arrivage #{{ $arrivage->bon_ref }}
+                Détails #{{ $arrivage->bon_ref }}
             </h2>
-            <div class="flex gap-3">
-                <a href="{{ route('arrivages.pdf', $arrivage) }}" class="inline-flex items-center px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm">
-                    <i class="fa-solid fa-file-pdf mr-2 text-lg"></i>
-                    Télécharger PDF
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('arrivages.pdf', $arrivage) }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors font-medium text-xs sm:text-sm whitespace-nowrap">
+                    <i class="fa-solid fa-file-pdf mr-2"></i>PDF
                 </a>
-                <a href="{{ route('arrivages.excel', $arrivage) }}" class="inline-flex items-center px-4 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-colors font-medium text-sm">
-                    <i class="fa-solid fa-file-excel mr-2 text-lg"></i>
-                    Télécharger Excel
+                <a href="{{ route('arrivages.excel', $arrivage) }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-colors font-medium text-xs sm:text-sm whitespace-nowrap">
+                    <i class="fa-solid fa-file-excel mr-2"></i>Excel
                 </a>
             </div>
         </div>

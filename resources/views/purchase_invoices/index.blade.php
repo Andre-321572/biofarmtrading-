@@ -7,10 +7,10 @@
         {{-- HEADER --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-                <h1 class="text-2xl font-black text-slate-900">Mes Factures d'Achat</h1>
-                <p class="text-sm text-slate-500">Gestion des achats coopérative Bio Farm Trading</p>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900">Factures d'Achat</h1>
+                <p class="text-xs sm:text-sm text-slate-500">Gestion des achats coopérative</p>
             </div>
-            <a href="{{ route('purchase_invoices.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 rounded-xl text-sm font-bold text-white hover:bg-indigo-700 shadow-indigo-200 shadow-lg transition">
+            <a href="{{ route('purchase_invoices.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 rounded-xl text-sm font-bold text-white hover:bg-indigo-700 shadow-indigo-200 shadow-lg transition">
                 <i class="fa-solid fa-plus"></i> Nouvelle Facture
             </a>
         </div>
@@ -27,11 +27,11 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-200">
-                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Bon N° / Date</th>
-                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Producteur / Zone</th>
-                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Fruit</th>
-                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Poids Total</th>
-                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-right">Net à Payer</th>
+                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Bon / Date</th>
+                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Producteur</th>
+                            <th class="hidden sm:table-cell px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Fruit</th>
+                            <th class="hidden sm:table-cell px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">Poids</th>
+                            <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-right">Net</th>
                             <th class="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Actions</th>
                         </tr>
                     </thead>
@@ -46,12 +46,12 @@
                                 <div class="text-sm font-bold text-slate-700">{{ $invoice->producteur }}</div>
                                 <div class="text-[10px] font-bold text-slate-400 uppercase italic">{{ $invoice->zone }}</div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="hidden sm:table-cell px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 uppercase">
                                     {{ $invoice->fruit }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="hidden sm:table-cell px-6 py-4">
                                 <div class="text-sm font-black text-slate-900">{{ number_format($invoice->total_weight, 2, ',', ' ') }} kg</div>
                             </td>
                             <td class="px-6 py-4 text-right">

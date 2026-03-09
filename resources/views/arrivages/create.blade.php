@@ -47,62 +47,62 @@
                     <img src="{{ asset('images/logo.jpg') }}" class="w-10 h-10 sm:w-12 sm:h-12 object-contain" onerror="this.style.display='none'">
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm sm:text-lg font-black tracking-widest text-slate-900 uppercase truncate">Bio Farm Trading</p>
-                    <p class="text-[9px] sm:text-xs text-slate-500 whitespace-normal sm:truncate leading-tight">Production · Commercialisation de produits agricoles biologiques</p>
+                    <p class="text-xs sm:text-lg font-black tracking-widest text-slate-900 uppercase truncate">Bio Farm Trading</p>
+                    <p class="text-[8px] sm:text-xs text-slate-500 whitespace-normal leading-tight font-bold">Production · Commercialisation</p>
                 </div>
             </div>
-            <div class="flex items-center justify-between md:justify-end gap-5 flex-shrink-0 border-t border-slate-200 md:border-0 pt-3 md:pt-0">
+            <div class="flex items-center justify-between md:justify-end gap-4 sm:gap-8 flex-shrink-0 border-t border-slate-200 md:border-0 pt-3 md:pt-0">
                 <div class="text-left md:text-right">
                     <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
-                    <p class="text-base sm:text-lg font-black text-slate-900" x-text="bonRef">#</p>
+                    <p class="text-sm sm:text-lg font-black text-slate-900" x-text="bonRef">#</p>
                 </div>
                 <div class="text-right">
                     <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Date</p>
                     <input type="date" name="date_arrivage" value="{{ date('Y-m-d') }}"
-                           class="text-sm font-black text-slate-900 border-0 border-b-2 border-slate-300 bg-transparent focus:border-green-600 focus:ring-0 p-0 w-28 sm:w-32 text-right md:text-left" required>
+                           class="text-sm font-black text-slate-900 border-0 border-b-2 border-slate-300 bg-transparent focus:border-green-600 focus:ring-0 p-0 w-28 sm:w-32 text-right" required>
                 </div>
             </div>
         </div>
 
         {{-- INFOS GÉNÉRALES --}}
         <div class="border-b border-slate-300">
-            {{-- Ligne 1 --}}
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-[1px] bg-slate-200 border-b border-slate-200">
+            {{-- Grid responsive --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-[1px] bg-slate-200">
                 
                 {{-- Chauffeur --}}
-                <div class="flex min-h-[40px] bg-white relative">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Chauffeur</span>
-                    <input type="text" list="list_chauffeurs" name="chauffeur" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
+                <div class="flex min-h-[40px] bg-white border-b sm:border-b-0">
+                    <span class="bg-slate-50 px-3 py-2 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-28 flex items-center shrink-0 border-r border-slate-100">Chauffeur</span>
+                    <input type="text" list="list_chauffeurs" name="chauffeur" class="flex-1 px-3 py-2 text-xs font-bold border-0 focus:ring-0 bg-transparent w-full" required placeholder="..." autocomplete="off">
                 </div>
 
                 {{-- Matricule --}}
-                <div class="flex min-h-[40px] bg-white relative">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Matricule</span>
-                    <input type="text" list="list_matricules" name="matricule_camion" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent uppercase w-full" required placeholder="Saisir ou choisir" autocomplete="off">
+                <div class="flex min-h-[40px] bg-white border-b sm:border-b-0">
+                    <span class="bg-slate-50 px-3 py-2 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-28 flex items-center shrink-0 border-r border-slate-100">Matricule</span>
+                    <input type="text" list="list_matricules" name="matricule_camion" class="flex-1 px-3 py-2 text-xs font-bold border-0 focus:ring-0 bg-transparent uppercase w-full" required placeholder="..." autocomplete="off">
                 </div>
 
                 {{-- Zone --}}
-                <div class="flex min-h-[40px] bg-white relative">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Zone</span>
-                    <input type="text" list="list_zones" name="zone_provenance" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
+                <div class="flex min-h-[40px] bg-white border-b sm:border-b-0">
+                    <span class="bg-slate-50 px-3 py-2 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-28 flex items-center shrink-0 border-r border-slate-100">Zone</span>
+                    <input type="text" list="list_zones" name="zone_provenance" class="flex-1 px-3 py-2 text-xs font-bold border-0 focus:ring-0 bg-transparent w-full" required placeholder="..." autocomplete="off">
                 </div>
 
                 {{-- Fruit --}}
-                <div class="flex min-h-[40px] bg-white relative">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Fruit</span>
-                    <input type="text" list="list_fruits" name="fruit_type" x-model="globalFruit" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" required placeholder="Saisir ou choisir" autocomplete="off">
+                <div class="flex min-h-[40px] bg-white border-b sm:border-b-0">
+                    <span class="bg-slate-50 px-3 py-2 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-28 flex items-center shrink-0 border-r border-slate-100">Fruit</span>
+                    <input type="text" list="list_fruits" name="fruit_type" x-model="globalFruit" class="flex-1 px-3 py-2 text-xs font-bold border-0 focus:ring-0 bg-transparent w-full" required placeholder="..." autocomplete="off">
                 </div>
 
                 {{-- PH --}}
-                <div class="flex min-h-[40px] bg-white relative">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">PH</span>
-                    <input type="text" name="ph" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" placeholder="Ex: 4.5" autocomplete="off">
+                <div class="flex min-h-[40px] bg-white border-b sm:border-b-0">
+                    <span class="bg-slate-50 px-3 py-2 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-28 flex items-center shrink-0 border-r border-slate-100">PH</span>
+                    <input type="text" name="ph" class="flex-1 px-3 py-2 text-xs font-bold border-0 focus:ring-0 bg-transparent w-full" placeholder="..." autocomplete="off">
                 </div>
 
                 {{-- Brix --}}
-                <div class="flex min-h-[40px] bg-white relative">
-                    <span class="bg-slate-100 px-3 py-2 text-[10px] sm:text-[9px] font-bold uppercase text-slate-500 w-24 sm:w-28 flex items-center flex-shrink-0 leading-tight border-r border-slate-200">Brix</span>
-                    <input type="text" name="brix" class="flex-1 px-3 py-2 text-sm sm:text-xs font-semibold border-0 focus:ring-0 bg-transparent w-full" placeholder="Ex: 12.5 %" autocomplete="off">
+                <div class="flex min-h-[40px] bg-white">
+                    <span class="bg-slate-50 px-3 py-2 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-28 flex items-center shrink-0 border-r border-slate-100">Brix</span>
+                    <input type="text" name="brix" class="flex-1 px-3 py-2 text-xs font-bold border-0 focus:ring-0 bg-transparent w-full" placeholder="..." autocomplete="off">
                 </div>
             </div>
         </div>
@@ -236,7 +236,7 @@
         </div>
 
         {{-- SIGNATURES --}}
-        <div class="border-t border-slate-200 grid grid-cols-2 divide-x divide-slate-200">
+        <div class="border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
             <div class="px-5 py-4">
                 <p class="text-[9px] font-bold uppercase text-slate-500">A2C SAM / Responsable</p>
                 <div class="border-b border-dotted border-slate-300 mt-7 mb-1"></div>
@@ -244,7 +244,7 @@
             </div>
             <div class="px-5 py-4 text-right">
                 <p class="text-[9px] font-bold uppercase text-slate-500">Le Producteur</p>
-                <div class="border-b border-dotted border-slate-300 mt-7 mb-1"></div>
+                <div class="border-b border-dotted border-slate-300 mt-7 mb-1 border-r md:border-r-0"></div>
                 <p class="text-[8px] text-slate-400 text-center">Signature</p>
             </div>
         </div>
