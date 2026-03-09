@@ -19,7 +19,7 @@ class PurchaseInvoice extends Model
         'op',
         'producteur',
         'code_parcelle_matricule',
-        'quantite_estimee',
+        'calibre',
         'pu',
         'prime_bio_kg',
         'poids_avarie',

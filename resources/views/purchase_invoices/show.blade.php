@@ -78,8 +78,8 @@
                     <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->fruit ?? '—' }}</div>
                 </div>
                 <div class="flex bg-white">
-                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">QTÉ ESTIMÉE</label>
-                    <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic text-right">{{ number_format($purchaseInvoice->quantite_estimee, 2, ',', ' ') }} kg</div>
+                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">CALIBRE FRUIT</label>
+                    <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->calibre ?? '—' }}</div>
                 </div>
             </div>
 

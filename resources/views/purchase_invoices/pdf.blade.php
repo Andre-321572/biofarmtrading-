@@ -84,8 +84,8 @@
             <tr>
                 <td class="label">FRUIT</td>
                 <td class="value">{{ $purchaseInvoice->fruit ?? '—' }}</td>
-                <td class="label">QUANTITÉ ESTIMÉE</td>
-                <td class="value" style="text-align: right;">{{ number_format($purchaseInvoice->quantite_estimee, 2, ',', ' ') }} kg</td>
+                <td class="label">CALIBRE FRUIT</td>
+                <td class="value">{{ $purchaseInvoice->calibre ?? '—' }}</td>
             </tr>
         </table>
 

@@ -114,13 +114,14 @@
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">FRUIT</label>
                         <input type="text" name="fruit" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Ananas Braza...">
                     </div>
-                    {{-- Quantité Estimée --}}
+                    {{-- Calibre --}}
                     <div class="flex bg-white">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">QTÉ ESTIMÉE</label>
-                        <div class="flex-1 flex items-center px-4">
-                            <input type="number" step="0.01" name="quantite_estimee" class="w-full py-2 text-sm font-bold border-0 focus:ring-0 text-right" placeholder="0.00">
-                            <span class="ml-2 text-xs font-bold text-slate-400">kg</span>
-                        </div>
+                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">CALIBRE FRUIT</label>
+                        <select name="calibre" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0 cursor-pointer">
+                            <option value="">Sélectionner le calibre...</option>
+                            <option value="Petit fruit">Petit fruit</option>
+                            <option value="Gros fruit">Gros fruit</option>
+                        </select>
                     </div>
                 </div>
 
