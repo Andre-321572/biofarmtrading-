@@ -16,12 +16,24 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Admin User
-        User::create([
-            'name' => 'Admin Bio Farm',
-            'email' => 'admin@biofarmtrading.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@biofarmtrading.com'],
+            [
+                'name' => 'Admin Bio Farm',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
+
+        // Achat Coopérative User
+        User::updateOrCreate(
+            ['email' => 'achat@biofarmtrading.com'],
+            [
+                'name' => 'Achat Coopérative',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'achat_cooperative',
+            ]
+        );
 
         // Shops
         \App\Models\Shop::create([
