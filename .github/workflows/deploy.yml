@@ -20,6 +20,12 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --no-dev --optimize-autoloader
 
+      - name: Clear problematic cache files
+        run: |
+          rm -f bootstrap/cache/packages.php
+          rm -f bootstrap/cache/services.php
+          rm -f bootstrap/cache/config.php
+
       - name: sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
