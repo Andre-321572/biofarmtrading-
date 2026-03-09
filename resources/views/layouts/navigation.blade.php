@@ -42,6 +42,18 @@
                             {{ __('Pointage RH') }}
                         </x-nav-link>
                     @endif
+
+                    @if(Auth::user()->role === 'arrivage' || Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('arrivages.index')" :active="request()->routeIs('arrivages.*')">
+                            {{ __('Arrivages') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if(Auth::user()->role === 'achat_cooperative' || Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('purchase_invoices.index')" :active="request()->routeIs('purchase_invoices.*')">
+                            {{ __('Achat Coopérative') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -122,6 +134,18 @@
             @if(Auth::user()->role === 'rh')
                 <x-responsive-nav-link :href="route('rh.attendance.index')" :active="request()->routeIs('rh.attendance.index')">
                     {{ __('Pointage RH') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(Auth::user()->role === 'arrivage' || Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('arrivages.index')" :active="request()->routeIs('arrivages.*')">
+                    {{ __('Arrivages') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(Auth::user()->role === 'achat_cooperative' || Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('purchase_invoices.index')" :active="request()->routeIs('purchase_invoices.*')">
+                    {{ __('Achat Coopérative') }}
                 </x-responsive-nav-link>
             @endif
         </div>

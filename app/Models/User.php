@@ -45,6 +45,11 @@ class User extends Authenticatable
         return $this->role === 'rh';
     }
 
+    public function isAchatCooperative()
+    {
+        return $this->role === 'achat_cooperative';
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

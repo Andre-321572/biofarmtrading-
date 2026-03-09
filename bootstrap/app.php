@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'manager' => \App\Http\Middleware\ManagerMiddleware::class,
             'rh' => \App\Http\Middleware\RhMiddleware::class,
             'arrivage' => \App\Http\Middleware\ArrivageMiddleware::class,
+            'achat_cooperative' => \App\Http\Middleware\AchatCooperativeMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

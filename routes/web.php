@@ -69,6 +69,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/arrivages/{arrivage}/excel', [\App\Http\Controllers\ArrivageController::class, 'excel'])->name('arrivages.excel');
     });
 
+    // Purchase Invoice Routes (Achat Coopérative)
+    Route::middleware(['auth', 'achat_cooperative'])->group(function () {
+        Route::get('/purchase-invoices', [\App\Http\Controllers\PurchaseInvoiceController::class, 'index'])->name('purchase_invoices.index');
+        Route::get('/purchase-invoices/create', [\App\Http\Controllers\PurchaseInvoiceController::class, 'create'])->name('purchase_invoices.create');
+        Route::post('/purchase-invoices', [\App\Http\Controllers\PurchaseInvoiceController::class, 'store'])->name('purchase_invoices.store');
+        Route::get('/purchase-invoices/{purchaseInvoice}', [\App\Http\Controllers\PurchaseInvoiceController::class, 'show'])->name('purchase_invoices.show');
+        Route::get('/purchase-invoices/{purchaseInvoice}/pdf', [\App\Http\Controllers\PurchaseInvoiceController::class, 'pdf'])->name('purchase_invoices.pdf');
+    });
+
     // Manager Routes
     Route::middleware(['auth', 'manager'])->prefix('manager')->name('manager.')->group(function () {
         Route::get('/sales', [\App\Http\Controllers\Manager\SalesController::class, 'index'])->name('sales.index');
