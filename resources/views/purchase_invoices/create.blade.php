@@ -249,7 +249,7 @@
                         </div>
                         <div class="flex flex-col px-4 py-2 bg-slate-50 border-b border-slate-200">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
-                            <textarea name="net_payer_lettre" rows="1" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none" placeholder="Saisir le montant en lettres..."></textarea>
+                            <textarea name="net_payer_lettre" rows="2" x-text="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none" readonly placeholder="Calcul automatique..."></textarea>
                         </div>
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-4 py-2.5 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100 leading-tight">MONTANT TOTAL DE LA PRIME</label>
@@ -330,6 +330,30 @@ function purchaseInvoiceForm() {
 
         formatCurrency(val) {
             return new Intl.NumberFormat('fr-FR').format(Math.round(val));
+        },
+
+        numberToWords(n) {
+            if (n <= 0) return "";
+            const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+            const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+            const tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+            
+            function convert(num) {
+                if (num < 10) return units[num];
+                if (num < 20) return teens[num - 10];
+                if (num < 70) return tens[Math.floor(num / 10)] + (num % 10 === 1 ? ' et un' : (num % 10 !== 0 ? '-' + units[num % 10] : ''));
+                if (num < 80) return "soixante-" + convert(num - 60);
+                if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? '-' + convert(num % 10) : '');
+                if (num < 200) return "cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
+                if (num < 1000) return units[Math.floor(num / 100)] + " cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
+                if (num < 2000) return "mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
+                if (num < 1000000) return convert(Math.floor(num / 1000)) + " mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
+                if (num < 1000000000) return convert(Math.floor(num / 1000000)) + " million" + (Math.floor(num/1000000) > 1 ? "s" : "") + (num % 1000000 !== 0 ? " " + convert(num % 1000000) : "");
+                return num.toString();
+            }
+            
+            let result = convert(Math.round(n)).trim();
+            return result.charAt(0).toUpperCase() + result.slice(1) + " francs CFA";
         }
     }
 }
