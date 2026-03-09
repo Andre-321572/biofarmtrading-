@@ -17,7 +17,7 @@
         .logo-box { position: absolute; left: 0; top: 0; }
         .logo { width: 75px; } /* Logo without circle as requested */
         .header-center { text-align: center; width: 100%; }
-        .company-name { font-size: 22px; font-weight: 1000; letter-spacing: 4px; margin-bottom: 0px; margin-top: 5px; color: #1a1a1a; }
+        .company-name { font-size: 24px; font-weight: 900; letter-spacing: 4px; margin-bottom: 0px; margin-top: 5px; color: #00a651; }
         .company-desc { font-size: 7.5px; color: #555; margin-bottom: 8px; font-style: italic; }
         .document-title { 
             font-size: 13px; 
@@ -96,8 +96,22 @@
         .signature-title { font-weight: bold; text-transform: uppercase; font-size: 8px; color: #333; }
         .signature-placeholder { margin-top: 55px; border-top: 1px dotted #999; text-align: center; font-size: 7px; color: #aaa; padding-top: 2px; }
 
-        /* Bottom Footer */
-        .small-footer { text-align: center; margin-top: 25px; font-size: 7px; color: #888; border-top: 0.5px solid #ddd; padding-top: 5px; }
+        /* Modernized Footer */
+        .footer-bar { 
+            position: fixed; 
+            bottom: 0.2cm; 
+            left: 0; 
+            right: 0; 
+            background: #f8f8f8; 
+            border-top: 1.5px solid #000; 
+            padding: 5px 15px; 
+            height: 45px;
+        }
+        .footer-table { width: 100%; border-collapse: collapse; }
+        .footer-left-info { width: 70%; font-size: 7.5px; line-height: 1.3; color: #000; font-weight: bold; text-align: center; }
+        .footer-right-certif { width: 30%; font-size: 7px; vertical-align: middle; border-left: 1px solid #ddd; padding-left: 10px; }
+        .certif-box { display: inline-block; vertical-align: middle; width: 35px; border: 0.5px solid #999; padding: 2px; background: white; text-align: center; margin-right: 5px; }
+        .certif-text { display: inline-block; vertical-align: middle; font-weight: bold; line-height: 1.1; }
     </style>
 </head>
 <body>
@@ -108,7 +122,7 @@
         </div>
         <div class="header-center">
             <div class="company-name">BIO FARM TRADING</div>
-            <div class="company-desc">Production-Commercialisation de produits agricoles biologiques - Conseils - Formations en Agrobusiness</div>
+            <div class="company-desc">Production-Transformation-Commercialisation de produits agricoles biologiques</div>
             <div class="document-title">Bon d'Arrivage N° {{ $arrivage->bon_ref }}</div>
         </div>
         <div class="bon-info">
@@ -187,9 +201,26 @@
         </tr>
     </table>
 
-    <div class="small-footer">
-        BIO FARM TRADING - NIF 1002966783 - Tél : (+229) 97562640 / 97264340 - www.biofarmtrading.com<br>
-        Document généré le {{ now()->format('d/m/Y à H:i') }}
+    <div class="footer-bar">
+        <table class="footer-table">
+            <tr>
+                <td class="footer-left-info">
+                    BIO FARM TRADING RCCM : TG-LOM 2019 B 1488 ; NIF 1001469316 ; Capita 10 000 000 de FCFA.<br>
+                    Noépé_Baka Kondji. Rue derière EPP Noépé Tél.: (+228) 92 02 01 10 .<br>
+                    E-mail: tbiofarm@gmail.com //// www.biofarmtogo.com
+                </td>
+                <td class="footer-right-certif">
+                    <div class="certif-box">
+                        <img src="{{ public_path('images/logo.jpg') }}" style="width: 25px; filter: grayscale(100%)">
+                    </div>
+                    <div class="certif-text">
+                        Produits bios Certifiés Par<br>
+                        Ecocert S.A.S<br>
+                        TG - BIO - 154
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
