@@ -78,7 +78,7 @@
             <tr>
                 <td class="label">CHAUFFEUR</td>
                 <td class="value">{{ $purchaseInvoice->chauffeur ?? '—' }}</td>
-                <td class="label">CODE PARCELLE / MATRICULE</td>
+                <td class="label">MATRICULE</td>
                 <td class="value">{{ $purchaseInvoice->code_parcelle_matricule ?? '—' }}</td>
             </tr>
             <tr>

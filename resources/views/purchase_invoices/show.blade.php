@@ -70,7 +70,7 @@
                     <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->chauffeur ?? '—' }}</div>
                 </div>
                 <div class="flex bg-white">
-                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-44 border-r border-slate-100 leading-tight">CODE PARCELLE / MATRICULE</label>
+                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-44 border-r border-slate-100 leading-tight">MATRICULE</label>
                     <div class="flex-1 px-4 py-3 text-sm font-black text-slate-800 uppercase">{{ $purchaseInvoice->code_parcelle_matricule ?? '—' }}</div>
                 </div>
                 <div class="flex bg-white">

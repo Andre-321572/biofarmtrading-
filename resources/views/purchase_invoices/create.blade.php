@@ -68,7 +68,17 @@
                     {{-- Zone --}}
                     <div class="flex bg-white border-b border-slate-100">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">ZONE</label>
-                        <input type="text" name="zone" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
+                        <input type="text" name="zone" list="zones_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Sélectionner ou saisir une zone...">
+                        <datalist id="zones_list">
+                            <option value="Avé">
+                            <option value="Zio">
+                            <option value="Vo">
+                            <option value="Danyi">
+                            <option value="Kloto">
+                            <option value="Agou">
+                            <option value="Haho">
+                            <option value="Bas-mono">
+                        </datalist>
                     </div>
                     {{-- Producteur --}}
                     <div class="flex bg-white border-b border-slate-100">
@@ -78,12 +88,26 @@
                     {{-- Chauffeur --}}
                     <div class="flex bg-white border-b border-slate-100">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">CHAUFFEUR</label>
-                        <input type="text" name="chauffeur" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
+                        <input type="text" name="chauffeur" list="chauffeurs_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Sélectionner ou saisir un chauffeur...">
+                        <datalist id="chauffeurs_list">
+                            <option value="SOUMAGBO Yao">
+                            <option value="AGBADZI Komi Victor">
+                            <option value="AMEGBETO K. Promise">
+                            <option value="MORKLEY Komi">
+                        </datalist>
                     </div>
-                    {{-- Code Parcelle --}}
+                    {{-- Matricule --}}
                     <div class="flex bg-white border-b border-slate-100">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-44 flex items-center border-r border-slate-100 leading-tight">CODE PARCELLE / MATRICULE</label>
-                        <input type="text" name="code_parcelle_matricule" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0 uppercase" placeholder="...">
+                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-44 flex items-center border-r border-slate-100 leading-tight">MATRICULE</label>
+                        <input type="text" name="code_parcelle_matricule" list="matricules_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0 uppercase" placeholder="Sélectionner ou saisir un matricule...">
+                        <datalist id="matricules_list">
+                            <option value="BL 7151">
+                            <option value="BL 7238">
+                            <option value="BD 2671">
+                            <option value="BH 5895">
+                            <option value="BH 5588">
+                            <option value="EL 2473">
+                        </datalist>
                     </div>
                     {{-- Fruit --}}
                     <div class="flex bg-white">
