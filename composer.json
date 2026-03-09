@@ -77,8 +77,10 @@
     "extra": {
         "laravel": {
             "dont-discover": [
+                "laravel/breeze",
                 "laravel/pail",
-                "laravel/sail"
+                "laravel/sail",
+                "nunomaduro/collision"
             ]
         }
     },
