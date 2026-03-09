@@ -128,11 +128,20 @@
                         </li>
                     @endif
 
-                    @if(Auth::user()->role === 'arrivage')
+                    @if(Auth::user()->role === 'arrivage' || Auth::user()->role === 'admin')
                         <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Gestion Arrivages</li>
                         <li>
                             <x-nav-link-custom href="{{ route('arrivages.index') }}" :active="request()->routeIs('arrivages.*')" icon="products">
                                 {{ __('Arrivages') }}
+                            </x-nav-link-custom>
+                        </li>
+                    @endif
+
+                    @if(Auth::user()->role === 'achat_cooperative' || Auth::user()->role === 'admin')
+                        <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Achat Coopérative</li>
+                        <li>
+                            <x-nav-link-custom href="{{ route('purchase_invoices.index') }}" :active="request()->routeIs('purchase_invoices.*')" icon="orders">
+                                {{ __('Factures d\'Achat') }}
                             </x-nav-link-custom>
                         </li>
                     @endif
