@@ -13,7 +13,7 @@
                 </div>
                 <div>
                     <h1 class="text-base font-black text-slate-800 leading-none">Nouvelle Facture d'Achat</h1>
-                    <p class="text-xs text-slate-400">Achat coopérative · Relevé de 30 poids</p>
+                    <p class="text-xs text-slate-400">Achat coopérative · Relevé de 200 poids</p>
                 </div>
             </div>
             <a href="{{ route('purchase_invoices.index') }}" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 shadow-sm transition">
@@ -112,7 +112,14 @@
                     {{-- Fruit --}}
                     <div class="flex bg-white">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">FRUIT</label>
-                        <input type="text" name="fruit" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Ananas Braza...">
+                        <input type="text" name="fruit" list="fruits_list" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="Sélectionner ou saisir un fruit...">
+                        <datalist id="fruits_list">
+                            <option value="Ananas Cayenne">
+                            <option value="Ananas Braza">
+                            <option value="Papaye">
+                            <option value="Banane">
+                            <option value="Mangue">
+                        </datalist>
                     </div>
                     {{-- Calibre --}}
                     <div class="flex bg-white">
