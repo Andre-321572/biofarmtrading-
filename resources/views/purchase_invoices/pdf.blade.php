@@ -70,12 +70,6 @@
 
         <table class="info-table" style="margin-bottom: 10px;">
             <tr>
-                <td class="label">PRÉFECTURE</td>
-                <td class="value">{{ $purchaseInvoice->prefecture ?? '—' }}</td>
-                <td class="label">OP</td>
-                <td class="value">{{ $purchaseInvoice->op ?? '—' }}</td>
-            </tr>
-            <tr>
                 <td class="label">ZONE</td>
                 <td class="value">{{ $purchaseInvoice->zone ?? '—' }}</td>
                 <td class="label">PRODUCTEUR</td>

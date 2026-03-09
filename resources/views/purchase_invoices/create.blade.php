@@ -65,16 +65,6 @@
 
                 {{-- FORM GRID --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 bg-slate-200 gap-[1px]">
-                    {{-- Prefet --}}
-                    <div class="flex bg-white border-b border-slate-100">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">PRÉFECTURE</label>
-                        <input type="text" name="prefecture" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
-                    </div>
-                    {{-- OP --}}
-                    <div class="flex bg-white border-b border-slate-100">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">OP</label>
-                        <input type="text" name="op" class="flex-1 px-4 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
-                    </div>
                     {{-- Zone --}}
                     <div class="flex bg-white border-b border-slate-100">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 flex items-center border-r border-slate-100">ZONE</label>

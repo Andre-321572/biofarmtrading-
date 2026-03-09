@@ -58,14 +58,6 @@
             {{-- FORM GRID --}}
             <div class="grid grid-cols-1 md:grid-cols-2 bg-slate-200 gap-[1px]">
                 <div class="flex bg-white">
-                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">PRÉFECTURE</label>
-                    <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->prefecture ?? '—' }}</div>
-                </div>
-                <div class="flex bg-white">
-                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">OP</label>
-                    <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->op ?? '—' }}</div>
-                </div>
-                <div class="flex bg-white">
                     <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">ZONE</label>
                     <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->zone ?? '—' }}</div>
                 </div>

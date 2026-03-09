@@ -34,11 +34,9 @@ class PurchaseInvoiceController extends Controller
         $validated = $request->validate([
             'bon_no' => 'required|string|unique:purchase_invoices',
             'date_invoice' => 'required|date',
-            'prefecture' => 'nullable|string',
             'zone' => 'nullable|string',
             'chauffeur' => 'nullable|string',
             'fruit' => 'nullable|string',
-            'op' => 'nullable|string',
             'producteur' => 'nullable|string',
             'code_parcelle_matricule' => 'nullable|string',
             'quantite_estimee' => 'nullable|numeric|min:0',
@@ -54,11 +52,9 @@ class PurchaseInvoiceController extends Controller
         $invoice = PurchaseInvoice::create([
             'bon_no' => $validated['bon_no'],
             'date_invoice' => $validated['date_invoice'],
-            'prefecture' => $validated['prefecture'] ?? null,
             'zone' => $validated['zone'] ?? null,
             'chauffeur' => $validated['chauffeur'] ?? null,
             'fruit' => $validated['fruit'] ?? null,
-            'op' => $validated['op'] ?? null,
             'producteur' => $validated['producteur'] ?? null,
             'code_parcelle_matricule' => $validated['code_parcelle_matricule'] ?? null,
             'quantite_estimee' => $validated['quantite_estimee'] ?? 0,
