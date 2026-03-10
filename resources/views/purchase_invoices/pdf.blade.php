@@ -113,10 +113,10 @@
                     E-mail: tbiofarm@gmail.com // www.biofarmtogo.com
                 </td>
                 <td class="footer-certif">
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <div style="width: 45px; height: 35px; border: 1px solid #000; margin-right: 15px; display: inline-block;"></div>
-                        <div style="width: 35px; height: 35px; border: 1px solid #000; border-radius: 50%; display: inline-block; margin-right: 15px; position: relative;"></div>
-                        <div class="certif-text">
+                    <div style="text-align: right; white-space: nowrap;">
+                        <img src="{{ public_path('images/joossi_kinu_logo_white.png') }}" style="height: 35px; vertical-align: middle; margin-right: 5px; visibility: hidden; width: 35px;">
+                        <img src="{{ public_path('images/joossi_kinu_logo_white.png') }}" style="height: 35px; vertical-align: middle; margin-right: 15px; visibility: hidden; width: 35px;">
+                        <div class="certif-text" style="text-align: left; display: inline-block; vertical-align: middle;">
                             Produits bios Certifiés Par<br>
                             <strong>Ecocert S.A.S</strong><br>
                             TG - BIO - 154
