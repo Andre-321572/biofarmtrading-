@@ -22,6 +22,7 @@ class PurchaseInvoice extends Model
         'calibre',
         'pu',
         'prime_bio_kg',
+        'avarie_pct',
         'poids_avarie',
         'poids_marchand',
         'net_payer_lettre',

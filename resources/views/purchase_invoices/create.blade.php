@@ -130,6 +130,31 @@
                             <option value="Gros fruit">Gros fruit</option>
                         </select>
                     </div>
+                    {{-- % Avarie --}}
+                    <div class="flex bg-white border border-orange-200">
+                        <label class="bg-orange-50 px-3 py-3 text-[9px] font-bold uppercase text-orange-500 w-24 sm:w-32 flex items-center shrink-0 border-r border-orange-200">
+                            <i class="fa-solid fa-triangle-exclamation mr-1 text-orange-400"></i> % AVARIE
+                        </label>
+                        <div class="flex-1 flex items-center px-3">
+                            <input type="number" name="avarie_pct" id="avarie_pct_input"
+                                   x-model.number="avariePct"
+                                   step="0.01" min="0" max="100"
+                                   class="flex-1 py-2 text-sm font-black text-orange-600 border-0 focus:ring-0 bg-transparent"
+                                   placeholder="0.00">
+                            <span class="ml-1 text-sm font-black text-orange-500">%</span>
+                        </div>
+                        {{-- Aperçu en temps réel --}}
+                        <div class="hidden sm:flex items-center gap-3 px-3 border-l border-orange-100 bg-orange-50/50">
+                            <div class="text-right">
+                                <p class="text-[8px] text-orange-400 uppercase font-bold">Avarié</p>
+                                <p class="text-[11px] font-black text-orange-600" x-text="poidsAvarieCalc().toFixed(2) + ' kg'">0.00 kg</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[8px] text-slate-400 uppercase font-bold">Marchand</p>
+                                <p class="text-[11px] font-black text-slate-700" x-text="poidsMarchandCalc().toFixed(2) + ' kg'">0.00 kg</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- RELEVÉ DE POIDS --}}
@@ -231,16 +256,14 @@
                     <div class="flex flex-col divide-y divide-slate-100 bg-white">
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">Poids Avarié</label>
-                            <div class="flex-1 flex items-center px-3 sm:px-4">
-                                <input type="number" name="poids_avarie" x-model.number="poidsAvarie" class="w-full py-1 text-right font-bold text-red-600 border-0 focus:ring-0 text-sm" placeholder="0">
-                                <span class="ml-2 text-[10px] font-bold text-slate-400">FCFA</span>
+                            <div class="flex-1 flex items-center px-3 sm:px-4 justify-end">
+                                <span class="font-black text-orange-500 text-sm" x-text="poidsAvarieCalc().toFixed(2) + ' kg'">0.00 kg</span>
                             </div>
                         </div>
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">Poids marchand</label>
-                            <div class="flex-1 flex items-center px-3 sm:px-4">
-                                <input type="number" name="poids_marchand" x-model.number="poidsMarchand" class="w-full py-1 text-right font-bold text-red-600 border-0 focus:ring-0 text-sm" placeholder="0">
-                                <span class="ml-2 text-[10px] font-bold text-slate-400">FCFA</span>
+                            <div class="flex-1 flex items-center px-3 sm:px-4 justify-end">
+                                <span class="font-black text-slate-700 text-sm" x-text="poidsMarchandCalc().toFixed(2) + ' kg'">0.00 kg</span>
                             </div>
                         </div>
                         <div class="flex items-center">
@@ -291,9 +314,15 @@ function purchaseInvoiceForm() {
         weights: Array(200).fill(null),
         pu: 0,
         primeBio: 0,
-        poidsAvarie: 0,
-        poidsMarchand: 0,
+        avariePct: 0,
 
+        poidsAvarieCalc() {
+            return (this.totalWeight() * (this.avariePct || 0)) / 100;
+        },
+
+        poidsMarchandCalc() {
+            return this.totalWeight() - this.poidsAvarieCalc();
+        },
         grpTotal(offset) {
             let sum = 0;
             for (let i = offset; i < offset + 50; i++) sum += (this.weights[i] || 0);
@@ -317,11 +346,11 @@ function purchaseInvoiceForm() {
         },
 
         totalCredit() {
-            return (this.poidsAvarie || 0) + (this.poidsMarchand || 0);
+            return this.poidsAvarieCalc();
         },
 
         netAPayer() {
-            return this.montantTotal() - this.totalCredit();
+            return this.montantTotal() - this.poidsAvarieCalc();
         },
 
         totalPrime() {

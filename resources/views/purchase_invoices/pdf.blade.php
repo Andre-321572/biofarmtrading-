@@ -4,22 +4,21 @@
     <meta charset="UTF-8">
     <title>Facture d'Achat - {{ $purchaseInvoice->bon_no }}</title>
     <style>
-        @page { margin: 0.5cm 1cm 1.5cm 1cm; }
+        @page { margin: 0; }
         body { font-family: 'Helvetica', sans-serif; font-size: 10px; color: #333; margin: 0; padding: 0; line-height: 1.2; }
         .container { padding: 10px; }
         
         /* Header */
-        .header-container { width: 100%; position: relative; height: 70px; margin-bottom: 5px; }
-        .logo-box { position: absolute; left: 0; top: 0; }
-        .logo { width: 70px; }
-        .header-center { text-align: center; width: 100%; }
-        .company-name { font-size: 24px; font-weight: bold; color: #00a04a; letter-spacing: 2px; margin-bottom: 0px; }
-        .company-tagline { font-size: 8px; color: #333; font-weight: normal; margin-top: -5px; font-style: italic; }
-        .header-separator { border-top: 1px solid #000; margin-top: 5px; margin-bottom: 5px; }
-        
-        .bon-info { position: absolute; right: 0; top: 0; text-align: right; }
-        .bon-label { font-size: 8px; color: #666; font-weight: bold; }
-        .bon-date { font-size: 11px; font-weight: bold; }
+        .header-outer { width: 100%; background: #2d2d2d; margin-bottom: 0; display: block; }
+        .header-inner { display: table; width: 100%; border-collapse: collapse; }
+        .header-logo-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; }
+        .logo-white-box { background: #fff; padding: 8px 12px; display: inline-block; border-radius: 4px; }
+        .logo-white-box img { height: 55px; width: auto; display: block; }
+        .header-spacer { display: table-cell; width: 100%; }
+        .header-date-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; text-align: right; white-space: nowrap; }
+        .bon-label { font-size: 7px; color: #aaa; font-weight: bold; text-transform: uppercase; display: block; }
+        .bon-date { font-size: 12px; font-weight: bold; color: #fff; display: block; margin-top: 2px; }
+        .header-separator { border-top: 3px solid #3cb54a; margin: 0 0 8px 0; }
 
         /* Title */
         .title-box { border: 1.5px solid #000; text-align: center; padding: 5px 0; margin-bottom: 10px; width: 100%; }
@@ -72,78 +71,29 @@
         .signature-title { font-weight: bold; text-transform: uppercase; font-size: 9px; display: block; margin-bottom: 40px; }
         .signature-hint { font-size: 7px; color: #999; border-top: 0.5px solid #eee; padding-top: 5px; }
 
-        /* Footer Bar */
-        .footer-bar { 
-            position: fixed; 
-            bottom: -0.5cm; 
-            left: 0; 
-            right: 0; 
-            background: #fff; 
-            border-top: 1.5px solid #000; 
-            padding: 10px 0; 
-            text-align: center;
-        }
-        .footer-table { width: 100%; border-collapse: collapse; }
-        .footer-info { width: 70%; font-size: 9px; color: #000; line-height: 1.4; }
-        .footer-certif { width: 30%; border-left: 1px solid #000; padding-left: 15px; text-align: left; vertical-align: middle; }
-        
-        .certif-logo-placeholder { 
-            display: inline-block; 
-            vertical-align: middle; 
-            width: 40px; 
-            height: 30px; 
-            border: 0.5px solid #eee; 
-            margin-right: 10px;
-        }
-        .certif-text { 
-            display: inline-block; 
-            vertical-align: middle; 
-            font-size: 8px; 
-            line-height: 1.2; 
-        }
+
     </style>
 </head>
 <body>
-    <div class="footer-bar">
-        <table class="footer-table">
-            <tr>
-                <td class="footer-info">
-                    <strong>BIO FARM TRADING RCCM : TG-LOM 2019 B 1488 ; NIF 1001469316 ; Capital 10 000 000 de FCFA.</strong><br>
-                    Noépé Baka Kondji, Rue derrière EPP Noépé Tél.: (+228) 92 02 01 10 .<br>
-                    E-mail: tbiofarm@gmail.com // www.biofarmtogo.com
-                </td>
-                <td class="footer-certif">
-                    <div style="text-align: right; white-space: nowrap;">
-                        <img src="{{ public_path('images/joossi_kinu_logo_white.png') }}" style="height: 35px; vertical-align: middle; margin-right: 5px; visibility: hidden; width: 35px;">
-                        <img src="{{ public_path('images/joossi_kinu_logo_white.png') }}" style="height: 35px; vertical-align: middle; margin-right: 15px; visibility: hidden; width: 35px;">
-                        <div class="certif-text" style="text-align: left; display: inline-block; vertical-align: middle;">
-                            Produits bios Certifiés Par<br>
-                            <strong>Ecocert S.A.S</strong><br>
-                            TG - BIO - 154
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header-container">
-            <div class="logo-box">
-                <img src="{{ public_path('images/logo.jpg') }}" class="logo">
+    <!-- Header SCOOPS OFCA style -->
+    <div class="header-outer">
+        <div class="header-inner">
+            <div class="header-logo-cell">
+                <div class="logo-white-box">
+                    <img src="{{ public_path('images/ofca_logo.png') }}" alt="SCOOPS OFCA Logo">
+                </div>
             </div>
-            <div class="header-center">
-                <div class="company-name" style="color: #00a651;">BIO FARM TRADING</div>
-                <div class="company-tagline">Production-Transformation-Commercialisation de produits agricoles biologiques</div>
-            </div>
-            <div class="bon-info" style="margin-top: -10px;">
-                <span class="bon-label" style="font-size: 7px;">DATE</span><br>
-                <span class="bon-date" style="font-size: 10px;">{{ $purchaseInvoice->date_invoice->format('d/m/Y') }}</span>
+            <div class="header-spacer"></div>
+            <div class="header-date-cell">
+                <span class="bon-label">DATE</span>
+                <span class="bon-date">{{ $purchaseInvoice->date_invoice->format('d/m/Y') }}</span>
             </div>
         </div>
+    </div>
+    <div class="header-separator"></div>
 
-        <div class="header-separator"></div>
+    <div class="container">
 
         <!-- Title -->
         <div class="title-box">
@@ -169,6 +119,12 @@
                 <td class="value">{{ $purchaseInvoice->fruit ?? '—' }}</td>
                 <td class="label">CALIBRE FRUIT</td>
                 <td class="value">{{ $purchaseInvoice->calibre ?? '—' }}</td>
+            </tr>
+            <tr>
+                <td class="label" style="background: #fff8ed; color: #c2410c;">% AVARIE</td>
+                <td class="value" style="color: #c2410c; font-weight: 900;">{{ number_format($purchaseInvoice->avarie_pct ?? 0, 2, ',', ' ') }} %</td>
+                <td class="label" style="background: #fff8ed; color: #c2410c;">POIDS MARCHAND</td>
+                <td class="value" style="color: #374151; font-weight: 900;">{{ number_format($purchaseInvoice->poids_marchand ?? 0, 2, ',', ' ') }} kg</td>
             </tr>
         </table>
 
@@ -293,7 +249,7 @@
         </div>
 
         <div style="text-align: center; font-size: 7px; color: #999; margin-top: 5px;">
-            GÉNÉRÉ LE {{ now()->format('d/m/Y à H:i') }} PAR {{ Auth::user()->name ?? 'Système' }} · BIO FARM TRADING
+            GÉNÉRÉ LE {{ now()->format('d/m/Y à H:i') }} PAR {{ Auth::user()->name ?? 'Système' }} · SCOOPS OFCA
         </div>
     </div>
 </body>

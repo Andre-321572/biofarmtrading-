@@ -42,8 +42,7 @@ class PurchaseInvoiceController extends Controller
             'calibre' => 'nullable|string',
             'pu' => 'required|numeric|min:0',
             'prime_bio_kg' => 'nullable|numeric|min:0',
-            'poids_avarie' => 'nullable|numeric|min:0',
-            'poids_marchand' => 'nullable|numeric|min:0',
+            'avarie_pct' => 'nullable|numeric|min:0|max:100',
             'net_payer_lettre' => 'nullable|string',
             'weights' => 'required|array',
             'weights.*' => 'nullable|numeric|min:0',
@@ -60,8 +59,9 @@ class PurchaseInvoiceController extends Controller
             'calibre' => $validated['calibre'] ?? null,
             'pu' => $validated['pu'],
             'prime_bio_kg' => $validated['prime_bio_kg'] ?? 0,
-            'poids_avarie' => $validated['poids_avarie'] ?? 0,
-            'poids_marchand' => $validated['poids_marchand'] ?? 0,
+            'avarie_pct' => $validated['avarie_pct'] ?? 0,
+            'poids_avarie' => 0,
+            'poids_marchand' => 0,
             'net_payer_lettre' => $validated['net_payer_lettre'] ?? null,
             'user_id' => Auth::id(),
         ]);
@@ -74,6 +74,17 @@ class PurchaseInvoiceController extends Controller
                 ]);
             }
         }
+
+        // Calcul automatique avarie & poids marchand après insertion des poids
+        $totalWeight = $invoice->weights()->sum('weight');
+        $avariePct   = $validated['avarie_pct'] ?? 0;
+        $poidsAvarie = round(($totalWeight * $avariePct) / 100, 2);
+        $poidsMarchand = round($totalWeight - $poidsAvarie, 2);
+
+        $invoice->update([
+            'poids_avarie'   => $poidsAvarie,
+            'poids_marchand' => $poidsMarchand,
+        ]);
 
         return redirect()->route('purchase_invoices.index')->with('success', 'Facture d\'achat enregistrée avec succès.');
     }
