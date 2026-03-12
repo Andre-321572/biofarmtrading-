@@ -216,22 +216,22 @@
                             @php $colOffset = $offset + $col*10; @endphp
                             <div class="flex flex-col bg-white rounded-lg shadow-sm border border-blue-200 overflow-hidden">
                                 {{-- Header de colonne --}}
-                                <div class="grid grid-cols-[40px_1fr] bg-blue-600 text-white font-black text-[10px] uppercase tracking-wider">
-                                    <div class="py-2 text-center border-r border-blue-500">N°</div>
-                                    <div class="py-2 text-center">Poids</div>
+                                <div style="display: flex; background-color: #2563eb; color: white; font-weight: 900; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    <div style="width: 45px; padding: 8px 0; text-align: center; border-right: 1px solid #3b82f6;">N°</div>
+                                    <div style="flex: 1; padding: 8px 0; text-align: center;">Poids</div>
                                 </div>
                                 
                                 {{-- Corps de colonne --}}
                                 <div class="flex-1 divide-y divide-slate-100">
                                     @for($row=0; $row<10; $row++)
                                     @php $absIdx = $colOffset + $row; @endphp
-                                    <div class="grid grid-cols-[40px_1fr] items-center hover:bg-blue-50/30 transition-colors group">
-                                        <div class="py-2 text-center text-[10px] font-bold text-slate-400 bg-slate-50/50 border-r border-slate-100 italic">
+                                    <div style="display: flex; align-items: center;" class="hover:bg-blue-50/30 transition-colors group">
+                                        <div style="width: 45px; padding: 10px 0; text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; background-color: #f8fafc; border-right: 1px solid #f1f5f9; font-style: italic;">
                                             {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
                                         </div>
-                                        <div class="px-2 py-1">
+                                        <div style="flex: 1; padding: 4px 8px;">
                                             <input type="number" step="0.01" name="weights[]" x-model.number="weights[{{ $absIdx }}]"
-                                                class="w-full text-center py-1.5 text-[11px] font-black text-blue-900 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-300" 
+                                                class="w-full text-center py-1.5 text-[11px] font-black text-blue-900 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
                                                 placeholder="0">
                                             <input type="hidden" name="calibres[]" x-model="calibres[{{ $absIdx }}]">
                                         </div>
@@ -240,9 +240,9 @@
                                 </div>
 
                                 {{-- Footer de colonne (Total) --}}
-                                <div class="grid grid-cols-[40px_1fr] bg-blue-600 text-white font-black text-[11px]">
-                                    <div class="py-2 text-center border-r border-blue-500 opacity-60">T</div>
-                                    <div class="py-2 text-center">
+                                <div style="display: flex; background-color: #2563eb; color: white; font-weight: 900; font-size: 11px;">
+                                    <div style="width: 45px; padding: 8px 0; text-align: center; border-right: 1px solid #3b82f6; opacity: 0.6;">T</div>
+                                    <div style="flex: 1; padding: 8px 0; text-align: center;">
                                         <span x-text="weights.slice({{ $colOffset }}, {{ $colOffset + 10 }}).reduce((a, b) => a + (b || 0), 0).toFixed(2)"></span>
                                     </div>
                                 </div>
