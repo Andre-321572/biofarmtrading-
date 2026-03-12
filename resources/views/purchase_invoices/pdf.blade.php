@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <title>Facture d'Achat - {{ $purchaseInvoice->bon_no }}</title>
     <style>
-        @page { margin: 0; }
-        body { font-family: 'Helvetica', sans-serif; font-size: 10px; color: #333; margin: 0; padding: 0; line-height: 1.2; }
-        .container { padding: 10px; }
+        @page { margin: 5mm; }
+        body { font-family: 'Helvetica', sans-serif; font-size: 9px; color: #333; margin: 0; padding: 0; line-height: 1.1; }
+        .container { padding: 0; }
         
         /* Header */
-        .header-outer { width: 100%; background: #ffffff; margin-bottom: 0; display: block; border-bottom: 2px solid #3cb54a; }
+        .header-outer { width: 100%; background: #ffffff; margin-bottom: 5px; display: block; border-bottom: 2px solid #3cb54a; }
         .header-inner { display: table; width: 100%; border-collapse: collapse; }
-        .header-logo-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; width: 80px; }
-        .logo-img { height: 60px; width: auto; display: block; }
-        .header-center-cell { display: table-cell; vertical-align: middle; text-align: center; padding: 10px 0; }
-        .company-name { font-size: 26px; font-weight: bold; color: #3cb54a; letter-spacing: 2px; margin: 0; }
-        .company-tagline { font-size: 9px; color: #333; font-weight: bold; margin: 0; }
-        .header-date-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; width: 90px; text-align: right; white-space: nowrap; }
-        .bon-label { font-size: 7px; color: #666; font-weight: bold; text-transform: uppercase; display: block; }
-        .bon-date { font-size: 11px; font-weight: bold; color: #000; display: block; margin-top: 2px; }
+        .header-logo-cell { display: table-cell; vertical-align: middle; padding: 5px 10px; width: 60px; }
+        .logo-img { height: 45px; width: auto; display: block; }
+        .header-center-cell { display: table-cell; vertical-align: middle; text-align: center; padding: 5px 0; }
+        .company-name { font-size: 22px; font-weight: bold; color: #3cb54a; letter-spacing: 1px; margin: 0; }
+        .company-tagline { font-size: 8px; color: #333; font-weight: bold; margin: 0; }
+        .header-date-cell { display: table-cell; vertical-align: middle; padding: 5px 10px; width: 80px; text-align: right; white-space: nowrap; }
+        .bon-label { font-size: 6px; color: #666; font-weight: bold; text-transform: uppercase; display: block; }
+        .bon-date { font-size: 10px; font-weight: bold; color: #000; display: block; margin-top: 1px; }
         .header-separator { display: none; }
 
         /* Title */
@@ -26,44 +26,44 @@
         .title-box h1 { margin: 0; letter-spacing: 8px; text-transform: uppercase; font-size: 16px; font-weight: bold; }
         
         /* Info Table */
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; border: 1px solid #ccc; }
-        .info-table td { border: 1px solid #ccc; padding: 5px 10px; font-size: 9px; }
-        .info-table .label { background: #fdfdfd; font-weight: bold; text-transform: uppercase; width: 130px; color: #555; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; border: 1px solid #ccc; }
+        .info-table td { border: 1px solid #ccc; padding: 3px 6px; font-size: 8px; }
+        .info-table .label { background: #fdfdfd; font-weight: bold; text-transform: uppercase; width: 110px; color: #555; }
         .info-table .value { background: #fff; font-weight: bold; color: #000; }
         
         /* Weight Table Section */
-        .releve-title { background: #1a202c; color: #fff; text-align: center; padding: 6px; text-transform: uppercase; font-weight: bold; letter-spacing: 10px; margin-bottom: 0px; font-size: 11px; }
+        .releve-title { background: #1a202c; color: #fff; text-align: center; padding: 4px; text-transform: uppercase; font-weight: bold; letter-spacing: 5px; margin-bottom: 0px; font-size: 9px; }
         
-        .weight-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 5px; }
-        .weight-table th { background: #4a5568; color: #fff; padding: 3px; font-size: 8px; border: 0.5px solid #1a202c; text-transform: uppercase; }
-        .weight-table td { border: 0.5px solid #ddd; padding: 2px 4px; text-align: center; font-size: 9px; height: 12px; }
-        .weight-table .num { color: #4338ca; font-weight: bold; width: 6%; background: #f9fafb; border-right: 0.5px solid #ccc; }
-        .weight-table .weight { font-weight: bold; width: 14%; }
-        .weight-table .total-row td { background: #f9fafb; font-weight: bold; border-top: 1.5px solid #4a5568; font-size: 9px; padding: 4px; }
+        .weight-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 3px; }
+        .weight-table th { background: #4a5568; color: #fff; padding: 2px; font-size: 6px; border: 0.5px solid #1a202c; text-transform: uppercase; }
+        .weight-table td { border: 0.5px solid #ddd; padding: 1px 2px; text-align: center; font-size: 7px; height: 10px; }
+        .weight-table .num { color: #4338ca; font-weight: bold; width: 3.5%; background: #f9fafb; border-right: 0.5px solid #ccc; }
+        .weight-table .weight { font-weight: bold; width: 9%; }
+        .weight-table .total-row td { background: #f9fafb; font-weight: bold; border-top: 1px solid #4a5568; font-size: 7px; padding: 2px; }
         
         /* Summary Section */
-        .summary-layout { width: 100%; margin-top: 10px; border-collapse: collapse; }
+        .summary-layout { width: 100%; margin-top: 5px; border-collapse: collapse; }
         .summary-layout td { vertical-align: top; padding: 0; }
         .summary-left { width: 49%; }
         .summary-right { width: 49%; text-align: right; }
         .spacer { width: 2%; }
         
         .summary-table { width: 100%; border-collapse: collapse; }
-        .summary-table td { border: 1px solid #ddd; padding: 5px 10px; font-size: 9px; }
+        .summary-table td { border: 1px solid #ddd; padding: 3px 8px; font-size: 8px; }
         .summary-table .label { background: #f8f8f8; font-weight: bold; text-transform: uppercase; color: #555; width: 60%; }
-        .summary-table .amount { text-align: right; font-weight: bold; font-size: 10px; color: #000; }
-        .summary-table .amount-unit { font-size: 8px; color: #666; }
+        .summary-table .amount { text-align: right; font-weight: bold; font-size: 9px; color: #000; }
+        .summary-table .amount-unit { font-size: 7px; color: #666; }
         
-        .net-payable-row .label { background: #dcfce7 !important; color: #166534 !important; font-size: 10px; }
-        .net-payable-row .amount { background: #dcfce7 !important; color: #166534 !important; font-size: 11px; font-weight: bold; }
+        .net-payable-row .label { background: #dcfce7 !important; color: #166534 !important; font-size: 9px; }
+        .net-payable-row .amount { background: #dcfce7 !important; color: #166534 !important; font-size: 10px; font-weight: bold; }
         
         .right-label { text-align: left; }
         .danger-amount { color: #dc2626 !important; }
         .primary-amount { color: #2563eb !important; }
         
-        .net-in-words-box { background: #f9fafb; border: 1px solid #ddd; padding: 8px; margin-top: -1px; text-align: left; min-height: 40px; }
-        .net-in-words-label { font-size: 7px; color: #666; text-transform: uppercase; display: block; margin-bottom: 3px; font-style: italic; }
-        .net-in-words-value { font-weight: bold; font-style: italic; font-size: 10px; color: #000; }
+        .net-in-words-box { background: #f9fafb; border: 1px solid #ddd; padding: 5px; margin-top: -1px; text-align: left; min-height: 25px; }
+        .net-in-words-label { font-size: 6px; color: #666; text-transform: uppercase; display: block; margin-bottom: 2px; font-style: italic; }
+        .net-in-words-value { font-weight: bold; font-style: italic; font-size: 9px; color: #000; }
 
         /* Signatures */
         .signatures-container { margin-top: 30px; width: 100%; }
@@ -99,8 +99,8 @@
     <div class="container">
 
         <!-- Title -->
-        <div class="title-box">
-            <h1 style="font-size: 18px; letter-spacing: 12px;">Facture d'Achat</h1>
+        <div class="title-box" style="padding: 3px 0; margin-bottom: 5px;">
+            <h1 style="font-size: 14px; letter-spacing: 8px;">Facture d'Achat</h1>
         </div>
 
         <!-- Info Grid -->
@@ -132,15 +132,14 @@
         </table>
 
         <!-- Weights Section -->
-        <div class="releve-title" style="letter-spacing: 15px; font-size: 13px;">Relevé de Poids</div>
+        <div class="releve-title" style="letter-spacing: 10px; font-size: 11px;">Relevé de Poids</div>
         
         @php 
             $allWeights = $purchaseInvoice->weights->sortBy('position')->values();
             $count = $allWeights->count();
-            $numCols = 5;
-            $rowsPerCol = 10;
-            if ($count > 50) $rowsPerCol = ceil($count / $numCols);
-            if ($rowsPerCol > 35) $rowsPerCol = 35;
+            $numCols = 8;
+            $rowsPerCol = ceil($count / $numCols);
+            if ($rowsPerCol < 10) $rowsPerCol = 10;
         @endphp
 
         <table class="weight-table">
@@ -157,14 +156,14 @@
                     @for($c = 0; $c < $numCols; $c++)
                         @php $idx = $row + ($c * $rowsPerCol); @endphp
                         <td class="num">{{ isset($allWeights[$idx]) ? str_pad($allWeights[$idx]->position, 3, '0', STR_PAD_LEFT) : '' }}</td>
-                        <td class="weight" style="position: relative;">
+                        <td class="weight" style="font-size: 6.5px;">
                             @if(isset($allWeights[$idx]))
                                 {{ number_format($allWeights[$idx]->weight, 2, ',', ' ') }}
-                                <span style="font-size: 7px; font-weight: bold; {{ $allWeights[$idx]->calibre == 'GF' ? 'color: #c2410c;' : 'color: #4338ca;' }}">
+                                <span style="font-size: 5px; font-weight: bold; {{ $allWeights[$idx]->calibre == 'GF' ? 'color: #c2410c;' : 'color: #4338ca;' }}">
                                     [{{ $allWeights[$idx]->calibre }}]
                                 </span>
                             @else
-                                —
+                                &nbsp;
                             @endif
                         </td>
                     @endfor
@@ -252,16 +251,16 @@
         </table>
 
         <!-- Signatures -->
-        <div class="signatures-container">
+        <div class="signatures-container" style="margin-top: 15px;">
             <table class="signature-table">
                 <tr>
-                    <td class="signature-box" style="width: 48%;">
-                        <span class="signature-title">A2C SAM / RESPONSABLE</span>
+                    <td class="signature-box" style="width: 48%; height: 60px; padding: 5px;">
+                        <span class="signature-title" style="margin-bottom: 25px;">A2C SAM / RESPONSABLE</span>
                         <span class="signature-hint">Signature & Cachet</span>
                     </td>
                     <td style="width: 4%;"></td>
-                    <td class="signature-box" style="width: 48%;">
-                        <span class="signature-title">LE PRODUCTEUR</span>
+                    <td class="signature-box" style="width: 48%; height: 60px; padding: 5px;">
+                        <span class="signature-title" style="margin-bottom: 25px;">LE PRODUCTEUR</span>
                         <span class="signature-hint">Signature</span>
                     </td>
                 </tr>
