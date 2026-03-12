@@ -255,7 +255,7 @@
             <table class="signature-table">
                 <tr>
                     <td class="signature-box" style="width: 48%; height: 60px; padding: 5px;">
-                        <span class="signature-title" style="margin-bottom: 25px;">A2C SAM / RESPONSABLE</span>
+                        <span class="signature-title" style="margin-bottom: 25px;">A2C OFCA / RESPONSABLE</span>
                         <span class="signature-hint">Signature & Cachet</span>
                     </td>
                     <td style="width: 4%;"></td>
