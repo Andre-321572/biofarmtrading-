@@ -196,11 +196,11 @@
                             <td class="amount">{{ number_format($purchaseInvoice->total_weight, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
-                            <td class="label" style="background: #f8fafc; font-size: 8px;">DONT PETIT FRUIT (PF)</td>
+                            <td class="label" style="background: #f8fafc; font-size: 8px;"> PETIT FRUIT (PF)</td>
                             <td class="amount" style="font-size: 9px; color: #4338ca;">{{ number_format($purchaseInvoice->weights->where('calibre', 'PF')->sum('weight'), 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
-                            <td class="label" style="background: #f8fafc; font-size: 8px;">DONT GROS FRUIT (GF)</td>
+                            <td class="label" style="background: #f8fafc; font-size: 8px;"> GROS FRUIT (GF)</td>
                             <td class="amount" style="font-size: 9px; color: #c2410c;">{{ number_format($purchaseInvoice->weights->where('calibre', 'GF')->sum('weight'), 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>

@@ -186,12 +186,24 @@
                 <div x-data="{ open: {{ $alpineOpen }} }">
                     <button type="button" @click="open=!open"
                             class="w-full flex items-center justify-between px-4 py-2 text-left hover:brightness-95 transition select-none {{ $g['light'] }} border-b {{ $g['border'] }}">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 flex-1 overflow-hidden">
                             <div class="w-6 h-6 rounded {{ $g['bg'] }} flex items-center justify-center shrink-0">
                                 <span class="text-[10px] font-black text-white">{{ $g['num'] }}</span>
                             </div>
-                            <span class="text-xs font-black {{ $g['text'] }}">Groupe {{ $g['num'] }} <span class="opacity-50 font-normal">({{ $g['from'] }}–{{ $g['to'] }})</span></span>
-                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $g['badge'] }}">
+                            <span class="text-xs font-black {{ $g['text'] }} truncate">Groupe {{ $g['num'] }} <span class="opacity-50 font-normal hidden sm:inline">({{ $g['from'] }}–{{ $g['to'] }})</span></span>
+                            
+                            {{-- Sélecteur de calibre pour le groupe --}}
+                            <div class="flex items-center bg-white rounded border border-slate-200 p-0.5 ml-auto sm:ml-0" @click.stop>
+                                <label class="text-[8px] font-bold px-2 text-slate-400 uppercase hidden xs:inline">Calibre Groupe:</label>
+                                <select class="text-[9px] font-black border-0 focus:ring-0 py-0.5 pl-2 pr-6 rounded cursor-pointer bg-slate-50"
+                                        @change="setGrpCalibre({{ $offset }}, $event.target.value)">
+                                    <option value="">PF / GF</option>
+                                    <option value="PF">PETIT (PF)</option>
+                                    <option value="GF">GROS (GF)</option>
+                                </select>
+                            </div>
+
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $g['badge'] }} hidden sm:flex">
                                 <span x-text="grpFilled({{ $offset }})"></span>/50 cases &nbsp;·&nbsp;
                                 <span x-text="grpTotal({{ $offset }}).toFixed(2)+' kg'"></span>
                             </span>
@@ -338,6 +350,13 @@ function purchaseInvoiceForm() {
 
         grpFilled(offset) {
             return this.weights.slice(offset, offset + 50).filter(v => v > 0).length;
+        },
+
+        setGrpCalibre(offset, val) {
+            if (!val) return;
+            for (let i = offset; i < offset + 50; i++) {
+                this.calibres[i] = val;
+            }
         },
 
         totalWeight() {
