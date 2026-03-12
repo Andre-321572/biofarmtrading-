@@ -9,16 +9,17 @@
         .container { padding: 10px; }
         
         /* Header */
-        .header-outer { width: 100%; background: #2d2d2d; margin-bottom: 0; display: block; }
+        .header-outer { width: 100%; background: #ffffff; margin-bottom: 0; display: block; border-bottom: 2px solid #3cb54a; }
         .header-inner { display: table; width: 100%; border-collapse: collapse; }
-        .header-logo-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; }
-        .logo-white-box { background: #fff; padding: 8px 12px; display: inline-block; border-radius: 4px; }
-        .logo-white-box img { height: 55px; width: auto; display: block; }
-        .header-spacer { display: table-cell; width: 100%; }
-        .header-date-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; text-align: right; white-space: nowrap; }
-        .bon-label { font-size: 7px; color: #aaa; font-weight: bold; text-transform: uppercase; display: block; }
-        .bon-date { font-size: 12px; font-weight: bold; color: #fff; display: block; margin-top: 2px; }
-        .header-separator { border-top: 3px solid #3cb54a; margin: 0 0 8px 0; }
+        .header-logo-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; width: 80px; }
+        .logo-img { height: 60px; width: auto; display: block; }
+        .header-center-cell { display: table-cell; vertical-align: middle; text-align: center; padding: 10px 0; }
+        .company-name { font-size: 26px; font-weight: bold; color: #3cb54a; letter-spacing: 2px; margin: 0; }
+        .company-tagline { font-size: 9px; color: #333; font-weight: bold; margin: 0; }
+        .header-date-cell { display: table-cell; vertical-align: middle; padding: 10px 15px; width: 90px; text-align: right; white-space: nowrap; }
+        .bon-label { font-size: 7px; color: #666; font-weight: bold; text-transform: uppercase; display: block; }
+        .bon-date { font-size: 11px; font-weight: bold; color: #000; display: block; margin-top: 2px; }
+        .header-separator { display: none; }
 
         /* Title */
         .title-box { border: 1.5px solid #000; text-align: center; padding: 5px 0; margin-bottom: 10px; width: 100%; }
@@ -77,14 +78,16 @@
 <body>
 
     <!-- Header SCOOPS OFCA style -->
+    <!-- Header SCOOPS OFCA white style -->
     <div class="header-outer">
         <div class="header-inner">
             <div class="header-logo-cell">
-                <div class="logo-white-box">
-                    <img src="{{ public_path('images/ofca_logo.png') }}" alt="SCOOPS OFCA Logo">
-                </div>
+                <img src="{{ public_path('images/ofca_logo.png') }}" class="logo-img" alt="Logo">
             </div>
-            <div class="header-spacer"></div>
+            <div class="header-center-cell">
+                <div class="company-name">SCOOPS OFCA</div>
+                <div class="company-tagline">Production-Commercialisation de produits agricoles biologiques</div>
+            </div>
             <div class="header-date-cell">
                 <span class="bon-label">DATE</span>
                 <span class="bon-date">{{ $purchaseInvoice->date_invoice->format('d/m/Y') }}</span>
