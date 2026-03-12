@@ -217,18 +217,17 @@
                             <div class="bg-white rounded border {{ $g['border'] }}">
                                 @for($row=0; $row<10; $row++)
                                 @php $absIdx = $colOffset + $row; @endphp
-                                <div class="grid grid-cols-[25px_1fr_30px] border-b border-slate-50 items-center">
+                                <div class="grid grid-cols-[25px_1fr_20px] border-b border-slate-50 items-center">
                                     <div class="py-1 text-center text-[8px] font-black {{ $g['text'] }} border-r border-slate-100 bg-slate-50/50">
                                         {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
                                     </div>
                                     <input type="number" step="0.01" name="weights[]" x-model.number="weights[{{ $absIdx }}]"
                                            class="w-full text-center py-1 text-[10px] font-bold border-0 focus:ring-1 focus:ring-indigo-400 bg-transparent" placeholder="...">
-                                    <select name="calibres[]" x-model="calibres[{{ $absIdx }}]" 
-                                            class="text-[8px] font-black border-0 border-l border-slate-100 focus:ring-0 p-0 h-full text-center cursor-pointer appearance-none"
-                                            :class="calibres[{{ $absIdx }}] === 'GF' ? 'text-orange-600 bg-orange-50' : 'text-indigo-600 bg-indigo-50'">
-                                        <option value="PF">PF</option>
-                                        <option value="GF">GF</option>
-                                    </select>
+                                    <input type="hidden" name="calibres[]" x-model="calibres[{{ $absIdx }}]">
+                                    <div class="text-[7px] font-black h-full flex items-center justify-center border-l border-slate-100 min-w-[20px]"
+                                         :class="calibres[{{ $absIdx }}] === 'GF' ? 'text-orange-500 bg-orange-50' : 'text-indigo-500 bg-indigo-50'"
+                                         x-text="calibres[{{ $absIdx }}]">
+                                    </div>
                                 </div>
                                 @endfor
                             </div>
