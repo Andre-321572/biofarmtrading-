@@ -210,22 +210,42 @@
                         </div>
                         <i class="fa-solid fa-chevron-down w-3 h-3 {{ $g['text'] }} transition-transform duration-200" :class="open?'rotate-180':''"></i>
                     </button>
-                    <div x-show="open" class="{{ $g['light'] }} p-2">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                    <div x-show="open" class="p-3 bg-slate-50">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                             @for($col=0; $col<5; $col++)
                             @php $colOffset = $offset + $col*10; @endphp
-                            <div class="bg-white rounded border {{ $g['border'] }}">
-                                @for($row=0; $row<10; $row++)
-                                @php $absIdx = $colOffset + $row; @endphp
-                                <div class="grid grid-cols-[25px_1fr] border-b border-slate-50 items-center">
-                                    <div class="py-1 text-center text-[8px] font-black {{ $g['text'] }} border-r border-slate-100 bg-slate-50/50">
-                                        {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
-                                    </div>
-                                    <input type="number" step="0.01" name="weights[]" x-model.number="weights[{{ $absIdx }}]"
-                                           class="w-full text-center py-1 text-[10px] font-bold border-0 focus:ring-1 focus:ring-indigo-400 bg-transparent" placeholder="...">
-                                    <input type="hidden" name="calibres[]" x-model="calibres[{{ $absIdx }}]">
+                            <div class="flex flex-col bg-white rounded-lg shadow-sm border border-blue-200 overflow-hidden">
+                                {{-- Header de colonne --}}
+                                <div class="grid grid-cols-[40px_1fr] bg-blue-600 text-white font-black text-[10px] uppercase tracking-wider">
+                                    <div class="py-2 text-center border-r border-blue-500">N°</div>
+                                    <div class="py-2 text-center">Poids</div>
                                 </div>
-                                @endfor
+                                
+                                {{-- Corps de colonne --}}
+                                <div class="flex-1 divide-y divide-slate-100">
+                                    @for($row=0; $row<10; $row++)
+                                    @php $absIdx = $colOffset + $row; @endphp
+                                    <div class="grid grid-cols-[40px_1fr] items-center hover:bg-blue-50/30 transition-colors group">
+                                        <div class="py-2 text-center text-[10px] font-bold text-slate-400 bg-slate-50/50 border-r border-slate-100 italic">
+                                            {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
+                                        </div>
+                                        <div class="px-2 py-1">
+                                            <input type="number" step="0.01" name="weights[]" x-model.number="weights[{{ $absIdx }}]"
+                                                class="w-full text-center py-1.5 text-[11px] font-black text-blue-900 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-300" 
+                                                placeholder="0">
+                                            <input type="hidden" name="calibres[]" x-model="calibres[{{ $absIdx }}]">
+                                        </div>
+                                    </div>
+                                    @endfor
+                                </div>
+
+                                {{-- Footer de colonne (Total) --}}
+                                <div class="grid grid-cols-[40px_1fr] bg-blue-600 text-white font-black text-[11px]">
+                                    <div class="py-2 text-center border-r border-blue-500 opacity-60">T</div>
+                                    <div class="py-2 text-center">
+                                        <span x-text="weights.slice({{ $colOffset }}, {{ $colOffset + 10 }}).reduce((a, b) => a + (b || 0), 0).toFixed(2)"></span>
+                                    </div>
+                                </div>
                             </div>
                             @endfor
                         </div>
