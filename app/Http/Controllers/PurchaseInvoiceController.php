@@ -46,6 +46,8 @@ class PurchaseInvoiceController extends Controller
             'net_payer_lettre' => 'nullable|string',
             'weights' => 'required|array',
             'weights.*' => 'nullable|numeric|min:0',
+            'calibres' => 'nullable|array',
+            'calibres.*' => 'nullable|string|in:PF,GF',
         ]);
 
         $invoice = PurchaseInvoice::create([
@@ -71,6 +73,7 @@ class PurchaseInvoiceController extends Controller
                 $invoice->weights()->create([
                     'position' => $index + 1,
                     'weight' => $weight,
+                    'calibre' => $request->calibres[$index] ?? 'PF',
                 ]);
             }
         }

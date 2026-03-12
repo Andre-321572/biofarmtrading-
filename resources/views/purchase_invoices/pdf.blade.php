@@ -144,7 +144,7 @@
             <thead>
                 <tr>
                     @for($c = 0; $c < $numCols; $c++)
-                    <th class="num">N°</th><th class="weight">Poids kg</th>
+                    <th class="num">N°</th><th class="weight">Poids/Cal</th>
                     @endfor
                 </tr>
             </thead>
@@ -154,7 +154,16 @@
                     @for($c = 0; $c < $numCols; $c++)
                         @php $idx = $row + ($c * $rowsPerCol); @endphp
                         <td class="num">{{ isset($allWeights[$idx]) ? str_pad($allWeights[$idx]->position, 3, '0', STR_PAD_LEFT) : '' }}</td>
-                        <td class="weight">{{ isset($allWeights[$idx]) ? number_format($allWeights[$idx]->weight, 2, ',', ' ') : '—' }}</td>
+                        <td class="weight" style="position: relative;">
+                            @if(isset($allWeights[$idx]))
+                                {{ number_format($allWeights[$idx]->weight, 2, ',', ' ') }}
+                                <span style="font-size: 7px; font-weight: bold; {{ $allWeights[$idx]->calibre == 'GF' ? 'color: #c2410c;' : 'color: #4338ca;' }}">
+                                    [{{ $allWeights[$idx]->calibre }}]
+                                </span>
+                            @else
+                                —
+                            @endif
+                        </td>
                     @endfor
                 </tr>
                 @endfor
@@ -182,6 +191,14 @@
                         <tr>
                             <td class="label" style="background: #f9fafb;">POIDS TOTAL</td>
                             <td class="amount">{{ number_format($purchaseInvoice->total_weight, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
+                        </tr>
+                        <tr>
+                            <td class="label" style="background: #f8fafc; font-size: 8px;">DONT PETIT FRUIT (PF)</td>
+                            <td class="amount" style="font-size: 9px; color: #4338ca;">{{ number_format($purchaseInvoice->weights->where('calibre', 'PF')->sum('weight'), 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
+                        </tr>
+                        <tr>
+                            <td class="label" style="background: #f8fafc; font-size: 8px;">DONT GROS FRUIT (GF)</td>
+                            <td class="amount" style="font-size: 9px; color: #c2410c;">{{ number_format($purchaseInvoice->weights->where('calibre', 'GF')->sum('weight'), 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
                             <td class="label" style="background: #f9fafb;">P.U</td>

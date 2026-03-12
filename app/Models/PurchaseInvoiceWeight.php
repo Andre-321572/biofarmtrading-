@@ -13,6 +13,7 @@ class PurchaseInvoiceWeight extends Model
         'purchase_invoice_id',
         'position',
         'weight',
+        'calibre',
     ];
 
     public function invoice()
