@@ -81,6 +81,10 @@
                     <label class="bg-orange-50 px-4 py-3 text-[10px] font-bold uppercase text-orange-400 w-32 border-r border-orange-100">% AVARIE</label>
                     <div class="flex-1 px-4 py-3 text-sm font-black text-orange-600 italic">{{ number_format($purchaseInvoice->avarie_pct ?? 0, 2, ',', ' ') }} %</div>
                 </div>
+                <div class="flex bg-white border-t border-slate-100">
+                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-400 w-32 border-r border-slate-100">POIDS MARCHAND</label>
+                    <div class="flex-1 px-4 py-3 text-sm font-black text-slate-700 italic">{{ number_format($purchaseInvoice->poids_marchand_pf + $purchaseInvoice->poids_marchand_gf, 2, ',', ' ') }} kg</div>
+                </div>
             </div>
 
             {{-- RELEVÉ DE POIDS --}}

@@ -22,9 +22,14 @@ class PurchaseInvoice extends Model
         'calibre',
         'pu_pf',
         'pu_gf',
+        'prime_bio_kg',
+        'avarie_pct',
+        'poids_avarie',
+        'poids_marchand',
         'total_credit',
         'signature_resp',
         'signature_prod',
+        'net_payer_lettre',
         'user_id',
     ];
 

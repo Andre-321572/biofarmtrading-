@@ -234,10 +234,20 @@
                                         <div style="width: 45px; padding: 10px 0; text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; background-color: #f8fafc; border-right: 1px solid #f1f5f9; font-style: italic;">
                                             {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
                                         </div>
-                                        <div style="flex: 1; padding: 4px 8px;">
+                                        <div style="flex: 1; padding: 4px 6px; position: relative;">
                                             <input type="number" step="0.01" name="weights[]" x-model.number="weights[{{ $absIdx }}]"
                                                 class="w-full text-center py-1.5 text-[11px] font-black text-blue-900 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
                                                 placeholder="0">
+                                            
+                                            {{-- Badge de calibre cliquable pour changer individuellement --}}
+                                            <div class="absolute right-0 top-0 mt-1 mr-1">
+                                                <button type="button" 
+                                                        @click="calibres[{{ $absIdx }}] = (calibres[{{ $absIdx }}] === 'PF' ? 'GF' : 'PF')"
+                                                        :class="calibres[{{ $absIdx }}] === 'GF' ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-indigo-100 text-indigo-700 border-indigo-200'"
+                                                        class="text-[7px] font-black px-1 rounded border shadow-sm uppercase">
+                                                    <span x-text="calibres[{{ $absIdx }}]"></span>
+                                                </button>
+                                            </div>
                                             <input type="hidden" name="calibres[]" x-model="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
@@ -319,7 +329,7 @@
                         </div>
                         <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
-                            <textarea name="net_payer_lettre" rows="2" x-text="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
+                            <textarea name="net_payer_lettre" rows="2" :value="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
                         </div>
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">TOTAL PRIME</label>
@@ -366,21 +376,45 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
-    let sigPads = {};
+    function resizeCanvas() {
+        ['signature-resp', 'signature-prod'].forEach(id => {
+            const canvas = document.getElementById(id);
+            if (!canvas) return;
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const offsetWidth = canvas.offsetWidth;
+            const offsetHeight = canvas.offsetHeight;
+            
+            // Only resize if dimensions changed
+            if (canvas.width !== offsetWidth * ratio || canvas.height !== offsetHeight * ratio) {
+                canvas.width = offsetWidth * ratio;
+                canvas.height = offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                if (sigPads[id]) sigPads[id].clear();
+            }
+        });
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         // Init signature pads
         ['signature-resp', 'signature-prod'].forEach(id => {
             const canvas = document.getElementById(id);
             sigPads[id] = new SignaturePad(canvas, {
-                backgroundColor: 'rgb(255, 255, 255)'
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)'
             });
         });
 
+        // initial resize
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
         // Sync signatures on submit
         document.getElementById('mainForm').addEventListener('submit', function(e) {
-            document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
-            document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+            const isEmptyResp = sigPads['signature-resp'].isEmpty();
+            const isEmptyProd = sigPads['signature-prod'].isEmpty();
+            
+            document.getElementById('signature_resp_input').value = isEmptyResp ? '' : sigPads['signature-resp'].toDataURL();
+            document.getElementById('signature_prod_input').value = isEmptyProd ? '' : sigPads['signature-prod'].toDataURL();
         });
     });
 
