@@ -193,24 +193,20 @@
                             <td class="amount">{{ number_format($purchaseInvoice->total_weight, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
-                            <td class="label" style="background: #f8fafc; font-size: 8px;"> PETIT FRUIT (PF)</td>
-                            <td class="amount" style="font-size: 9px; color: #4338ca;">{{ number_format($purchaseInvoice->weights->where('calibre', 'PF')->sum('weight'), 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
+                            <td class="label" style="background: #eef2ff; font-size: 8px;">P.U PF</td>
+                            <td class="amount" style="color: #4338ca;">{{ number_format($purchaseInvoice->pu_pf ?? 0, 0, ',', ' ') }} <span class="amount-unit">FCFA/kg</span></td>
                         </tr>
                         <tr>
-                            <td class="label" style="background: #f8fafc; font-size: 8px;"> GROS FRUIT (GF)</td>
-                            <td class="amount" style="font-size: 9px; color: #c2410c;">{{ number_format($purchaseInvoice->weights->where('calibre', 'GF')->sum('weight'), 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
-                        </tr>
-                        <tr>
-                            <td class="label" style="background: #f9fafb;">P.U</td>
-                            <td class="amount">{{ number_format($purchaseInvoice->pu, 0, ',', ' ') }} <span class="amount-unit">FCFA/kg</span></td>
+                            <td class="label" style="background: #fffbeb; font-size: 8px;">P.U GF</td>
+                            <td class="amount" style="color: #c2410c;">{{ number_format($purchaseInvoice->pu_gf ?? 0, 0, ',', ' ') }} <span class="amount-unit">FCFA/kg</span></td>
                         </tr>
                         <tr>
                             <td class="label" style="background: #f9fafb;">MONTANT TOTAL</td>
                             <td class="amount" style="color: #15803d;">{{ number_format($purchaseInvoice->montant_total, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
                         </tr>
                         <tr class="net-payable-row">
-                            <td class="label" style="background: #e8f5e9 !important; font-weight: 800;">NET À PAYER</td>
-                            <td class="amount" style="background: #e8f5e9 !important; font-weight: 800; color: #1b5e20;">{{ number_format($purchaseInvoice->net_a_payer, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
+                            <td class="label" style="background: #e1f5fe !important; font-weight: 800; color: #01579b !important;">NET À PAYER</td>
+                            <td class="amount" style="background: #e1f5fe !important; font-weight: 800; color: #01579b;">{{ number_format($purchaseInvoice->net_a_payer, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
                         </tr>
                         <tr>
                             <td class="label" style="background: #f9fafb;">PRIME BIO/KG</td>
@@ -222,12 +218,12 @@
                 <td class="summary-right" style="width: 53%;">
                     <table class="summary-table">
                         <tr>
-                            <td class="label right-label" style="background: #f9fafb;">POIDS AVARIÉ</td>
-                            <td class="amount" style="color: #b91c1c;">{{ number_format($purchaseInvoice->poids_avarie, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
+                            <td class="label right-label" style="background: #f9fafb;">Poids marchand petit fruit</td>
+                            <td class="amount" style="color: #4338ca;">{{ number_format($purchaseInvoice->poids_marchand_pf, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
-                            <td class="label right-label" style="background: #f9fafb;">POIDS MARCHAND (POIDS NET)</td>
-                            <td class="amount" style="color: #374151;">{{ number_format($purchaseInvoice->poids_marchand, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
+                            <td class="label right-label" style="background: #f9fafb;">Poids marchand gros fruit</td>
+                            <td class="amount" style="color: #c2410c;">{{ number_format($purchaseInvoice->poids_marchand_gf, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
                             <td class="label right-label" style="background: #f9fafb;">TOTAL CRÉDIT</td>
@@ -249,17 +245,23 @@
         </table>
 
         <!-- Signatures -->
-        <div class="signatures-container" style="margin-top: 15px;">
+        <div class="signatures-container" style="margin-top: 5px;">
             <table class="signature-table">
                 <tr>
-                    <td class="signature-box" style="width: 48%; height: 60px; padding: 5px;">
-                        <span class="signature-title" style="margin-bottom: 25px;">A2C OFCA / RESPONSABLE</span>
-                        <span class="signature-hint">Signature & Cachet</span>
+                    <td class="signature-box" style="width: 48%; height: 70px; padding: 3px;">
+                        <span class="signature-title" style="margin-bottom: 5px;">A2C OFCA / RESPONSABLE</span>
+                        @if($purchaseInvoice->signature_resp)
+                            <img src="{{ $purchaseInvoice->signature_resp }}" style="height: 40px; width: auto; mix-blend-multiply;">
+                        @endif
+                        <span class="signature-hint" style="margin-top: 5px; display: block;">Signature & Cachet</span>
                     </td>
                     <td style="width: 4%;"></td>
-                    <td class="signature-box" style="width: 48%; height: 60px; padding: 5px;">
-                        <span class="signature-title" style="margin-bottom: 25px;">LE PRODUCTEUR</span>
-                        <span class="signature-hint">Signature</span>
+                    <td class="signature-box" style="width: 48%; height: 70px; padding: 3px;">
+                        <span class="signature-title" style="margin-bottom: 5px;">LE PRODUCTEUR</span>
+                        @if($purchaseInvoice->signature_prod)
+                            <img src="{{ $purchaseInvoice->signature_prod }}" style="height: 40px; width: auto; mix-blend-multiply;">
+                        @endif
+                        <span class="signature-hint" style="margin-top: 5px; display: block;">Signature</span>
                     </td>
                 </tr>
             </table>

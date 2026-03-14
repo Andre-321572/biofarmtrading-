@@ -20,12 +20,11 @@ class PurchaseInvoice extends Model
         'producteur',
         'code_parcelle_matricule',
         'calibre',
-        'pu',
-        'prime_bio_kg',
-        'avarie_pct',
-        'poids_avarie',
-        'poids_marchand',
-        'net_payer_lettre',
+        'pu_pf',
+        'pu_gf',
+        'total_credit',
+        'signature_resp',
+        'signature_prod',
         'user_id',
     ];
 
@@ -48,20 +47,50 @@ class PurchaseInvoice extends Model
         return $this->weights()->sum('weight');
     }
 
+    public function getTotalWeightPfAttribute()
+    {
+        return $this->weights()->where('calibre', 'PF')->sum('weight');
+    }
+
+    public function getTotalWeightGfAttribute()
+    {
+        return $this->weights()->where('calibre', 'GF')->sum('weight');
+    }
+
+    public function getPoidsMarchandPfAttribute()
+    {
+        return round($this->total_weight_pf * (1 - ($this->avarie_pct ?? 0) / 100), 2);
+    }
+
+    public function getPoidsMarchandGfAttribute()
+    {
+        return round($this->total_weight_gf * (1 - ($this->avarie_pct ?? 0) / 100), 2);
+    }
+
+    public function getMontantPfAttribute()
+    {
+        return round($this->poids_marchand_pf * ($this->pu_pf ?? 0), 2);
+    }
+
+    public function getMontantGfAttribute()
+    {
+        return round($this->poids_marchand_gf * ($this->pu_gf ?? 0), 2);
+    }
+
     public function getMontantTotalAttribute()
     {
-        return $this->total_weight * $this->pu;
+        return $this->montant_pf + $this->montant_gf;
     }
 
     public function getTotalCreditAttribute()
     {
-        // Le crédit correspond à la valeur monétaire des fruits avariés (qui est déduite)
-        return ($this->poids_avarie ?? 0) * $this->pu;
+        // Retourne la valeur stockée en base (saisie manuellement)
+        return $this->attributes['total_credit'] ?? 0;
     }
 
     public function getNetAPayerAttribute()
     {
-        return $this->montant_total - $this->total_credit;
+        return ($this->montant_total + $this->montant_total_prime) - $this->total_credit;
     }
 
     public function getMontantTotalPrimeAttribute()

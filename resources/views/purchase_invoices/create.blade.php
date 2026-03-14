@@ -1,5 +1,18 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    .signature-pad {
+        border: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        width: 100%;
+        height: 120px;
+        touch-action: none;
+        border-radius: 8px;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="min-h-screen bg-slate-100 py-5" x-data="purchaseInvoiceForm()">
 
@@ -255,9 +268,16 @@
                             <div class="flex-1 px-3 sm:px-4 text-right font-black text-slate-900 text-sm" x-text="totalWeight().toFixed(2) + ' kg'"></div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">P.U</label>
+                            <label class="bg-indigo-50/50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-indigo-400 w-28 sm:w-48 border-r border-indigo-50 shrink-0">P.U PF</label>
                             <div class="flex-1 flex items-center px-3 sm:px-4">
-                                <input type="number" name="pu" x-model.number="pu" class="w-full py-1 text-right font-black text-slate-900 border-0 focus:ring-0 text-sm" placeholder="0">
+                                <input type="number" name="pu_pf" x-model.number="pu_pf" class="w-full py-1 text-right font-black text-indigo-600 border-0 focus:ring-0 text-sm" placeholder="0">
+                                <span class="ml-2 text-[10px] font-bold text-slate-400 whitespace-nowrap">FCFA</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <label class="bg-amber-50/50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-amber-400 w-28 sm:w-48 border-r border-amber-50 shrink-0">P.U GF</label>
+                            <div class="flex-1 flex items-center px-3 sm:px-4">
+                                <input type="number" name="pu_gf" x-model.number="pu_gf" class="w-full py-1 text-right font-black text-amber-600 border-0 focus:ring-0 text-sm" placeholder="0">
                                 <span class="ml-2 text-[10px] font-bold text-slate-400 whitespace-nowrap">FCFA</span>
                             </div>
                         </div>
@@ -280,20 +300,22 @@
                     {{-- Right Column (Credits) --}}
                     <div class="flex flex-col divide-y divide-slate-100 bg-white">
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">Poids Avarié</label>
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">Poids marchand PF</label>
                             <div class="flex-1 flex items-center px-3 sm:px-4 justify-end">
-                                <span class="font-black text-orange-500 text-sm" x-text="poidsAvarieCalc().toFixed(2) + ' kg'">0.00 kg</span>
+                                <span class="font-black text-indigo-500 text-sm" x-text="poidsMarchandPF().toFixed(2) + ' kg'">0.00 kg</span>
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">Poids marchand</label>
+                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">Poids marchand GF</label>
                             <div class="flex-1 flex items-center px-3 sm:px-4 justify-end">
-                                <span class="font-black text-slate-700 text-sm" x-text="poidsMarchandCalc().toFixed(2) + ' kg'">0.00 kg</span>
+                                <span class="font-black text-amber-500 text-sm" x-text="poidsMarchandGF().toFixed(2) + ' kg'">0.00 kg</span>
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">TOTAL CRÉDIT</label>
-                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-red-600 text-sm" x-text="formatCurrency(totalCredit()) + ' FCFA'"></div>
+                            <label class="bg-red-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-red-400 w-28 sm:w-48 border-r border-red-100 shrink-0">TOTAL CRÉDIT</label>
+                            <div class="flex-1 flex items-center px-3 sm:px-4">
+                                <input type="number" name="total_credit" x-model.number="manualCredit" class="w-full py-1 text-right font-black text-red-600 border-0 focus:ring-0 text-sm" placeholder="Saisir crédit...">
+                            </div>
                         </div>
                         <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
@@ -309,14 +331,22 @@
                 {{-- SIGNATURES --}}
                 <div class="border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 bg-slate-50">
                     <div class="px-5 py-4">
-                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-6">Responsable Bio Farm</p>
-                        <div class="border-b border-dotted border-slate-300 mb-1"></div>
-                        <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Cachet & Signature</p>
+                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-2">Responsable Bio Farm</p>
+                        <canvas id="signature-resp" class="signature-pad"></canvas>
+                        <input type="hidden" name="signature_resp" id="signature_resp_input">
+                        <div class="flex justify-between mt-2">
+                            <p class="text-[8px] text-slate-400 uppercase font-bold">Cachet & Signature</p>
+                            <button type="button" @click="clearSignature('signature-resp')" class="text-[8px] text-red-500 uppercase font-bold">Effacer</button>
+                        </div>
                     </div>
                     <div class="px-5 py-4 text-right">
-                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-6">Le Producteur / Opérateur</p>
-                        <div class="border-b border-dotted border-slate-300 mb-1"></div>
-                        <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Signature</p>
+                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-2">Le Producteur / Opérateur</p>
+                        <canvas id="signature-prod" class="signature-pad"></canvas>
+                        <input type="hidden" name="signature_prod" id="signature_prod_input">
+                        <div class="flex justify-between mt-2">
+                            <button type="button" @click="clearSignature('signature-prod')" class="text-[8px] text-red-500 uppercase font-bold">Effacer</button>
+                            <p class="text-[8px] text-slate-400 uppercase font-bold">Signature</p>
+                        </div>
                     </div>
                 </div>
 
@@ -333,14 +363,60 @@
     </div>
 </div>
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
+    let sigPads = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Init signature pads
+        ['signature-resp', 'signature-prod'].forEach(id => {
+            const canvas = document.getElementById(id);
+            sigPads[id] = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)'
+            });
+        });
+
+        // Sync signatures on submit
+        document.getElementById('mainForm').addEventListener('submit', function(e) {
+            document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
+            document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+        });
+    });
+
 function purchaseInvoiceForm() {
     return {
         weights: Array(200).fill(null),
         calibres: Array(200).fill('PF'),
-        pu: 0,
+        pu_pf: 0,
+        pu_gf: 0,
+        manualCredit: 0,
         primeBio: 0,
         avariePct: 0,
+
+        clearSignature(id) {
+            sigPads[id].clear();
+        },
+
+        weightPF() {
+            let sum = 0;
+            for(let i=0; i<200; i++) if(this.weights[i] > 0 && this.calibres[i] === 'PF') sum += this.weights[i];
+            return sum;
+        },
+
+        weightGF() {
+            let sum = 0;
+            for(let i=0; i<200; i++) if(this.weights[i] > 0 && this.calibres[i] === 'GF') sum += this.weights[i];
+            return sum;
+        },
+
+        poidsMarchandPF() {
+            return this.weightPF() * (1 - (this.avariePct || 0) / 100);
+        },
+
+        poidsMarchandGF() {
+            return this.weightGF() * (1 - (this.avariePct || 0) / 100);
+        },
 
         poidsAvarieCalc() {
             return (this.totalWeight() * (this.avariePct || 0)) / 100;
@@ -375,17 +451,15 @@ function purchaseInvoiceForm() {
         },
 
         montantTotal() {
-            return this.totalWeight() * this.pu;
+            return (this.poidsMarchandPF() * (this.pu_pf || 0)) + (this.poidsMarchandGF() * (this.pu_gf || 0));
         },
 
         totalCredit() {
-            // Le crédit correspond à la valeur monétaire des fruits avariés
-            return this.poidsAvarieCalc() * this.pu;
+            return (this.manualCredit || 0);
         },
 
         netAPayer() {
-            // Paiement basé uniquement sur le poids marchand
-            return this.poidsMarchandCalc() * this.pu;
+            return (this.montantTotal() + this.totalPrime()) - this.totalCredit();
         },
 
         totalPrime() {
@@ -422,4 +496,5 @@ function purchaseInvoiceForm() {
     }
 }
 </script>
+@endpush
 @endsection

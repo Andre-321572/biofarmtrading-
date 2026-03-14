@@ -154,8 +154,12 @@
                         <div class="flex-1 px-4 text-right font-bold text-orange-600 text-xs">{{ number_format($purchaseInvoice->weights->where('calibre', 'GF')->sum('weight'), 2, ',', ' ') }} kg</div>
                     </div>
                     <div class="flex items-center">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">P.U</label>
-                        <div class="flex-1 px-4 text-right font-black text-slate-900">{{ number_format($purchaseInvoice->pu, 0, ',', ' ') }} FCFA/kg</div>
+                        <label class="bg-indigo-50/50 px-4 py-2.5 text-[10px] font-bold uppercase text-indigo-500 w-48 border-r border-indigo-100">P.U PF</label>
+                        <div class="flex-1 px-4 text-right font-black text-indigo-700">{{ number_format($purchaseInvoice->pu_pf ?? 0, 0, ',', ' ') }} FCFA/kg</div>
+                    </div>
+                    <div class="flex items-center">
+                        <label class="bg-amber-50/50 px-4 py-2.5 text-[10px] font-bold uppercase text-amber-500 w-48 border-r border-amber-100">P.U GF</label>
+                        <div class="flex-1 px-4 text-right font-black text-amber-700">{{ number_format($purchaseInvoice->pu_gf ?? 0, 0, ',', ' ') }} FCFA/kg</div>
                     </div>
                     <div class="flex items-center">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">MONTANT TOTAL</label>
@@ -174,12 +178,12 @@
                 {{-- Right Column (Credits) --}}
                 <div class="flex flex-col divide-y divide-slate-100 bg-white">
                     <div class="flex items-center">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">Poids Avarié</label>
-                        <div class="flex-1 px-4 text-right font-bold text-red-600">{{ number_format($purchaseInvoice->poids_avarie, 2, ',', ' ') }} kg</div>
+                        <label class="bg-indigo-50/30 px-4 py-3 text-[10px] font-bold uppercase text-indigo-400 w-48 border-r border-indigo-50 leading-tight">Poids marchand petit fruit</label>
+                        <div class="flex-1 px-4 text-right font-bold text-indigo-600">{{ number_format($purchaseInvoice->poids_marchand_pf, 2, ',', ' ') }} kg</div>
                     </div>
                     <div class="flex items-center">
-                        <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100 leading-tight">Poids marchand (Poids net)</label>
-                        <div class="flex-1 px-4 text-right font-bold text-slate-700">{{ number_format($purchaseInvoice->poids_marchand, 2, ',', ' ') }} kg</div>
+                        <label class="bg-amber-50/30 px-4 py-3 text-[10px] font-bold uppercase text-amber-400 w-48 border-r border-amber-50 leading-tight">Poids marchand gros fruit</label>
+                        <div class="flex-1 px-4 text-right font-bold text-amber-600">{{ number_format($purchaseInvoice->poids_marchand_gf, 2, ',', ' ') }} kg</div>
                     </div>
                     <div class="flex items-center">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">TOTAL CRÉDIT</label>
@@ -198,14 +202,24 @@
 
             {{-- SIGNATURES --}}
             <div class="border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 bg-slate-50">
-                <div class="px-5 py-4">
-                    <p class="text-[9px] font-bold uppercase text-slate-500 mb-6 font-mono">Responsable Bio Farm</p>
-                    <div class="border-b border-dotted border-slate-300 mb-1"></div>
+                <div class="px-5 py-4 flex flex-col items-center">
+                    <p class="text-[9px] font-bold uppercase text-slate-500 mb-2 w-full">Responsable Bio Farm</p>
+                    @if($purchaseInvoice->signature_resp)
+                        <img src="{{ $purchaseInvoice->signature_resp }}" class="h-24 object-contain mix-blend-multiply">
+                    @else
+                        <div class="h-24 flex items-center justify-center text-[10px] text-slate-300 italic">Pas de signature</div>
+                    @endif
+                    <div class="w-full border-b border-dotted border-slate-300 mb-1 mt-2"></div>
                     <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Cachet & Signature</p>
                 </div>
-                <div class="px-5 py-4 text-right">
-                    <p class="text-[9px] font-bold uppercase text-slate-500 mb-6 font-mono">Le Producteur / Opérateur</p>
-                    <div class="border-b border-dotted border-slate-300 mb-1"></div>
+                <div class="px-5 py-4 flex flex-col items-center">
+                    <p class="text-[9px] font-bold uppercase text-slate-500 mb-2 w-full text-right">Le Producteur / Opérateur</p>
+                    @if($purchaseInvoice->signature_prod)
+                        <img src="{{ $purchaseInvoice->signature_prod }}" class="h-24 object-contain mix-blend-multiply">
+                    @else
+                        <div class="h-24 flex items-center justify-center text-[10px] text-slate-300 italic">Pas de signature</div>
+                    @endif
+                    <div class="w-full border-b border-dotted border-slate-300 mb-1 mt-2"></div>
                     <p class="text-[8px] text-slate-400 text-center uppercase font-bold">Signature</p>
                 </div>
             </div>

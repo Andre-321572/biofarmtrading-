@@ -40,9 +40,13 @@ class PurchaseInvoiceController extends Controller
             'producteur' => 'nullable|string',
             'code_parcelle_matricule' => 'nullable|string',
             'calibre' => 'nullable|string',
-            'pu' => 'required|numeric|min:0',
+            'pu_pf' => 'nullable|numeric|min:0',
+            'pu_gf' => 'nullable|numeric|min:0',
             'prime_bio_kg' => 'nullable|numeric|min:0',
             'avarie_pct' => 'nullable|numeric|min:0|max:100',
+            'total_credit' => 'nullable|numeric|min:0',
+            'signature_resp' => 'nullable|string',
+            'signature_prod' => 'nullable|string',
             'net_payer_lettre' => 'nullable|string',
             'weights' => 'required|array',
             'weights.*' => 'nullable|numeric|min:0',
@@ -59,9 +63,13 @@ class PurchaseInvoiceController extends Controller
             'producteur' => $validated['producteur'] ?? null,
             'code_parcelle_matricule' => $validated['code_parcelle_matricule'] ?? null,
             'calibre' => $validated['calibre'] ?? null,
-            'pu' => $validated['pu'],
+            'pu_pf' => $validated['pu_pf'] ?? 0,
+            'pu_gf' => $validated['pu_gf'] ?? 0,
             'prime_bio_kg' => $validated['prime_bio_kg'] ?? 0,
             'avarie_pct' => $validated['avarie_pct'] ?? 0,
+            'total_credit' => $validated['total_credit'] ?? 0,
+            'signature_resp' => $validated['signature_resp'] ?? null,
+            'signature_prod' => $validated['signature_prod'] ?? null,
             'poids_avarie' => 0,
             'poids_marchand' => 0,
             'net_payer_lettre' => $validated['net_payer_lettre'] ?? null,
@@ -78,7 +86,7 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
-        // Calcul automatique avarie & poids marchand après insertion des poids
+        // Calcul automatique avarie & poids marchand après insertion des poids pour le cache DB
         $totalWeight = $invoice->weights()->sum('weight');
         $avariePct   = $validated['avarie_pct'] ?? 0;
         $poidsAvarie = round(($totalWeight * $avariePct) / 100, 2);
