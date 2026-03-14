@@ -77,10 +77,6 @@
                     <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">FRUIT</label>
                     <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->fruit ?? '—' }}</div>
                 </div>
-                <div class="flex bg-white">
-                    <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">CALIBRE FRUIT</label>
-                    <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->calibre ?? '—' }}</div>
-                </div>
                 <div class="flex bg-white border-t border-orange-100">
                     <label class="bg-orange-50 px-4 py-3 text-[10px] font-bold uppercase text-orange-400 w-32 border-r border-orange-100">% AVARIE</label>
                     <div class="flex-1 px-4 py-3 text-sm font-black text-orange-600 italic">{{ number_format($purchaseInvoice->avarie_pct ?? 0, 2, ',', ' ') }} %</div>

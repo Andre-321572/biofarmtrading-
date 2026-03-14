@@ -119,9 +119,7 @@
             </tr>
             <tr>
                 <td class="label">FRUIT</td>
-                <td class="value">{{ $purchaseInvoice->fruit ?? '—' }}</td>
-                <td class="label">CALIBRE FRUIT</td>
-                <td class="value">{{ $purchaseInvoice->calibre ?? '—' }}</td>
+                <td class="value" colspan="3">{{ $purchaseInvoice->fruit ?? '—' }}</td>
             </tr>
             <tr>
                 <td class="label" style="background: #fff8ed; color: #c2410c;">% AVARIE</td>

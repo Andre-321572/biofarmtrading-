@@ -121,15 +121,7 @@
                             <option value="Mangue">
                         </datalist>
                     </div>
-                    {{-- Calibre --}}
-                    <div class="flex bg-white">
-                        <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">CALIBRE</label>
-                        <select name="calibre" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0 cursor-pointer">
-                            <option value="">...</option>
-                            <option value="Petit fruit">Petit fruit</option>
-                            <option value="Gros fruit">Gros fruit</option>
-                        </select>
-                    </div>
+
                     {{-- % Avarie --}}
                     <div class="flex bg-white border border-orange-200">
                         <label class="bg-orange-50 px-3 py-3 text-[9px] font-bold uppercase text-orange-500 w-24 sm:w-32 flex items-center shrink-0 border-r border-orange-200">
