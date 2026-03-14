@@ -236,7 +236,8 @@
                                         </div>
                                         <div style="flex: 1; padding: 4px 6px; position: relative;">
                                             <input type="number" step="0.01" name="weights[{{ $absIdx }}]" x-model.number="weights[{{ $absIdx }}]"
-                                                class="w-full text-center py-1.5 text-[11px] font-black text-blue-900 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                                                :class="calibres[{{ $absIdx }}] === 'GF' ? 'border-orange-400 focus:ring-orange-200 text-orange-900' : 'border-slate-200 focus:ring-blue-200 text-blue-900'"
+                                                class="w-full text-center py-1.5 text-[11px] font-black bg-white border rounded focus:border-indigo-500 transition-all shadow-sm" 
                                                 placeholder="0">
                                             
                                             {{-- Badge de calibre cliquable pour changer individuellement --}}
@@ -248,7 +249,7 @@
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
-                                            <input type="hidden" name="calibres[{{ $absIdx }}]" x-model="calibres[{{ $absIdx }}]">
+                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -330,7 +331,7 @@
                         <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
                             <textarea rows="2" x-text="netAPayerLettre" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
-                            <input type="hidden" name="net_payer_lettre" x-model="netAPayerLettre">
+                            <input type="hidden" name="net_payer_lettre" :value="netAPayerLettre">
                         </div>
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">TOTAL PRIME</label>
@@ -433,14 +434,19 @@
 
             toggleCalibre(idx) {
                 this.calibres[idx] = this.calibres[idx] === 'PF' ? 'GF' : 'PF';
-                this.calibres = [...this.calibres]; // Force reactivity
+                // Trigger full array refresh to ensure all bindings (:value, :class) update
+                this.calibres = [...this.calibres];
+                this.updateLettre();
             },
 
             setGrpCalibre(offset, val) {
                 if (!val) return;
                 let newC = [...this.calibres];
-                for (let i = offset; i < offset + 50; i++) newC[i] = val;
+                for (let i = offset; i < offset + 50; i++) {
+                    newC[i] = val;
+                }
                 this.calibres = newC;
+                this.updateLettre();
             },
 
             clearSignature(id) {

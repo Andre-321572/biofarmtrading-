@@ -81,7 +81,7 @@ class PurchaseInvoiceController extends Controller
                 $invoice->weights()->create([
                     'position' => $index + 1,
                     'weight' => $weight,
-                    'calibre' => $request->calibres[$index] ?? 'PF',
+                    'calibre' => $validated['calibres'][$index] ?? 'PF',
                 ]);
             }
         }
