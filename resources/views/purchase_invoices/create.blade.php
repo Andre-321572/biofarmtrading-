@@ -242,7 +242,7 @@
                                             {{-- Badge de calibre cliquable pour changer individuellement --}}
                                             <div class="absolute right-0 top-0 mt-1 mr-1">
                                                 <button type="button" 
-                                                        @click="calibres[{{ $absIdx }}] = (calibres[{{ $absIdx }}] === 'PF' ? 'GF' : 'PF')"
+                                                        @click="toggleCalibre({{ $absIdx }})"
                                                         :class="calibres[{{ $absIdx }}] === 'GF' ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-indigo-100 text-indigo-700 border-indigo-200'"
                                                         class="text-[7px] font-black px-1 rounded border shadow-sm uppercase">
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
@@ -329,8 +329,8 @@
                         </div>
                         <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
-                            <textarea rows="2" :value="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
-                            <input type="hidden" name="net_payer_lettre" :value="numberToWords(netAPayer())">
+                            <textarea rows="2" x-text="netAPayerLettre" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
+                            <input type="hidden" name="net_payer_lettre" x-model="netAPayerLettre">
                         </div>
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">TOTAL PRIME</label>
@@ -365,7 +365,7 @@
 
             <div class="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
                 <a href="{{ route('purchase_invoices.index') }}" class="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">Annuler</a>
-                <button type="submit" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
+                <button type="submit" @mousedown="syncValues()" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
                     <i class="fa-solid fa-check"></i> Enregistrer la Facture
                 </button>
             </div>
@@ -375,164 +375,164 @@
 </div>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
     let sigPads = {};
 
     function resizeCanvas() {
         ['signature-resp', 'signature-prod'].forEach(id => {
             const canvas = document.getElementById(id);
-            if (!canvas) return;
+            if (!canvas || !sigPads[id]) return;
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            const offsetWidth = canvas.offsetWidth;
-            const offsetHeight = canvas.offsetHeight;
-            
-            // Only resize if dimensions changed significantly
-            if (canvas.width !== offsetWidth * ratio || canvas.height !== offsetHeight * ratio) {
-                canvas.width = offsetWidth * ratio;
-                canvas.height = offsetHeight * ratio;
+            const w = canvas.offsetWidth;
+            const h = canvas.offsetHeight;
+            if (canvas.width !== w * ratio || canvas.height !== h * ratio) {
+                canvas.width = w * ratio;
+                canvas.height = h * ratio;
                 canvas.getContext("2d").scale(ratio, ratio);
-                if (sigPads[id]) sigPads[id].clear();
+                sigPads[id].clear();
             }
         });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Init signature pads
         ['signature-resp', 'signature-prod'].forEach(id => {
             const canvas = document.getElementById(id);
-            if (!canvas) return;
-            sigPads[id] = new SignaturePad(canvas, {
-                backgroundColor: 'rgb(255, 255, 255)',
-                penColor: 'rgb(0, 0, 0)'
-            });
+            if (canvas) {
+                sigPads[id] = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
+            }
         });
-
-        // initial resize
         resizeCanvas();
         window.addEventListener("resize", resizeCanvas);
-
-        // Sync signatures on submit
-        document.getElementById('mainForm').addEventListener('submit', function(e) {
-            const isEmptyResp = sigPads['signature-resp'].isEmpty();
-            const isEmptyProd = sigPads['signature-prod'].isEmpty();
-            
-            document.getElementById('signature_resp_input').value = isEmptyResp ? '' : sigPads['signature-resp'].toDataURL();
-            document.getElementById('signature_prod_input').value = isEmptyProd ? '' : sigPads['signature-prod'].toDataURL();
-        });
     });
 
-function purchaseInvoiceForm() {
-    return {
-        weights: Array(200).fill(null),
-        calibres: Array(200).fill('PF'),
-        pu_pf: 0,
-        pu_gf: 0,
-        manualCredit: 0,
-        primeBio: 0,
-        avariePct: 0,
+    function purchaseInvoiceForm() {
+        return {
+            weights: Array(200).fill(null),
+            calibres: Array(200).fill('PF'),
+            pu_pf: 0,
+            pu_gf: 0,
+            manualCredit: 0,
+            primeBio: 0,
+            avariePct: 0,
+            netAPayerLettre: '',
 
-        clearSignature(id) {
-            sigPads[id].clear();
-        },
+            init() {
+                this.$watch('weights', () => this.updateLettre());
+                this.$watch('calibres', () => this.updateLettre());
+                this.$watch('pu_pf', () => this.updateLettre());
+                this.$watch('pu_gf', () => this.updateLettre());
+                this.$watch('manualCredit', () => this.updateLettre());
+                this.$watch('primeBio', () => this.updateLettre());
+                this.$watch('avariePct', () => this.updateLettre());
+            },
 
-        weightPF() {
-            let sum = 0;
-            for(let i=0; i<200; i++) if(this.weights[i] > 0 && this.calibres[i] === 'PF') sum += this.weights[i];
-            return sum;
-        },
+            updateLettre() {
+                this.netAPayerLettre = this.numberToWords(this.netAPayer());
+            },
 
-        weightGF() {
-            let sum = 0;
-            for(let i=0; i<200; i++) if(this.weights[i] > 0 && this.calibres[i] === 'GF') sum += this.weights[i];
-            return sum;
-        },
+            toggleCalibre(idx) {
+                this.calibres[idx] = this.calibres[idx] === 'PF' ? 'GF' : 'PF';
+                this.calibres = [...this.calibres]; // Force reactivity
+            },
 
-        poidsMarchandPF() {
-            return this.weightPF() * (1 - (this.avariePct || 0) / 100);
-        },
+            setGrpCalibre(offset, val) {
+                if (!val) return;
+                let newC = [...this.calibres];
+                for (let i = offset; i < offset + 50; i++) newC[i] = val;
+                this.calibres = newC;
+            },
 
-        poidsMarchandGF() {
-            return this.weightGF() * (1 - (this.avariePct || 0) / 100);
-        },
+            clearSignature(id) {
+                if (sigPads[id]) sigPads[id].clear();
+            },
 
-        poidsAvarieCalc() {
-            return (this.totalWeight() * (this.avariePct || 0)) / 100;
-        },
+            syncValues() {
+                // Sync signatures
+                if (sigPads['signature-resp']) 
+                    document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
+                if (sigPads['signature-prod'])
+                    document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+                
+                // Final update of words
+                this.updateLettre();
+            },
 
-        poidsMarchandCalc() {
-            return this.totalWeight() - this.poidsAvarieCalc();
-        },
-        grpTotal(offset) {
-            let sum = 0;
-            for (let i = offset; i < offset + 50; i++) sum += (this.weights[i] || 0);
-            return sum;
-        },
+            totalWeight() {
+                return this.weights.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+            },
 
-        grpFilled(offset) {
-            return this.weights.slice(offset, offset + 50).filter(v => v > 0).length;
-        },
+            weightPF() {
+                let s = 0;
+                for(let i=0; i<200; i++) if(this.weights[i]>0 && this.calibres[i]==='PF') s += parseFloat(this.weights[i]);
+                return s;
+            },
 
-        setGrpCalibre(offset, val) {
-            if (!val) return;
-            for (let i = offset; i < offset + 50; i++) {
-                this.calibres[i] = val;
-            }
-        },
+            weightGF() {
+                let s = 0;
+                for(let i=0; i<200; i++) if(this.weights[i]>0 && this.calibres[i]==='GF') s += parseFloat(this.weights[i]);
+                return s;
+            },
 
-        totalWeight() {
-            return this.weights.reduce((a, b) => a + (b || 0), 0);
-        },
-
-        filled() {
-            return this.weights.filter(v => v > 0).length;
-        },
-
-        montantTotal() {
-            return (this.poidsMarchandPF() * (this.pu_pf || 0)) + (this.poidsMarchandGF() * (this.pu_gf || 0));
-        },
-
-        totalCredit() {
-            return (this.manualCredit || 0);
-        },
-
-        netAPayer() {
-            return (this.montantTotal() + this.totalPrime()) - this.totalCredit();
-        },
-
-        totalPrime() {
-            return this.totalWeight() * (this.primeBio || 0);
-        },
-
-        formatCurrency(val) {
-            return new Intl.NumberFormat('fr-FR').format(Math.round(val));
-        },
-
-        numberToWords(n) {
-            if (n <= 0) return "";
-            const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
-            const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
-            const tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+            poidsMarchandPF() { return this.weightPF() * (1 - (this.avariePct || 0) / 100); },
+            poidsMarchandGF() { return this.weightGF() * (1 - (this.avariePct || 0) / 100); },
+            poidsAvarieCalc() { return (this.totalWeight() * (this.avariePct || 0)) / 100; },
+            poidsMarchandCalc() { return this.totalWeight() - this.poidsAvarieCalc(); },
             
-            function convert(num) {
-                if (num < 10) return units[num];
-                if (num < 20) return teens[num - 10];
-                if (num < 70) return tens[Math.floor(num / 10)] + (num % 10 === 1 ? ' et un' : (num % 10 !== 0 ? '-' + units[num % 10] : ''));
-                if (num < 80) return "soixante-" + convert(num - 60);
-                if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? '-' + convert(num % 10) : '');
-                if (num < 200) return "cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
-                if (num < 1000) return units[Math.floor(num / 100)] + " cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
-                if (num < 2000) return "mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
-                if (num < 1000000) return convert(Math.floor(num / 1000)) + " mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
-                if (num < 1000000000) return convert(Math.floor(num / 1000000)) + " million" + (Math.floor(num/1000000) > 1 ? "s" : "") + (num % 1000000 !== 0 ? " " + convert(num % 1000000) : "");
-                return num.toString();
+            grpTotal(offset) {
+                let s = 0;
+                for (let i = offset; i < offset + 50; i++) s += (parseFloat(this.weights[i]) || 0);
+                return s;
+            },
+
+            grpFilled(offset) {
+                return this.weights.slice(offset, offset + 50).filter(v => parseFloat(v) > 0).length;
+            },
+
+            filled() {
+                return this.weights.filter(v => parseFloat(v) > 0).length;
+            },
+
+            montantTotal() {
+                return (this.poidsMarchandPF() * (this.pu_pf || 0)) + (this.poidsMarchandGF() * (this.pu_gf || 0));
+            },
+
+            totalPrime() {
+                return this.totalWeight() * (this.primeBio || 0);
+            },
+
+            netAPayer() {
+                return Math.round((this.montantTotal() + this.totalPrime()) - (this.manualCredit || 0));
+            },
+
+            formatCurrency(val) {
+                return new Intl.NumberFormat('fr-FR').format(Math.round(val));
+            },
+
+            numberToWords(n) {
+                if (n <= 0) return "";
+                const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+                const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+                const tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+                
+                function convert(num) {
+                    if (num < 10) return units[num];
+                    if (num < 20) return teens[num - 10];
+                    if (num < 70) return tens[Math.floor(num / 10)] + (num % 10 === 1 ? ' et un' : (num % 10 !== 0 ? '-' + units[num % 10] : ''));
+                    if (num < 80) return "soixante-" + convert(num - 60);
+                    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? '-' + convert(num % 10) : '');
+                    if (num < 200) return "cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
+                    if (num < 1000) return units[Math.floor(num / 100)] + " cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
+                    if (num < 2000) return "mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
+                    if (num < 1000000) return convert(Math.floor(num / 1000)) + " mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
+                    if (num < 1000000000) return convert(Math.floor(num / 1000000)) + " million" + (Math.floor(num/1000000) > 1 ? "s" : "") + (num % 1000000 !== 0 ? " " + convert(num % 1000000) : "");
+                    return num.toString();
+                }
+                
+                let res = convert(Math.round(n)).trim();
+                return res.charAt(0).toUpperCase() + res.slice(1) + " francs CFA";
             }
-            
-            let result = convert(Math.round(n)).trim();
-            return result.charAt(0).toUpperCase() + result.slice(1) + " francs CFA";
         }
     }
-}
 </script>
 @endpush
 @endsection
