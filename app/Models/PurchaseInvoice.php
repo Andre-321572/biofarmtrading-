@@ -35,6 +35,7 @@ class PurchaseInvoice extends Model
 
     protected $casts = [
         'date_invoice' => 'date',
+        'avarie_pct'   => 'float',
     ];
 
     public function weights()
@@ -70,6 +71,11 @@ class PurchaseInvoice extends Model
     public function getPoidsMarchandGfAttribute()
     {
         return round($this->total_weight_gf * (1 - ($this->avarie_pct ?? 0) / 100), 2);
+    }
+
+    public function getPoidsMarchandTotalAttribute()
+    {
+        return $this->poids_marchand_pf + $this->poids_marchand_gf;
     }
 
     public function getMontantPfAttribute()

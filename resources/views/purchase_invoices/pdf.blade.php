@@ -125,7 +125,7 @@
                 <td class="label" style="background: #fff8ed; color: #c2410c;">% AVARIE</td>
                 <td class="value" style="color: #c2410c; font-weight: 900;">{{ number_format($purchaseInvoice->avarie_pct ?? 0, 2, ',', ' ') }} %</td>
                 <td class="label" style="background: #fff8ed; color: #c2410c;">POIDS MARCHAND</td>
-                <td class="value" style="color: #374151; font-weight: 900;">{{ number_format($purchaseInvoice->poids_marchand_pf + $purchaseInvoice->poids_marchand_gf, 2, ',', ' ') }} kg</td>
+                <td class="value" style="color: #374151; font-weight: 900;">{{ number_format($purchaseInvoice->poids_marchand_total, 2, ',', ' ') }} kg</td>
             </tr>
         </table>
 

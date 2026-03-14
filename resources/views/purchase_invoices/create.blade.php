@@ -235,7 +235,7 @@
                                             {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
                                         </div>
                                         <div style="flex: 1; padding: 4px 6px; position: relative;">
-                                            <input type="number" step="0.01" name="weights[]" x-model.number="weights[{{ $absIdx }}]"
+                                            <input type="number" step="0.01" name="weights[{{ $absIdx }}]" x-model.number="weights[{{ $absIdx }}]"
                                                 class="w-full text-center py-1.5 text-[11px] font-black text-blue-900 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
                                                 placeholder="0">
                                             
@@ -248,7 +248,7 @@
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
-                                            <input type="hidden" name="calibres[]" x-model="calibres[{{ $absIdx }}]">
+                                            <input type="hidden" name="calibres[{{ $absIdx }}]" x-model="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -329,7 +329,8 @@
                         </div>
                         <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
-                            <textarea name="net_payer_lettre" rows="2" :value="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
+                            <textarea rows="2" :value="numberToWords(netAPayer())" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
+                            <input type="hidden" name="net_payer_lettre" :value="numberToWords(netAPayer())">
                         </div>
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">TOTAL PRIME</label>
@@ -376,6 +377,8 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
+    let sigPads = {};
+
     function resizeCanvas() {
         ['signature-resp', 'signature-prod'].forEach(id => {
             const canvas = document.getElementById(id);
@@ -384,7 +387,7 @@
             const offsetWidth = canvas.offsetWidth;
             const offsetHeight = canvas.offsetHeight;
             
-            // Only resize if dimensions changed
+            // Only resize if dimensions changed significantly
             if (canvas.width !== offsetWidth * ratio || canvas.height !== offsetHeight * ratio) {
                 canvas.width = offsetWidth * ratio;
                 canvas.height = offsetHeight * ratio;
@@ -398,6 +401,7 @@
         // Init signature pads
         ['signature-resp', 'signature-prod'].forEach(id => {
             const canvas = document.getElementById(id);
+            if (!canvas) return;
             sigPads[id] = new SignaturePad(canvas, {
                 backgroundColor: 'rgb(255, 255, 255)',
                 penColor: 'rgb(0, 0, 0)'

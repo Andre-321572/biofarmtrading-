@@ -86,10 +86,10 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
-        // Calcul automatique avarie & poids marchand après insertion des poids pour le cache DB
-        $totalWeight = $invoice->weights()->sum('weight');
-        $avariePct   = $validated['avarie_pct'] ?? 0;
-        $poidsAvarie = round(($totalWeight * $avariePct) / 100, 2);
+        // Calcul automatique avarie & poids marchand (totaux) pour le cache DB
+        $totalWeight  = $invoice->total_weight;
+        $avariePct    = $validated['avarie_pct'] ?? 0;
+        $poidsAvarie  = round(($totalWeight * $avariePct) / 100, 2);
         $poidsMarchand = round($totalWeight - $poidsAvarie, 2);
 
         $invoice->update([
