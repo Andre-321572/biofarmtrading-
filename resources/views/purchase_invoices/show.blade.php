@@ -118,9 +118,18 @@
                                 <td class="py-1 text-center font-black text-indigo-600 bg-slate-50 border-r border-slate-100">
                                     {{ isset($allWeights[$idx]) ? str_pad($allWeights[$idx]->position, 3, '0', STR_PAD_LEFT) : '—' }}
                                 </td>
-                                <td class="py-1 text-center font-bold text-slate-800 border-r border-slate-100">
-                                    {{ isset($allWeights[$idx]) ? number_format($allWeights[$idx]->weight, 2, ',', ' ') : '—' }}
-                                </td>
+                                 <td class="py-1 text-center font-bold border-r border-slate-100">
+                                     @if(isset($allWeights[$idx]))
+                                        <span class="{{ $allWeights[$idx]->calibre === 'GF' ? 'text-orange-700' : 'text-slate-800' }}">
+                                            {{ number_format($allWeights[$idx]->weight, 2, ',', ' ') }}
+                                        </span>
+                                        <span class="text-[8px] font-black {{ $allWeights[$idx]->calibre === 'GF' ? 'text-orange-500' : 'text-indigo-400' }}">
+                                            [{{ $allWeights[$idx]->calibre }}]
+                                        </span>
+                                     @else
+                                        <span class="text-slate-200">—</span>
+                                     @endif
+                                 </td>
                             @endfor
                         </tr>
                         @endfor

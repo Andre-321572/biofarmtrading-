@@ -62,7 +62,7 @@ class PurchaseInvoiceController extends Controller
             'fruit' => $validated['fruit'] ?? null,
             'producteur' => $validated['producteur'] ?? null,
             'code_parcelle_matricule' => $validated['code_parcelle_matricule'] ?? null,
-            'calibre' => $validated['calibre'] ?? null,
+            'calibre' => null, // Global calibre field is deprecated
             'pu_pf' => $validated['pu_pf'] ?? 0,
             'pu_gf' => $validated['pu_gf'] ?? 0,
             'prime_bio_kg' => $validated['prime_bio_kg'] ?? 0,
@@ -76,12 +76,23 @@ class PurchaseInvoiceController extends Controller
             'user_id' => Auth::id(),
         ]);
 
+        // Match weights to their specific calibres (JSON or Array fallback)
+        $requestedCalibres = [];
+        if ($request->has('calibres_json')) {
+            $requestedCalibres = json_decode($request->input('calibres_json'), true) ?? [];
+        } else {
+            $requestedCalibres = $request->input('calibres', []);
+        }
+        
         foreach ($validated['weights'] as $index => $weight) {
             if ($weight > 0) {
+                // Find the calibre by index, default to 'PF'
+                $calibre = isset($requestedCalibres[$index]) ? strtoupper(trim($requestedCalibres[$index])) : 'PF';
+                
                 $invoice->weights()->create([
                     'position' => $index + 1,
-                    'weight' => $weight,
-                    'calibre' => $validated['calibres'][$index] ?? 'PF',
+                    'weight'   => $weight,
+                    'calibre'  => $calibre,
                 ]);
             }
         }

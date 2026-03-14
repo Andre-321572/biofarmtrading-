@@ -55,12 +55,12 @@ class PurchaseInvoice extends Model
 
     public function getTotalWeightPfAttribute()
     {
-        return $this->weights()->where('calibre', 'PF')->sum('weight');
+        return $this->weights()->whereRaw("UPPER(TRIM(calibre)) = 'PF'")->sum('weight');
     }
 
     public function getTotalWeightGfAttribute()
     {
-        return $this->weights()->where('calibre', 'GF')->sum('weight');
+        return $this->weights()->whereRaw("UPPER(TRIM(calibre)) = 'GF'")->sum('weight');
     }
 
     public function getPoidsMarchandPfAttribute()
