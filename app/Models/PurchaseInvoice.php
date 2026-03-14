@@ -55,7 +55,8 @@ class PurchaseInvoice extends Model
 
     public function getTotalCreditAttribute()
     {
-        return ($this->poids_avarie ?? 0) + ($this->poids_marchand ?? 0);
+        // Le crédit correspond à la valeur monétaire des fruits avariés (qui est déduite)
+        return ($this->poids_avarie ?? 0) * $this->pu;
     }
 
     public function getNetAPayerAttribute()

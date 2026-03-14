@@ -225,11 +225,11 @@
                     <table class="summary-table">
                         <tr>
                             <td class="label right-label" style="background: #f9fafb;">POIDS AVARIÉ</td>
-                            <td class="amount" style="color: #b91c1c;">{{ number_format($purchaseInvoice->poids_avarie, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
+                            <td class="amount" style="color: #b91c1c;">{{ number_format($purchaseInvoice->poids_avarie, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
                             <td class="label right-label" style="background: #f9fafb;">POIDS MARCHAND (POIDS NET)</td>
-                            <td class="amount" style="color: #b91c1c;">{{ number_format($purchaseInvoice->poids_marchand, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
+                            <td class="amount" style="color: #374151;">{{ number_format($purchaseInvoice->poids_marchand, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
                             <td class="label right-label" style="background: #f9fafb;">TOTAL CRÉDIT</td>

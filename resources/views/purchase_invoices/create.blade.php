@@ -387,11 +387,13 @@ function purchaseInvoiceForm() {
         },
 
         totalCredit() {
-            return this.poidsAvarieCalc();
+            // Le crédit correspond à la valeur monétaire des fruits avariés
+            return this.poidsAvarieCalc() * this.pu;
         },
 
         netAPayer() {
-            return this.montantTotal() - this.poidsAvarieCalc();
+            // Paiement basé uniquement sur le poids marchand
+            return this.poidsMarchandCalc() * this.pu;
         },
 
         totalPrime() {

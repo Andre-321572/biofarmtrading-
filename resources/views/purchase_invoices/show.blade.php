@@ -81,6 +81,10 @@
                     <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-32 border-r border-slate-100">CALIBRE FRUIT</label>
                     <div class="flex-1 px-4 py-3 text-sm font-bold text-slate-800 italic">{{ $purchaseInvoice->calibre ?? '—' }}</div>
                 </div>
+                <div class="flex bg-white border-t border-orange-100">
+                    <label class="bg-orange-50 px-4 py-3 text-[10px] font-bold uppercase text-orange-400 w-32 border-r border-orange-100">% AVARIE</label>
+                    <div class="flex-1 px-4 py-3 text-sm font-black text-orange-600 italic">{{ number_format($purchaseInvoice->avarie_pct ?? 0, 2, ',', ' ') }} %</div>
+                </div>
             </div>
 
             {{-- RELEVÉ DE POIDS --}}
@@ -145,6 +149,14 @@
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">POIDS TOTAL</label>
                         <div class="flex-1 px-4 text-right font-black text-slate-900">{{ number_format($purchaseInvoice->total_weight, 2, ',', ' ') }} kg</div>
                     </div>
+                    <div class="flex items-center border-t border-slate-50">
+                        <label class="bg-slate-50/50 px-4 py-2 text-[9px] font-bold uppercase text-slate-400 w-48 border-r border-slate-100 italic">Dont Petit Fruit (PF)</label>
+                        <div class="flex-1 px-4 text-right font-bold text-indigo-600 text-xs">{{ number_format($purchaseInvoice->weights->where('calibre', 'PF')->sum('weight'), 2, ',', ' ') }} kg</div>
+                    </div>
+                    <div class="flex items-center border-t border-slate-50">
+                        <label class="bg-slate-50/50 px-4 py-2 text-[9px] font-bold uppercase text-slate-400 w-48 border-r border-slate-100 italic">Dont Gros Fruit (GF)</label>
+                        <div class="flex-1 px-4 text-right font-bold text-orange-600 text-xs">{{ number_format($purchaseInvoice->weights->where('calibre', 'GF')->sum('weight'), 2, ',', ' ') }} kg</div>
+                    </div>
                     <div class="flex items-center">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">P.U</label>
                         <div class="flex-1 px-4 text-right font-black text-slate-900">{{ number_format($purchaseInvoice->pu, 0, ',', ' ') }} FCFA/kg</div>
@@ -167,11 +179,11 @@
                 <div class="flex flex-col divide-y divide-slate-100 bg-white">
                     <div class="flex items-center">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">Poids Avarié</label>
-                        <div class="flex-1 px-4 text-right font-bold text-red-600">{{ number_format($purchaseInvoice->poids_avarie, 0, ',', ' ') }} FCFA</div>
+                        <div class="flex-1 px-4 text-right font-bold text-red-600">{{ number_format($purchaseInvoice->poids_avarie, 2, ',', ' ') }} kg</div>
                     </div>
                     <div class="flex items-center">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100 leading-tight">Poids marchand (Poids net)</label>
-                        <div class="flex-1 px-4 text-right font-bold text-red-600">{{ number_format($purchaseInvoice->poids_marchand, 0, ',', ' ') }} FCFA</div>
+                        <div class="flex-1 px-4 text-right font-bold text-slate-700">{{ number_format($purchaseInvoice->poids_marchand, 2, ',', ' ') }} kg</div>
                     </div>
                     <div class="flex items-center">
                         <label class="bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase text-slate-500 w-48 border-r border-slate-100">TOTAL CRÉDIT</label>
