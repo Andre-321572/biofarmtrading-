@@ -48,10 +48,12 @@ class PurchaseInvoiceController extends Controller
             'signature_resp' => 'nullable|string',
             'signature_prod' => 'nullable|string',
             'net_payer_lettre' => 'nullable|string',
-            'weights' => 'required|array',
+            'weights' => 'nullable|array',
             'weights.*' => 'nullable|numeric|min:0',
             'calibres' => 'nullable|array',
             'calibres.*' => 'nullable|string|in:PF,GF',
+            'weights_csv' => 'nullable|string',
+            'calibres_csv' => 'nullable|string',
         ]);
 
         $invoice = PurchaseInvoice::create([
@@ -76,35 +78,32 @@ class PurchaseInvoiceController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        // Logic nuclear to match weights and calibres (Priority to CSV)
-        $rawWeights = $request->input('weights', []);
-        $rawCalibres = $request->input('calibres', []);
-
-        if ($request->filled('weights_csv')) {
-            $rawWeights = explode(',', $request->input('weights_csv'));
-        }
-        if ($request->filled('calibres_csv')) {
-            $rawCalibres = explode(',', $request->input('calibres_csv'));
-        }
+        // Match weights to their specific calibres from CSV strings (100% reliable)
+        $rawWeights = explode(',', $request->input('weights_csv'));
+        $rawCalibres = explode(',', $request->input('calibres_csv'));
         
-        // Ensure we handle sequential or associative arrays
-        for ($i = 0; $i < 200; $i++) {
-            $weight = $rawWeights[$i] ?? null;
+        $gfCount = 0;
+        $pfCount = 0;
+
+        foreach ($rawWeights as $index => $weight) {
             $weightVal = (float)$weight;
-            
             if ($weightVal > 0) {
-                // Determine calibre: check array first, then CSV-exploded array
-                $calibreRaw = $rawCalibres[$i] ?? 'PF';
+                // Determine calibre: default to 'PF' if index missing or invalid
+                $calibreRaw = $rawCalibres[$index] ?? 'PF';
                 $calibre = strtoupper(trim($calibreRaw));
                 if ($calibre !== 'GF') $calibre = 'PF';
                 
+                if ($calibre === 'GF') $gfCount++; else $pfCount++;
+
                 $invoice->weights()->create([
-                    'position' => $i + 1,
+                    'position' => $index + 1,
                     'weight'   => $weightVal,
                     'calibre'  => $calibre,
                 ]);
             }
         }
+
+        \Log::info("Purchase Invoice stored: Total weights saved: " . ($pfCount + $gfCount) . " (PF: $pfCount, GF: $gfCount)");
 
         // Calcul automatique avarie & poids marchand (totaux) pour le cache DB
         $totalWeight  = $invoice->total_weight;
