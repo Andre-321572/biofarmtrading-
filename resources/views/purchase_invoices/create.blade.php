@@ -249,6 +249,7 @@
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
+                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -370,9 +371,10 @@
                 </button>
             </div>
 
-            <input type="hidden" name="weights_csv" x-model="weightsCSV">
-            <input type="hidden" name="calibres_csv" x-model="calibresCSV">
-            <input type="hidden" name="net_payer_lettre" x-model="netAPayerLettre">
+            {{-- Hidden fields for CSV transport (Nuclear Option for Reliability) --}}
+            <input type="hidden" name="weights_csv" :value="weights.map(v => v === null ? '' : v).join(',')">
+            <input type="hidden" name="calibres_csv" :value="calibres.join(',')">
+            <input type="hidden" name="net_payer_lettre" :value="netAPayerLettre">
         </form>
     </div>
 </div>
@@ -423,8 +425,8 @@
             netAPayerLettre: '',
 
             init() {
-                this.$watch('weights', () => this.updateAll());
-                this.$watch('calibres', () => this.updateAll());
+                this.$watch('weights', () => { this.updateAll(); });
+                this.$watch('calibres', () => { this.updateAll(); });
                 this.$watch('pu_pf', () => this.updateAll());
                 this.$watch('pu_gf', () => this.updateAll());
                 this.$watch('manualCredit', () => this.updateAll());
@@ -435,13 +437,11 @@
 
             updateAll() {
                 this.netAPayerLettre = this.numberToWords(this.netAPayer());
-                this.weightsCSV = this.weights.map(v => v === null ? '' : v).join(',');
-                this.calibresCSV = this.calibres.join(',');
             },
 
             toggleCalibre(idx) {
                 this.calibres[idx] = (this.calibres[idx] === 'PF') ? 'GF' : 'PF';
-                this.calibres = [...this.calibres]; // Force reactivity
+                this.calibres = JSON.parse(JSON.stringify(this.calibres)); // Nuclear reactivity refresh
                 this.updateAll();
             },
 
@@ -450,7 +450,7 @@
                 for (let i = offset; i < offset + 50; i++) {
                     this.calibres[i] = val;
                 }
-                this.calibres = [...this.calibres]; // Deep refresh
+                this.calibres = JSON.parse(JSON.stringify(this.calibres)); // Nuclear reactivity refresh
                 this.updateAll();
             },
 
