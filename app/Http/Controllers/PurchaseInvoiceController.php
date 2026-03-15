@@ -76,13 +76,8 @@ class PurchaseInvoiceController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        // Match weights to their specific calibres (JSON or Array fallback)
-        $requestedCalibres = [];
-        if ($request->has('calibres_json')) {
-            $requestedCalibres = json_decode($request->input('calibres_json'), true) ?? [];
-        } else {
-            $requestedCalibres = $request->input('calibres', []);
-        }
+        // Match weights to their specific calibres from the request array
+        $requestedCalibres = $request->input('calibres', []);
         
         foreach ($validated['weights'] as $index => $weight) {
             if ($weight > 0) {

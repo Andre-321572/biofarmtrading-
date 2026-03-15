@@ -249,6 +249,7 @@
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
+                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -370,7 +371,6 @@
                 </button>
             </div>
 
-            <input type="hidden" name="calibres_json" :value="JSON.stringify(calibres)">
         </form>
     </div>
 </div>
@@ -433,16 +433,17 @@
             },
 
             toggleCalibre(idx) {
-                this.calibres[idx] = this.calibres[idx] === 'PF' ? 'GF' : 'PF';
-                this.calibres = [...this.calibres]; // Force update
+                this.calibres[idx] = (this.calibres[idx] === 'PF') ? 'GF' : 'PF';
+                this.calibres = Object.assign([], this.calibres); // Force reactivity refresh
                 this.updateLettre();
             },
 
             setGrpCalibre(offset, val) {
                 if (!val) return;
-                let newC = [...this.calibres];
-                for (let i = offset; i < offset + 50; i++) newC[i] = val;
-                this.calibres = newC;
+                for (let i = offset; i < offset + 50; i++) {
+                    this.calibres[i] = val;
+                }
+                this.calibres = Object.assign([], this.calibres); // Deep refresh
                 this.updateLettre();
             },
 
