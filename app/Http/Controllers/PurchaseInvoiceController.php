@@ -76,17 +76,28 @@ class PurchaseInvoiceController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        // Match weights to their specific calibres from the request array
-        $requestedCalibres = $request->input('calibres', []);
+        // Match weights to their specific calibres (CSV format for maximum reliability)
+        $rawWeights = $request->input('weights', []);
+        $rawCalibres = $request->input('calibres', []);
+
+        // Use CSV if provided (nuclear option against max_input_vars or missing indexes)
+        if ($request->filled('weights_csv')) {
+            $rawWeights = explode(',', $request->input('weights_csv'));
+        }
+        if ($request->filled('calibres_csv')) {
+            $rawCalibres = explode(',', $request->input('calibres_csv'));
+        }
         
-        foreach ($validated['weights'] as $index => $weight) {
-            if ($weight > 0) {
+        foreach ($rawWeights as $index => $weight) {
+            $weightVal = (float)$weight;
+            if ($weightVal > 0) {
                 // Find the calibre by index, default to 'PF'
-                $calibre = isset($requestedCalibres[$index]) ? strtoupper(trim($requestedCalibres[$index])) : 'PF';
+                $calibre = isset($rawCalibres[$index]) ? strtoupper(trim($rawCalibres[$index])) : 'PF';
+                if (!in_array($calibre, ['PF', 'GF'])) $calibre = 'PF';
                 
                 $invoice->weights()->create([
                     'position' => $index + 1,
-                    'weight'   => $weight,
+                    'weight'   => $weightVal,
                     'calibre'  => $calibre,
                 ]);
             }

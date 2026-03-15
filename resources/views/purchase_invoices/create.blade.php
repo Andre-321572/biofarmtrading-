@@ -244,12 +244,11 @@
                                             <div class="absolute right-0 top-0 mt-1 mr-1">
                                                 <button type="button" 
                                                         @click="toggleCalibre({{ $absIdx }})"
-                                                        :class="calibres[{{ $absIdx }}] === 'GF' ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-indigo-100 text-indigo-700 border-indigo-200'"
-                                                        class="text-[7px] font-black px-1 rounded border shadow-sm uppercase">
+                                                        :class="calibres[{{ $absIdx }}] === 'GF' ? 'bg-orange-500 text-white border-orange-600' : 'bg-indigo-100 text-indigo-700 border-indigo-200'"
+                                                        class="text-[7px] font-black px-1 rounded border shadow-sm uppercase transition-colors">
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
-                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -371,6 +370,9 @@
                 </button>
             </div>
 
+            <input type="hidden" name="weights_csv" x-model="weightsCSV">
+            <input type="hidden" name="calibres_csv" x-model="calibresCSV">
+            <input type="hidden" name="net_payer_lettre" x-model="netAPayerLettre">
         </form>
     </div>
 </div>
@@ -416,26 +418,31 @@
             manualCredit: 0,
             primeBio: 0,
             avariePct: 0,
+            weightsCSV: '',
+            calibresCSV: '',
             netAPayerLettre: '',
 
             init() {
-                this.$watch('weights', () => this.updateLettre());
-                this.$watch('calibres', () => this.updateLettre());
-                this.$watch('pu_pf', () => this.updateLettre());
-                this.$watch('pu_gf', () => this.updateLettre());
-                this.$watch('manualCredit', () => this.updateLettre());
-                this.$watch('primeBio', () => this.updateLettre());
-                this.$watch('avariePct', () => this.updateLettre());
+                this.$watch('weights', () => this.updateAll());
+                this.$watch('calibres', () => this.updateAll());
+                this.$watch('pu_pf', () => this.updateAll());
+                this.$watch('pu_gf', () => this.updateAll());
+                this.$watch('manualCredit', () => this.updateAll());
+                this.$watch('primeBio', () => this.updateAll());
+                this.$watch('avariePct', () => this.updateAll());
+                this.updateAll();
             },
 
-            updateLettre() {
+            updateAll() {
                 this.netAPayerLettre = this.numberToWords(this.netAPayer());
+                this.weightsCSV = this.weights.map(v => v === null ? '' : v).join(',');
+                this.calibresCSV = this.calibres.join(',');
             },
 
             toggleCalibre(idx) {
                 this.calibres[idx] = (this.calibres[idx] === 'PF') ? 'GF' : 'PF';
-                this.calibres = Object.assign([], this.calibres); // Force reactivity refresh
-                this.updateLettre();
+                this.calibres = [...this.calibres]; // Force reactivity
+                this.updateAll();
             },
 
             setGrpCalibre(offset, val) {
@@ -443,8 +450,8 @@
                 for (let i = offset; i < offset + 50; i++) {
                     this.calibres[i] = val;
                 }
-                this.calibres = Object.assign([], this.calibres); // Deep refresh
-                this.updateLettre();
+                this.calibres = [...this.calibres]; // Deep refresh
+                this.updateAll();
             },
 
             clearSignature(id) {
@@ -458,8 +465,8 @@
                 if (sigPads['signature-prod'])
                     document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
                 
-                // Final update of words
-                this.updateLettre();
+                // Final update of CSVs and Words
+                this.updateAll();
             },
 
             totalWeight() {
