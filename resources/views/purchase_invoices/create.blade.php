@@ -10,11 +10,19 @@
         touch-action: none;
         border-radius: 8px;
     }
+    button[type="submit"] {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-slate-100 py-5" x-data="purchaseInvoiceForm()">
+<div class="min-h-screen bg-slate-100 py-5" 
+     x-data="purchaseInvoiceForm()" 
+     x-init="initForm()"
+     @keydown.escape="open = false">
+    
     <div class="max-w-6xl mx-auto px-4">
         {{-- TOP BAR --}}
         <div class="flex items-center justify-between mb-4">
@@ -32,7 +40,7 @@
             </a>
         </div>
 
-        {{-- ERREURS DE VALIDATION --}}
+        {{-- MESSAGES D'ERREUR --}}
         @if($errors->any())
         <div class="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
             <p class="text-xs font-bold text-red-700 mb-1">Erreurs :</p>
@@ -48,12 +56,13 @@
         </div>
         @endif
 
-        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm" x-ref="form" @submit.prevent="submitForm()">
+        {{-- FORMULAIRE --}}
+        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm">
             @csrf
 
             <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" style="font-family:'Courier New',monospace">
                 
-                {{-- HEADER DOCUMENT --}}
+                {{-- HEADER --}}
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-5 py-4 border-b-2 border-slate-800 bg-slate-50">
                     <div class="flex items-center gap-3 sm:gap-4">
                         <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white flex items-center justify-center shrink-0">
@@ -67,7 +76,8 @@
                     <div class="flex items-center justify-between md:justify-end gap-5 flex-shrink-0 border-t border-slate-200 md:border-0 pt-3 md:pt-0">
                         <div class="text-left md:text-right">
                             <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
-                            <input type="text" name="bon_no" value="{{ $nextBonNo }}" class="text-base sm:text-xl font-black text-slate-900 border-0 bg-transparent p-0 w-24 sm:w-32 md:text-right focus:ring-0" readonly>
+                            <input type="hidden" name="bon_no" value="{{ $nextBonNo }}">
+                            <span class="text-base sm:text-xl font-black text-slate-900">{{ $nextBonNo }}</span>
                         </div>
                         <div class="text-right">
                             <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Date</p>
@@ -82,77 +92,60 @@
 
                 {{-- FORM GRID --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 bg-slate-200 gap-[1px]">
-                    {{-- Zone --}}
+                    <!-- Zone -->
                     <div class="flex bg-white">
                         <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">ZONE</label>
                         <input type="text" name="zone" list="zones_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                         <datalist id="zones_list">
-                            <option value="Avé">
-                            <option value="Zio">
-                            <option value="Vo">
-                            <option value="Danyi">
-                            <option value="Kloto">
-                            <option value="Agou">
-                            <option value="Haho">
-                            <option value="Bas-mono">
+                            <option value="Avé"><option value="Zio"><option value="Vo"><option value="Danyi">
+                            <option value="Kloto"><option value="Agou"><option value="Haho"><option value="Bas-mono">
                         </datalist>
                     </div>
-                    {{-- Producteur --}}
+                    <!-- Producteur -->
                     <div class="flex bg-white">
                         <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">PRODUCTEUR</label>
                         <input type="text" name="producteur" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                     </div>
-                    {{-- Chauffeur --}}
+                    <!-- Chauffeur -->
                     <div class="flex bg-white">
                         <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">CHAUFFEUR</label>
                         <input type="text" name="chauffeur" list="chauffeurs_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                         <datalist id="chauffeurs_list">
-                            <option value="SOUMAGBO Yao">
-                            <option value="AGBADZI Komi Victor">
-                            <option value="AMEGBETO K. Promise">
-                            <option value="MORKLEY Komi">
+                            <option value="SOUMAGBO Yao"><option value="AGBADZI Komi Victor">
+                            <option value="AMEGBETO K. Promise"><option value="MORKLEY Komi">
                         </datalist>
                     </div>
-                    {{-- Matricule --}}
+                    <!-- Matricule -->
                     <div class="flex bg-white">
                         <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100 uppercase">MATRICULE</label>
                         <input type="text" name="code_parcelle_matricule" list="matricules_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0 uppercase" placeholder="...">
                         <datalist id="matricules_list">
-                            <option value="BL 7151">
-                            <option value="BL 7238">
-                            <option value="BD 2671">
-                            <option value="BH 5895">
-                            <option value="BH 5588">
-                            <option value="EL 2473">
+                            <option value="BL 7151"><option value="BL 7238"><option value="BD 2671">
+                            <option value="BH 5895"><option value="BH 5588"><option value="EL 2473">
                         </datalist>
                     </div>
-                    {{-- Fruit --}}
+                    <!-- Fruit -->
                     <div class="flex bg-white">
                         <label class="bg-slate-50 px-3 py-3 text-[9px] font-bold uppercase text-slate-400 w-24 sm:w-32 flex items-center shrink-0 border-r border-slate-100">FRUIT</label>
                         <input type="text" name="fruit" list="fruits_list" class="flex-1 px-3 py-2 text-sm font-bold border-0 focus:ring-0" placeholder="...">
                         <datalist id="fruits_list">
-                            <option value="Ananas Cayenne">
-                            <option value="Ananas Braza">
-                            <option value="Papaye">
-                            <option value="Banane">
-                            <option value="Mangue">
+                            <option value="Ananas Cayenne"><option value="Ananas Braza">
+                            <option value="Papaye"><option value="Banane"><option value="Mangue">
                         </datalist>
                     </div>
 
-                    {{-- % Avarie --}}
+                    <!-- % Avarie -->
                     <div class="flex bg-white border border-orange-200">
                         <label class="bg-orange-50 px-3 py-3 text-[9px] font-bold uppercase text-orange-500 w-24 sm:w-32 flex items-center shrink-0 border-r border-orange-200">
                             <i class="fa-solid fa-triangle-exclamation mr-1 text-orange-400"></i> % AVARIE
                         </label>
                         <div class="flex-1 flex items-center px-3">
-                            <input type="number" name="avarie_pct" id="avarie_pct_input"
-                                   x-model.number="avariePct"
+                            <input type="number" name="avarie_pct" x-model="avariePct"
                                    step="0.01" min="0" max="100"
                                    class="flex-1 py-2 text-sm font-black text-orange-600 border-0 focus:ring-0 bg-transparent"
                                    placeholder="0.00">
                             <span class="ml-1 text-sm font-black text-orange-500">%</span>
                         </div>
-                        {{-- Aperçu en temps réel --}}
                         <div class="hidden sm:flex items-center gap-3 px-3 border-l border-orange-100 bg-orange-50/50">
                             <div class="text-right">
                                 <p class="text-[8px] text-orange-400 uppercase font-bold">Avarié</p>
@@ -171,21 +164,21 @@
                     Relevé de Poids
                 </div>
 
-                {{-- BARRE STATS POIDS --}}
+                {{-- STATS POIDS --}}
                 <div class="flex items-center justify-between px-5 py-2 bg-slate-100 border-b border-slate-300">
                     <div class="text-[10px] font-black text-slate-500 uppercase flex gap-4">
-                        <span>Cases : <span class="text-indigo-600" x-text="filled()"></span>/200</span>
+                        <span>Cases : <span class="text-indigo-600" x-text="filledCount"></span>/200</span>
                         <span>Total : <span class="text-green-600" x-text="totalWeight().toFixed(2)+' kg'"></span></span>
                     </div>
                 </div>
 
-                {{-- 4 GROUPES DE 50 --}}
+                {{-- GROUPES DE POIDS --}}
                 @php
                     $groups = [
-                        ['num'=>1,'color'=>'blue',  'from'=>1,  'to'=>50,  'bg'=>'bg-blue-600',  'light'=>'bg-blue-50',  'border'=>'border-blue-200', 'text'=>'text-blue-700', 'badge'=>'bg-blue-100 text-blue-800'],
-                        ['num'=>2,'color'=>'emerald','from'=>51, 'to'=>100, 'bg'=>'bg-emerald-600','light'=>'bg-emerald-50','border'=>'border-emerald-200','text'=>'text-emerald-700','badge'=>'bg-emerald-100 text-emerald-800'],
-                        ['num'=>3,'color'=>'amber',  'from'=>101,'to'=>150, 'bg'=>'bg-amber-500',  'light'=>'bg-amber-50',  'border'=>'border-amber-200', 'text'=>'text-amber-700', 'badge'=>'bg-amber-100 text-amber-800'],
-                        ['num'=>4,'color'=>'purple', 'from'=>151,'to'=>200, 'bg'=>'bg-purple-600', 'light'=>'bg-purple-50', 'border'=>'border-purple-200','text'=>'text-purple-700','badge'=>'bg-purple-100 text-purple-800'],
+                        ['num'=>1,'color'=>'blue',  'from'=>1,  'to'=>50,  'bg'=>'bg-blue-600',  'light'=>'bg-blue-50',  'border'=>'border-blue-200', 'text'=>'text-blue-700'],
+                        ['num'=>2,'color'=>'emerald','from'=>51, 'to'=>100, 'bg'=>'bg-emerald-600','light'=>'bg-emerald-50','border'=>'border-emerald-200','text'=>'text-emerald-700'],
+                        ['num'=>3,'color'=>'amber',  'from'=>101,'to'=>150, 'bg'=>'bg-amber-500',  'light'=>'bg-amber-50',  'border'=>'border-amber-200', 'text'=>'text-amber-700'],
+                        ['num'=>4,'color'=>'purple', 'from'=>151,'to'=>200, 'bg'=>'bg-purple-600', 'light'=>'bg-purple-50', 'border'=>'border-purple-200','text'=>'text-purple-700'],
                     ];
                 @endphp
 
@@ -199,72 +192,49 @@
                             <div class="w-6 h-6 rounded {{ $g['bg'] }} flex items-center justify-center shrink-0">
                                 <span class="text-[10px] font-black text-white">{{ $g['num'] }}</span>
                             </div>
-                            <span class="text-xs font-black {{ $g['text'] }} truncate">Groupe {{ $g['num'] }} <span class="opacity-50 font-normal hidden sm:inline">({{ $g['from'] }}–{{ $g['to'] }})</span></span>
+                            <span class="text-xs font-black {{ $g['text'] }} truncate">Groupe {{ $g['num'] }} ({{ $g['from'] }}–{{ $g['to'] }})</span>
                             
-                            {{-- Sélecteur de calibre pour le groupe --}}
-                            <div class="flex items-center bg-white rounded border border-slate-200 p-0.5 ml-auto sm:ml-0" @click.stop>
-                                <label class="text-[8px] font-bold px-2 text-slate-400 uppercase hidden xs:inline">Calibre Groupe:</label>
-                                <select class="text-[9px] font-black border-0 focus:ring-0 py-0.5 pl-2 pr-6 rounded cursor-pointer bg-slate-50"
-                                        @change="setGrpCalibre({{ $offset }}, $event.target.value)">
-                                    <option value="">PF / GF</option>
-                                    <option value="PF">PETIT (PF)</option>
-                                    <option value="GF">GROS (GF)</option>
-                                </select>
-                            </div>
+                            <select class="text-[9px] font-black border-0 focus:ring-0 py-0.5 px-2 rounded bg-slate-50 ml-4"
+                                    @change="setGrpCalibre({{ $offset }}, $event.target.value)">
+                                <option value="PF">PF</option>
+                                <option value="GF">GF</option>
+                            </select>
 
-                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $g['badge'] }} hidden sm:flex">
-                                <span x-text="grpFilled({{ $offset }})"></span>/50 cases &nbsp;·&nbsp;
-                                <span x-text="grpTotal({{ $offset }}).toFixed(2)+' kg'"></span>
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $g['badge'] ?? 'bg-slate-100' }} ml-2">
+                                <span x-text="grpFilled({{ $offset }})"></span>/50
+                                <span x-text="grpTotal({{ $offset }}).toFixed(1)"></span>kg
                             </span>
                         </div>
-                        <i class="fa-solid fa-chevron-down w-3 h-3 {{ $g['text'] }} transition-transform duration-200" :class="open?'rotate-180':''"></i>
+                        <i class="fa-solid fa-chevron-down transition-transform" :class="open ? 'rotate-180' : ''"></i>
                     </button>
+                    
                     <div x-show="open" class="p-3 bg-slate-50">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <div class="grid grid-cols-5 gap-2">
                             @for($col=0; $col<5; $col++)
                             @php $colOffset = $offset + $col*10; @endphp
-                            <div class="flex flex-col bg-white rounded-lg shadow-sm border border-blue-200 overflow-hidden">
-                                {{-- Header de colonne --}}
-                                <div style="display: flex; background-color: #2563eb; color: white; font-weight: 900; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">
-                                    <div style="width: 45px; padding: 8px 0; text-align: center; border-right: 1px solid #3b82f6;">N°</div>
-                                    <div style="flex: 1; padding: 8px 0; text-align: center;">Poids</div>
+                            <div class="bg-white rounded border border-slate-200">
+                                <div class="bg-blue-600 text-white text-center py-1 text-[10px] font-bold">
+                                    {{ $colOffset+1 }}-{{ $colOffset+10 }}
                                 </div>
-                                
-                                {{-- Corps de colonne --}}
-                                <div class="flex-1 divide-y divide-slate-100">
-                                    @for($row=0; $row<10; $row++)
-                                    @php $absIdx = $colOffset + $row; @endphp
-                                    <div style="display: flex; align-items: center;" class="hover:bg-blue-50/30 transition-colors group">
-                                        <div style="width: 45px; padding: 10px 0; text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; background-color: #f8fafc; border-right: 1px solid #f1f5f9; font-style: italic;">
-                                            {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
-                                        </div>
-                                        <div style="flex: 1; padding: 4px 6px; position: relative;">
-                                            <input type="number" step="0.01" x-model.number="weights[{{ $absIdx }}]" @input="updateAll()"
-                                                :class="calibres[{{ $absIdx }}] === 'GF' ? 'border-orange-500 ring-2 ring-orange-200 border-2 text-orange-900 font-black' : 'border-slate-200 focus:ring-blue-200 text-blue-900'"
-                                                class="w-full text-center py-1.5 text-[11px] bg-white border rounded transition-all shadow-sm" 
-                                                placeholder="0">
-                                            
-                                            <div class="absolute right-0 top-0 mt-1 mr-1">
-                                                <button type="button" 
-                                                        @click="toggleCalibre({{ $absIdx }})"
-                                                        :class="calibres[{{ $absIdx }}] === 'GF' ? 'bg-orange-600 text-white border-orange-700' : 'bg-indigo-100 text-indigo-700 border-indigo-200'"
-                                                        class="text-[7px] font-black px-1 rounded border shadow-sm uppercase transition-colors">
-                                                    <span x-text="calibres[{{ $absIdx }}]"></span>
-                                                </button>
-                                            </div>
-                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
-                                        </div>
-                                    </div>
-                                    @endfor
+                                @for($row=0; $row<10; $row++)
+                                @php $idx = $colOffset + $row; @endphp
+                                <div class="flex items-center p-1 border-b border-slate-100 last:border-0">
+                                    <span class="w-8 text-[9px] font-bold text-slate-400">{{ str_pad($idx+1, 3, '0', STR_PAD_LEFT) }}</span>
+                                    <input type="number" step="0.01" 
+                                           name="weights[{{ $idx }}]"
+                                           x-model="weights[{{ $idx }}]"
+                                           @input="updateStats"
+                                           class="w-16 text-center text-[10px] font-bold border rounded py-1"
+                                           :class="calibres[{{ $idx }}] === 'GF' ? 'border-orange-300 bg-orange-50' : 'border-blue-200'">
+                                    <button type="button"
+                                            @click="toggleCalibre({{ $idx }})"
+                                            class="ml-1 px-1.5 py-0.5 text-[8px] font-black rounded"
+                                            :class="calibres[{{ $idx }}] === 'GF' ? 'bg-orange-600 text-white' : 'bg-blue-600 text-white'">
+                                        <span x-text="calibres[{{ $idx }}]"></span>
+                                    </button>
+                                    <input type="hidden" name="calibres[{{ $idx }}]" :value="calibres[{{ $idx }}]">
                                 </div>
-
-                                {{-- Footer de colonne (Total) --}}
-                                <div style="display: flex; background-color: #2563eb; color: white; font-weight: 900; font-size: 11px;">
-                                    <div style="width: 45px; padding: 8px 0; text-align: center; border-right: 1px solid #3b82f6; opacity: 0.6;">T</div>
-                                    <div style="flex: 1; padding: 8px 0; text-align: center;">
-                                        <span x-text="weights.slice({{ $colOffset }}, {{ $colOffset + 10 }}).reduce((a, b) => a + (b || 0), 0).toFixed(2)"></span>
-                                    </div>
-                                </div>
+                                @endfor
                             </div>
                             @endfor
                         </div>
@@ -273,102 +243,78 @@
                 @endforeach
                 </div>
 
-                {{-- TOTALS SECTION --}}
+                {{-- TOTAUX --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 bg-slate-200 gap-[1px] border-t-2 border-slate-800">
-                    {{-- Left Column (Prices) --}}
-                    <div class="flex flex-col divide-y divide-slate-100 bg-white">
-                        <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0">POIDS TOTAL</label>
-                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-slate-900 text-sm" x-text="totalWeight().toFixed(2) + ' kg'"></div>
+                    <!-- Colonne gauche -->
+                    <div class="bg-white p-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-slate-500">POIDS TOTAL</span>
+                            <span class="font-black" x-text="totalWeight().toFixed(2) + ' kg'"></span>
                         </div>
-                        <div class="flex items-center">
-                            <label class="bg-indigo-50/50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-indigo-400 w-28 sm:w-48 border-r border-indigo-50 shrink-0">P.U PF</label>
-                            <div class="flex-1 flex items-center px-3 sm:px-4">
-                                <input type="number" name="pu_pf" x-model.number="pu_pf" class="w-full py-1 text-right font-black text-indigo-600 border-0 focus:ring-0 text-sm" placeholder="0">
-                                <span class="ml-2 text-[10px] font-bold text-slate-400 whitespace-nowrap">FCFA</span>
-                            </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-indigo-600">P.U PF</span>
+                            <input type="number" name="pu_pf" x-model="pu_pf" class="w-24 text-right font-black border-0 focus:ring-0 text-sm">
                         </div>
-                        <div class="flex items-center">
-                            <label class="bg-amber-50/50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-amber-400 w-28 sm:w-48 border-r border-amber-50 shrink-0">P.U GF</label>
-                            <div class="flex-1 flex items-center px-3 sm:px-4">
-                                <input type="number" name="pu_gf" x-model.number="pu_gf" class="w-full py-1 text-right font-black text-amber-600 border-0 focus:ring-0 text-sm" placeholder="0">
-                                <span class="ml-2 text-[10px] font-bold text-slate-400 whitespace-nowrap">FCFA</span>
-                            </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-amber-600">P.U GF</span>
+                            <input type="number" name="pu_gf" x-model="pu_gf" class="w-24 text-right font-black border-0 focus:ring-0 text-sm">
                         </div>
-                        <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 uppercase">MONTANT TOTAL</label>
-                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-green-700 text-sm" x-text="formatCurrency(montantTotal()) + ' FCFA'"></div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-green-600">MONTANT</span>
+                            <span class="font-black" x-text="formatCurrency(montantTotal()) + ' FCFA'"></span>
                         </div>
-                        <div class="flex items-center bg-green-50">
-                            <label class="bg-green-100/50 px-3 sm:px-4 py-3 text-[9px] sm:text-[10px] font-black uppercase text-green-800 w-28 sm:w-48 border-r border-green-200 shrink-0">NET À PAYER</label>
-                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-green-600 text-lg sm:text-xl" x-text="formatCurrency(netAPayer()) + ' FCFA'"></div>
-                        </div>
-                        <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">PRIME BIO/KG</label>
-                            <div class="flex-1 px-3 sm:px-4">
-                                <input type="number" name="prime_bio_kg" x-model.number="primeBio" class="w-full py-1 text-right font-bold text-indigo-600 border-0 focus:ring-0 text-sm" placeholder="...">
-                            </div>
+                        <div class="flex justify-between bg-green-50 p-2 rounded">
+                            <span class="text-xs font-black uppercase text-green-800">NET À PAYER</span>
+                            <span class="font-black text-green-600" x-text="formatCurrency(netAPayer()) + ' FCFA'"></span>
                         </div>
                     </div>
 
-                    {{-- Right Column (Credits) --}}
-                    <div class="flex flex-col divide-y divide-slate-100 bg-white">
-                        <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">Poids marchand PF</label>
-                            <div class="flex-1 flex items-center px-3 sm:px-4 justify-end">
-                                <span class="font-black text-indigo-500 text-sm" x-text="poidsMarchandPF().toFixed(2) + ' kg'">0.00 kg</span>
-                            </div>
+                    <!-- Colonne droite -->
+                    <div class="bg-white p-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-indigo-600">Poids marchand PF</span>
+                            <span class="font-black" x-text="poidsMarchandPF().toFixed(2) + ' kg'"></span>
                         </div>
-                        <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">Poids marchand GF</label>
-                            <div class="flex-1 flex items-center px-3 sm:px-4 justify-end">
-                                <span class="font-black text-amber-500 text-sm" x-text="poidsMarchandGF().toFixed(2) + ' kg'">0.00 kg</span>
-                            </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-amber-600">Poids marchand GF</span>
+                            <span class="font-black" x-text="poidsMarchandGF().toFixed(2) + ' kg'"></span>
                         </div>
-                        <div class="flex items-center">
-                            <label class="bg-red-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-red-400 w-28 sm:w-48 border-r border-red-100 shrink-0">TOTAL CRÉDIT</label>
-                            <div class="flex-1 flex items-center px-3 sm:px-4">
-                                <input type="number" name="total_credit" x-model.number="manualCredit" class="w-full py-1 text-right font-black text-red-600 border-0 focus:ring-0 text-sm" placeholder="Saisir crédit...">
-                            </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-red-600">CRÉDIT</span>
+                            <input type="number" name="total_credit" x-model="manualCredit" class="w-24 text-right font-black border-0 focus:ring-0 text-sm">
                         </div>
-                        <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
-                            <textarea rows="2" name="net_payer_lettre" x-text="netAPayerLettre" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase text-indigo-600">PRIME BIO/KG</span>
+                            <input type="number" name="prime_bio_kg" x-model="primeBio" class="w-24 text-right font-black border-0 focus:ring-0 text-sm">
                         </div>
-                        <div class="flex items-center">
-                            <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">TOTAL PRIME</label>
-                            <div class="flex-1 px-3 sm:px-4 text-right font-black text-indigo-600 text-sm" x-text="formatCurrency(totalPrime()) + ' FCFA'"></div>
+                        <div class="mt-4 p-2 bg-slate-50 rounded">
+                            <div class="text-[8px] font-bold uppercase text-slate-400 mb-1">En lettres :</div>
+                            <textarea name="net_payer_lettre" x-model="netAPayerLettre" class="w-full text-[9px] font-bold italic border-0 bg-transparent resize-none" rows="2" readonly></textarea>
                         </div>
                     </div>
                 </div>
 
                 {{-- SIGNATURES --}}
-                <div class="border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 bg-slate-50">
-                    <div class="px-5 py-4">
-                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-2">Responsable Bio Farm</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-slate-200">
+                    <div class="p-4">
+                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-2">Responsable</p>
                         <canvas id="signature-resp" class="signature-pad"></canvas>
                         <input type="hidden" name="signature_resp" id="signature_resp_input">
-                        <div class="flex justify-between mt-2">
-                            <p class="text-[8px] text-slate-400 uppercase font-bold">Cachet & Signature</p>
-                            <button type="button" @click="clearSignature('signature-resp')" class="text-[8px] text-red-500 uppercase font-bold">Effacer</button>
-                        </div>
+                        <button type="button" @click="clearSignature('signature-resp')" class="text-[8px] text-red-500 mt-1">Effacer</button>
                     </div>
-                    <div class="px-5 py-4 text-right">
-                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-2">Le Producteur / Opérateur</p>
+                    <div class="p-4">
+                        <p class="text-[9px] font-bold uppercase text-slate-500 mb-2">Producteur</p>
                         <canvas id="signature-prod" class="signature-pad"></canvas>
                         <input type="hidden" name="signature_prod" id="signature_prod_input">
-                        <div class="flex justify-between mt-2">
-                            <button type="button" @click="clearSignature('signature-prod')" class="text-[8px] text-red-500 uppercase font-bold">Effacer</button>
-                            <p class="text-[8px] text-slate-400 uppercase font-bold">Signature</p>
-                        </div>
+                        <button type="button" @click="clearSignature('signature-prod')" class="text-[8px] text-red-500 mt-1">Effacer</button>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
-                <a href="{{ route('purchase_invoices.index') }}" class="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">Annuler</a>
-                <button type="submit" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
-                    <i class="fa-solid fa-check"></i> Enregistrer la Facture
+            <div class="mt-6 flex justify-end gap-3">
+                <a href="{{ route('purchase_invoices.index') }}" class="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-50">Annuler</a>
+                <button type="submit" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg">
+                    <i class="fa-solid fa-check mr-2"></i>Enregistrer
                 </button>
             </div>
 
@@ -381,6 +327,144 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('purchaseInvoiceForm', () => ({
+            // Données
+            weights: Array(200).fill(null),
+            calibres: Array(200).fill('PF'),
+            pu_pf: 0,
+            pu_gf: 0,
+            manualCredit: 0,
+            primeBio: 0,
+            avariePct: 0,
+            filledCount: 0,
+            
+            // Méthode d'initialisation
+            initForm() {
+                this.updateStats();
+                
+                // Watchers
+                this.$watch('weights', () => this.updateStats(), { deep: true });
+                this.$watch('calibres', () => this.updateStats(), { deep: true });
+                this.$watch('pu_pf', () => this.updateStats());
+                this.$watch('pu_gf', () => this.updateStats());
+                this.$watch('manualCredit', () => this.updateStats());
+                this.$watch('primeBio', () => this.updateStats());
+                this.$watch('avariePct', () => this.updateStats());
+            },
+            
+            // Mise à jour des statistiques
+            updateStats() {
+                this.filledCount = this.weights.filter(w => parseFloat(w) > 0).length;
+            },
+            
+            // Getter pour weightsCSV
+            get weightsCSV() {
+                return this.weights.map(w => w || '').join(',');
+            },
+            
+            // Getter pour calibresCSV
+            get calibresCSV() {
+                return this.calibres.join(',');
+            },
+            
+            // Getter pour netAPayerLettre
+            get netAPayerLettre() {
+                return this.numberToWords(this.netAPayer());
+            },
+            
+            // Changer le calibre
+            toggleCalibre(idx) {
+                this.calibres[idx] = this.calibres[idx] === 'PF' ? 'GF' : 'PF';
+                this.calibres = [...this.calibres];
+            },
+            
+            // Changer tout un groupe
+            setGrpCalibre(offset, val) {
+                for (let i = offset; i < offset + 50; i++) {
+                    this.calibres[i] = val;
+                }
+                this.calibres = [...this.calibres];
+            },
+            
+            // Effacer une signature
+            clearSignature(id) {
+                if (sigPads[id]) sigPads[id].clear();
+            },
+            
+            // Calculs
+            totalWeight() {
+                return this.weights.reduce((sum, w) => sum + (parseFloat(w) || 0), 0);
+            },
+            
+            weightPF() {
+                return this.weights.reduce((sum, w, i) => 
+                    sum + (parseFloat(w) > 0 && this.calibres[i] === 'PF' ? parseFloat(w) : 0), 0);
+            },
+            
+            weightGF() {
+                return this.weights.reduce((sum, w, i) => 
+                    sum + (parseFloat(w) > 0 && this.calibres[i] === 'GF' ? parseFloat(w) : 0), 0);
+            },
+            
+            poidsMarchandPF() {
+                return this.weightPF() * (1 - (this.avariePct || 0) / 100);
+            },
+            
+            poidsMarchandGF() {
+                return this.weightGF() * (1 - (this.avariePct || 0) / 100);
+            },
+            
+            poidsAvarieCalc() {
+                return this.totalWeight() * (this.avariePct || 0) / 100;
+            },
+            
+            poidsMarchandCalc() {
+                return this.totalWeight() - this.poidsAvarieCalc();
+            },
+            
+            grpTotal(offset) {
+                let sum = 0;
+                for (let i = offset; i < offset + 50; i++) {
+                    sum += parseFloat(this.weights[i]) || 0;
+                }
+                return sum;
+            },
+            
+            grpFilled(offset) {
+                let count = 0;
+                for (let i = offset; i < offset + 50; i++) {
+                    if (parseFloat(this.weights[i]) > 0) count++;
+                }
+                return count;
+            },
+            
+            montantTotal() {
+                return (this.poidsMarchandPF() * (this.pu_pf || 0)) + 
+                       (this.poidsMarchandGF() * (this.pu_gf || 0));
+            },
+            
+            totalPrime() {
+                return this.totalWeight() * (this.primeBio || 0);
+            },
+            
+            netAPayer() {
+                return Math.round((this.montantTotal() + this.totalPrime()) - (this.manualCredit || 0));
+            },
+            
+            formatCurrency(val) {
+                return new Intl.NumberFormat('fr-FR').format(Math.round(val));
+            },
+            
+            numberToWords(n) {
+                if (!n || n <= 0) return "";
+                // Version simplifiée pour l'exemple
+                return n.toString() + " francs CFA";
+            }
+        }));
+    });
+
+    // Signature pads
     let sigPads = {};
 
     function resizeCanvas() {
@@ -408,179 +492,33 @@
         });
         resizeCanvas();
         window.addEventListener("resize", resizeCanvas);
-    });
-
-    function purchaseInvoiceForm() {
-        return {
-            weights: Array(200).fill(null),
-            calibres: Array(200).fill('PF'),
-            pu_pf: 0,
-            pu_gf: 0,
-            manualCredit: 0,
-            primeBio: 0,
-            avariePct: 0,
-            weightsCSV: '',
-            calibresCSV: '',
-            netAPayerLettre: '',
-
-            init() {
-                this.$watch('weights', () => { this.updateAll(); }, { deep: true });
-                this.$watch('calibres', () => { this.updateAll(); }, { deep: true });
-                this.$watch('pu_pf', () => this.updateAll());
-                this.$watch('pu_gf', () => this.updateAll());
-                this.$watch('manualCredit', () => this.updateAll());
-                this.$watch('primeBio', () => this.updateAll());
-                this.$watch('avariePct', () => this.updateAll());
-                this.updateAll();
-            },
-
-            updateAll() {
-                this.netAPayerLettre = this.numberToWords(this.netAPayer());
-                this.weightsCSV = this.weights.map(v => (v === null || v === undefined || v === '') ? '' : v).join(',');
-                this.calibresCSV = this.calibres.join(',');
-            },
-
-            toggleCalibre(idx) {
-                this.calibres[idx] = (this.calibres[idx] === 'PF') ? 'GF' : 'PF';
-                this.calibres = [...this.calibres]; // Force reactivity
-                this.updateAll();
-            },
-
-            setGrpCalibre(offset, val) {
-                if (!val) return;
-                for (let i = offset; i < offset + 50; i++) {
-                    this.calibres[i] = val;
-                }
-                this.calibres = [...this.calibres]; // Force reactivity
-                this.updateAll();
-            },
-
-            clearSignature(id) {
-                if (sigPads[id]) sigPads[id].clear();
-            },
-
-            submitForm() {
-                try {
-                    this.updateAll();
-                    
-                    if (this.totalWeight() <= 0) {
-                        alert("ERREUR : Vous n'avez saisi aucun poids !");
-                        return;
-                    }
-
-                    // Sync signatures safely
-                    if (sigPads['signature-resp']) {
-                        const el = document.getElementById('signature_resp_input');
-                        if (el) el.value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
-                    }
-                    if (sigPads['signature-prod']) {
-                        const el = document.getElementById('signature_prod_input');
-                        if (el) el.value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
-                    }
-
-                    // Submit the form
-                    document.getElementById('mainForm').submit();
-                } catch (e) {
-                    console.error("Submission error:", e);
-                    alert("Une erreur est survenue lors de la préparation de la facture: " + e.message);
-                }
-            },
-
-            totalWeight() {
-                return this.weights.reduce((a, b) => a + (parseFloat(b) || 0), 0);
-            },
-
-            weightPF() {
-                let s = 0;
-                for(let i=0; i<200; i++) {
-                    if(parseFloat(this.weights[i]) > 0 && this.calibres[i] === 'PF') {
-                        s += parseFloat(this.weights[i]);
-                    }
-                }
-                return s;
-            },
-
-            weightGF() {
-                let s = 0;
-                for(let i=0; i<200; i++) {
-                    if(parseFloat(this.weights[i]) > 0 && this.calibres[i] === 'GF') {
-                        s += parseFloat(this.weights[i]);
-                    }
-                }
-                return s;
-            },
-
-            poidsMarchandPF() { 
-                return this.weightPF() * (1 - (this.avariePct || 0) / 100); 
-            },
-            
-            poidsMarchandGF() { 
-                return this.weightGF() * (1 - (this.avariePct || 0) / 100); 
-            },
-            
-            poidsAvarieCalc() { 
-                return (this.totalWeight() * (this.avariePct || 0)) / 100; 
-            },
-            
-            poidsMarchandCalc() { 
-                return this.totalWeight() - this.poidsAvarieCalc(); 
-            },
-            
-            grpTotal(offset) {
-                let s = 0;
-                for (let i = offset; i < offset + 50; i++) s += (parseFloat(this.weights[i]) || 0);
-                return s;
-            },
-
-            grpFilled(offset) {
-                return this.weights.slice(offset, offset + 50).filter(v => parseFloat(v) > 0).length;
-            },
-
-            filled() {
-                return this.weights.filter(v => parseFloat(v) > 0).length;
-            },
-
-            montantTotal() {
-                return (this.poidsMarchandPF() * (this.pu_pf || 0)) + (this.poidsMarchandGF() * (this.pu_gf || 0));
-            },
-
-            totalPrime() {
-                return this.totalWeight() * (this.primeBio || 0);
-            },
-
-            netAPayer() {
-                return Math.round((this.montantTotal() + this.totalPrime()) - (this.manualCredit || 0));
-            },
-
-            formatCurrency(val) {
-                return new Intl.NumberFormat('fr-FR').format(Math.round(val));
-            },
-
-            numberToWords(n) {
-                if (n === null || n === undefined || isNaN(n) || n <= 0) return "";
-                const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
-                const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
-                const tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
-                
-                function convert(num) {
-                    if (num < 10) return units[num];
-                    if (num < 20) return teens[num - 10];
-                    if (num < 70) return tens[Math.floor(num / 10)] + (num % 10 === 1 ? ' et un' : (num % 10 !== 0 ? '-' + units[num % 10] : ''));
-                    if (num < 80) return "soixante-" + convert(num - 60);
-                    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? '-' + convert(num % 10) : '');
-                    if (num < 200) return "cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
-                    if (num < 1000) return units[Math.floor(num / 100)] + " cent" + (num % 100 !== 0 ? " " + convert(num % 100) : "");
-                    if (num < 2000) return "mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
-                    if (num < 1000000) return convert(Math.floor(num / 1000)) + " mille" + (num % 1000 !== 0 ? " " + convert(num % 1000) : "");
-                    if (num < 1000000000) return convert(Math.floor(num / 1000000)) + " million" + (Math.floor(num/1000000) > 1 ? "s" : "") + (num % 1000000 !== 0 ? " " + convert(num % 1000000) : "");
-                    return num.toString();
-                }
-                
-                let res = convert(Math.round(n)).trim();
-                return res.charAt(0).toUpperCase() + res.slice(1) + " francs CFA";
+        
+        // Gestionnaire de soumission
+        document.getElementById('mainForm').addEventListener('submit', function(e) {
+            // Récupérer les signatures
+            if (sigPads['signature-resp']) {
+                document.getElementById('signature_resp_input').value = 
+                    sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
             }
-        }
-    }
+            if (sigPads['signature-prod']) {
+                document.getElementById('signature_prod_input').value = 
+                    sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+            }
+            
+            // Vérifier les poids
+            const weights = document.querySelectorAll('input[name^="weights"]');
+            let hasWeight = false;
+            weights.forEach(w => {
+                if (parseFloat(w.value) > 0) hasWeight = true;
+            });
+            
+            if (!hasWeight) {
+                e.preventDefault();
+                alert('ERREUR : Vous n\'avez saisi aucun poids !');
+                return false;
+            }
+        });
+    });
 </script>
 @endpush
 @endsection

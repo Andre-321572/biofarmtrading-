@@ -115,22 +115,25 @@ class PurchaseInvoiceController extends Controller
         $weights = [];
         $calibres = [];
 
-        // Récupération depuis les CSV
+        // 1. Récupération depuis les CSV (méthode Alpine.js préférée)
         if ($request->filled('weights_csv')) {
             $weights = explode(',', $request->input('weights_csv'));
+        } 
+        // 2. Fallback sur le tableau standard weights[] si le CSV est vide
+        elseif ($request->has('weights')) {
+            $weights = $request->input('weights');
         }
 
+        // Récupération des calibres
         if ($request->filled('calibres_csv')) {
             $calibres = explode(',', $request->input('calibres_csv'));
-        }
-
-        // Fallback sur le tableau calibres si nécessaire
-        if (empty($calibres) || count($calibres) < 200) {
-            $calibres = $request->input('calibres', array_fill(0, 200, 'PF'));
+        } else {
+            $calibres = $request->input('calibres', []);
         }
 
         $savedCount = 0;
 
+        // On traite jusqu'à 200 entrées
         for ($i = 0; $i < 200; $i++) {
             $weight = isset($weights[$i]) ? trim($weights[$i]) : null;
 
@@ -138,7 +141,7 @@ class PurchaseInvoiceController extends Controller
             if ($weight !== null && $weight !== '' && is_numeric($weight) && floatval($weight) > 0) {
                 $weightVal = floatval($weight);
 
-                // Détermination du calibre
+                // Détermination du calibre (par défaut PF)
                 $calibreRaw = isset($calibres[$i]) ? trim($calibres[$i]) : 'PF';
                 $calibre = strtoupper($calibreRaw) === 'GF' ? 'GF' : 'PF';
 
