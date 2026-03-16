@@ -78,36 +78,57 @@ class PurchaseInvoiceController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        // Match weights to their specific calibres from CSV strings (100% reliable)
-        $rawWeights = explode(',', $request->input('weights_csv'));
-        $rawCalibres = explode(',', $request->input('calibres_csv'));
-        
-        $gfCount = 0;
-        $pfCount = 0;
+        \Log::info("Full Request Data:", $request->all());
 
-        foreach ($rawWeights as $index => $weight) {
+        // Logic combined to match weights and calibres (CSV + Arrays fallback)
+        $rawWeights = [];
+        $rawCalibres = [];
+
+        // 1. Try CSV (Highest priority/reliability)
+        if ($request->filled('weights_csv')) {
+            $rawWeights = explode(',', $request->input('weights_csv'));
+        }
+        if ($request->filled('calibres_csv')) {
+            $rawCalibres = explode(',', $request->input('calibres_csv'));
+        }
+
+        // 2. Fallback to standard arrays if CSV was empty or incomplete
+        if (empty(array_filter($rawWeights))) {
+            $rawWeights = $request->input('weights', []);
+        }
+        if (empty(array_filter($rawCalibres))) {
+            $rawCalibres = $request->input('calibres', []);
+        }
+
+        $savedCount = 0;
+        for ($i = 0; $i < 200; $i++) {
+            $weight = $rawWeights[$i] ?? null;
             $weightVal = (float)$weight;
+            
             if ($weightVal > 0) {
-                // Determine calibre: default to 'PF' if index missing or invalid
-                $calibreRaw = $rawCalibres[$index] ?? 'PF';
+                $calibreRaw = $rawCalibres[$i] ?? 'PF';
                 $calibre = strtoupper(trim($calibreRaw));
                 if ($calibre !== 'GF') $calibre = 'PF';
                 
-                if ($calibre === 'GF') $gfCount++; else $pfCount++;
-
                 $invoice->weights()->create([
-                    'position' => $index + 1,
+                    'position' => $i + 1,
                     'weight'   => $weightVal,
                     'calibre'  => $calibre,
                 ]);
+                $savedCount++;
             }
         }
 
-        \Log::info("Purchase Invoice stored: Total weights saved: " . ($pfCount + $gfCount) . " (PF: $pfCount, GF: $gfCount)");
+        if ($savedCount === 0) {
+            $invoice->delete(); // Clean up incomplete invoice
+            return back()->withInput()->with('error', 'ERREUR : Aucun poids n\'a été reçu par le serveur. Veuillez réessayer ou contacter le support.');
+        }
+
+        \Log::info("Purchase Invoice stored: $savedCount weights saved.");
 
         // Calcul automatique avarie & poids marchand (totaux) pour le cache DB
         $totalWeight  = $invoice->total_weight;
-        $avariePct    = $validated['avarie_pct'] ?? 0;
+        $avariePct    = (float)($request->input('avarie_pct') ?? 0);
         $poidsAvarie  = round(($totalWeight * $avariePct) / 100, 2);
         $poidsMarchand = round($totalWeight - $poidsAvarie, 2);
 

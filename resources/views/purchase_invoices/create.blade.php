@@ -44,7 +44,7 @@
         </div>
         @endif
 
-        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm">
+        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm" @submit.prevent="syncValues() && $el.submit()">
             @csrf
 
             <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" style="font-family:'Courier New',monospace">
@@ -235,7 +235,7 @@
                                             {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
                                         </div>
                                         <div style="flex: 1; padding: 4px 6px; position: relative;">
-                                            <input type="number" step="0.01" x-model.number="weights[{{ $absIdx }}]" @input="updateAll()"
+                                            <input type="number" step="0.01" name="weights[{{ $absIdx }}]" x-model.number="weights[{{ $absIdx }}]" @input="updateAll()"
                                                 :class="calibres[{{ $absIdx }}] === 'GF' ? 'border-orange-400 focus:ring-orange-200 text-orange-900 border-2' : 'border-slate-200 focus:ring-blue-200 text-blue-900'"
                                                 class="w-full text-center py-1.5 text-[11px] font-black bg-white border rounded focus:border-indigo-500 transition-all shadow-sm" 
                                                 placeholder="0">
@@ -249,7 +249,7 @@
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
-                                            <input type="hidden" :value="calibres[{{ $absIdx }}]">
+                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -366,15 +366,14 @@
 
             <div class="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
                 <a href="{{ route('purchase_invoices.index') }}" class="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">Annuler</a>
-                <button type="submit" @mousedown="syncValues()" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
+                <button type="submit" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
                     <i class="fa-solid fa-check"></i> Enregistrer la Facture
                 </button>
             </div>
 
-            {{-- Hidden fields for CSV transport (Nuclear Option for Reliability) --}}
-            <input type="hidden" name="weights_csv" x-model="weightsCSV">
-            <input type="hidden" name="calibres_csv" x-model="calibresCSV">
-            <input type="hidden" name="net_payer_lettre" x-model="netAPayerLettre">
+            <input type="hidden" name="weights_csv" :value="weightsCSV">
+            <input type="hidden" name="calibres_csv" :value="calibresCSV">
+            <input type="hidden" name="net_payer_lettre" :value="netAPayerLettre">
         </form>
     </div>
 </div>
@@ -461,14 +460,20 @@
             },
 
             syncValues() {
-                // Sync signatures
-                if (sigPads['signature-resp']) 
-                    document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
-                if (sigPads['signature-prod'])
-                    document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
-                
-                // Final update of CSVs and Words
-                this.updateAll();
+                try {
+                    // Sync signatures
+                    if (sigPads['signature-resp']) 
+                        document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
+                    if (sigPads['signature-prod'])
+                        document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+                    
+                    // Final update of CSVs and Words
+                    this.updateAll();
+                    return true;
+                } catch (e) {
+                    console.error("Sync Error", e);
+                    return true; // Still allow submit fallback
+                }
             },
 
             totalWeight() {
