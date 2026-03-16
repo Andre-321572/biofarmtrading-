@@ -96,7 +96,7 @@
                 $allWeights = $purchaseInvoice->weights->sortBy('position')->values();
                 $count = $allWeights->count();
                 $numCols = 5;
-                $rowsPerCol = ceil($count / $numCols);
+                $rowsPerCol = (int) ceil($count / $numCols);
                 if ($rowsPerCol < 5) $rowsPerCol = 5; 
             @endphp
 
@@ -114,17 +114,20 @@
                         @for($i = 0; $i < $rowsPerCol; $i++)
                         <tr class="border-b border-slate-100 italic">
                             @for($c = 0; $c < $numCols; $c++)
-                                @php $idx = $i + ($c * $rowsPerCol); @endphp
+                                @php 
+                                    $idx = (int) ($i + ($c * $rowsPerCol)); 
+                                    $weightItem = $allWeights->get($idx);
+                                @endphp
                                 <td class="py-1 text-center font-black text-indigo-600 bg-slate-50 border-r border-slate-100">
-                                    {{ isset($allWeights[$idx]) ? str_pad($allWeights[$idx]->position, 3, '0', STR_PAD_LEFT) : '—' }}
+                                    {{ $weightItem ? str_pad($weightItem->position, 3, '0', STR_PAD_LEFT) : '—' }}
                                 </td>
                                  <td class="py-1 text-center font-bold border-r border-slate-100">
-                                     @if(isset($allWeights[$idx]))
-                                        <span class="{{ $allWeights[$idx]->calibre === 'GF' ? 'text-orange-700' : 'text-slate-800' }}">
-                                            {{ number_format($allWeights[$idx]->weight, 2, ',', ' ') }}
+                                     @if($weightItem)
+                                        <span class="{{ $weightItem->calibre === 'GF' ? 'text-orange-700' : 'text-slate-800' }}">
+                                            {{ number_format($weightItem->weight, 2, ',', ' ') }}
                                         </span>
-                                        <span class="text-[8px] font-black {{ $allWeights[$idx]->calibre === 'GF' ? 'text-orange-500' : 'text-indigo-400' }}">
-                                            [{{ $allWeights[$idx]->calibre }}]
+                                        <span class="text-[8px] font-black {{ $weightItem->calibre === 'GF' ? 'text-orange-500' : 'text-indigo-400' }}">
+                                            [{{ $weightItem->calibre }}]
                                         </span>
                                      @else
                                         <span class="text-slate-200">—</span>
@@ -140,7 +143,7 @@
                                 <td class="py-1 text-center text-slate-400 border-r border-slate-200">T</td>
                                 <td class="py-1 text-center text-slate-800 border-r border-slate-200">
                                     @php
-                                        $colWeights = $allWeights->slice($c * $rowsPerCol, $rowsPerCol);
+                                        $colWeights = $allWeights->slice((int)($c * $rowsPerCol), (int)$rowsPerCol);
                                     @endphp
                                     {{ number_format($colWeights->sum('weight'), 2, ',', ' ') }}
                                 </td>

@@ -15,9 +15,7 @@
 
 @section('content')
 <div class="min-h-screen bg-slate-100 py-5" x-data="purchaseInvoiceForm()">
-
     <div class="max-w-6xl mx-auto px-4">
-
         {{-- TOP BAR --}}
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
@@ -44,7 +42,13 @@
         </div>
         @endif
 
-        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm" x-ref="form">
+        @if(session('error'))
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p class="text-xs text-red-600">{{ session('error') }}</p>
+        </div>
+        @endif
+
+        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm" x-ref="form" @submit.prevent="submitForm()">
             @csrf
 
             <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" style="font-family:'Courier New',monospace">
@@ -63,7 +67,7 @@
                     <div class="flex items-center justify-between md:justify-end gap-5 flex-shrink-0 border-t border-slate-200 md:border-0 pt-3 md:pt-0">
                         <div class="text-left md:text-right">
                             <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">BON N°</p>
-                            <input type="text" name="bon_no" value="#{{ $nextBonNo }}" class="text-base sm:text-xl font-black text-slate-900 border-0 bg-transparent p-0 w-24 sm:w-32 md:text-right focus:ring-0">
+                            <input type="text" name="bon_no" value="{{ $nextBonNo }}" class="text-base sm:text-xl font-black text-slate-900 border-0 bg-transparent p-0 w-24 sm:w-32 md:text-right focus:ring-0" readonly>
                         </div>
                         <div class="text-right">
                             <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Date</p>
@@ -248,7 +252,7 @@
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
-                                            <input type="hidden" :value="calibres[{{ $absIdx }}]">
+                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -329,8 +333,7 @@
                         </div>
                         <div class="flex flex-col px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
                             <label class="text-[9px] font-bold uppercase text-slate-400 mb-1">NET À PAYER EN LETTRE</label>
-                            <textarea rows="2" x-text="netAPayerLettre" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
-                            <input type="hidden" name="net_payer_lettre" :value="netAPayerLettre">
+                            <textarea rows="2" name="net_payer_lettre" x-text="netAPayerLettre" class="w-full p-0 text-[10px] font-bold text-slate-600 italic border-0 bg-transparent focus:ring-0 resize-none leading-tight" readonly placeholder="Calcul automatique..."></textarea>
                         </div>
                         <div class="flex items-center">
                             <label class="bg-slate-50 px-3 sm:px-4 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase text-slate-400 w-28 sm:w-48 border-r border-slate-100 shrink-0 leading-tight">TOTAL PRIME</label>
@@ -360,19 +363,17 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
                 <a href="{{ route('purchase_invoices.index') }}" class="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">Annuler</a>
-                <button type="button" @click="submitForm()" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
+                <button type="submit" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
                     <i class="fa-solid fa-check"></i> Enregistrer la Facture
                 </button>
             </div>
 
             <input type="hidden" name="weights_csv" :value="weightsCSV">
             <input type="hidden" name="calibres_csv" :value="calibresCSV">
-            <input type="hidden" name="net_payer_lettre" :value="netAPayerLettre">
         </form>
     </div>
 </div>
@@ -423,8 +424,8 @@
             netAPayerLettre: '',
 
             init() {
-                this.$watch('weights', () => { this.updateAll(); });
-                this.$watch('calibres', () => { this.updateAll(); });
+                this.$watch('weights', () => { this.updateAll(); }, { deep: true });
+                this.$watch('calibres', () => { this.updateAll(); }, { deep: true });
                 this.$watch('pu_pf', () => this.updateAll());
                 this.$watch('pu_gf', () => this.updateAll());
                 this.$watch('manualCredit', () => this.updateAll());
@@ -441,7 +442,7 @@
 
             toggleCalibre(idx) {
                 this.calibres[idx] = (this.calibres[idx] === 'PF') ? 'GF' : 'PF';
-                this.calibres = JSON.parse(JSON.stringify(this.calibres)); // Nuclear reactivity refresh
+                this.calibres = [...this.calibres]; // Force reactivity
                 this.updateAll();
             },
 
@@ -450,7 +451,7 @@
                 for (let i = offset; i < offset + 50; i++) {
                     this.calibres[i] = val;
                 }
-                this.calibres = JSON.parse(JSON.stringify(this.calibres)); // Nuclear reactivity refresh
+                this.calibres = [...this.calibres]; // Force reactivity
                 this.updateAll();
             },
 
@@ -459,24 +460,30 @@
             },
 
             submitForm() {
-                this.updateAll();
-                
-                // Final weight validation
-                if (this.totalWeight() <= 0) {
-                    alert("ERREUR : Vous n'avez saisi aucun poids !");
-                    return;
+                try {
+                    this.updateAll();
+                    
+                    if (this.totalWeight() <= 0) {
+                        alert("ERREUR : Vous n'avez saisi aucun poids !");
+                        return;
+                    }
+
+                    // Sync signatures safely
+                    if (sigPads['signature-resp']) {
+                        const el = document.getElementById('signature_resp_input');
+                        if (el) el.value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
+                    }
+                    if (sigPads['signature-prod']) {
+                        const el = document.getElementById('signature_prod_input');
+                        if (el) el.value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+                    }
+
+                    // Submit the form
+                    document.getElementById('mainForm').submit();
+                } catch (e) {
+                    console.error("Submission error:", e);
+                    alert("Une erreur est survenue lors de la préparation de la facture: " + e.message);
                 }
-
-                // Sync signatures
-                if (sigPads['signature-resp']) 
-                    document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
-                if (sigPads['signature-prod'])
-                    document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
-
-                // Final sync before native submit
-                this.$nextTick(() => {
-                    this.$refs.form.submit();
-                });
             },
 
             totalWeight() {
@@ -485,20 +492,39 @@
 
             weightPF() {
                 let s = 0;
-                for(let i=0; i<200; i++) if(this.weights[i]>0 && this.calibres[i]==='PF') s += parseFloat(this.weights[i]);
+                for(let i=0; i<200; i++) {
+                    if(parseFloat(this.weights[i]) > 0 && this.calibres[i] === 'PF') {
+                        s += parseFloat(this.weights[i]);
+                    }
+                }
                 return s;
             },
 
             weightGF() {
                 let s = 0;
-                for(let i=0; i<200; i++) if(this.weights[i]>0 && this.calibres[i]==='GF') s += parseFloat(this.weights[i]);
+                for(let i=0; i<200; i++) {
+                    if(parseFloat(this.weights[i]) > 0 && this.calibres[i] === 'GF') {
+                        s += parseFloat(this.weights[i]);
+                    }
+                }
                 return s;
             },
 
-            poidsMarchandPF() { return this.weightPF() * (1 - (this.avariePct || 0) / 100); },
-            poidsMarchandGF() { return this.weightGF() * (1 - (this.avariePct || 0) / 100); },
-            poidsAvarieCalc() { return (this.totalWeight() * (this.avariePct || 0)) / 100; },
-            poidsMarchandCalc() { return this.totalWeight() - this.poidsAvarieCalc(); },
+            poidsMarchandPF() { 
+                return this.weightPF() * (1 - (this.avariePct || 0) / 100); 
+            },
+            
+            poidsMarchandGF() { 
+                return this.weightGF() * (1 - (this.avariePct || 0) / 100); 
+            },
+            
+            poidsAvarieCalc() { 
+                return (this.totalWeight() * (this.avariePct || 0)) / 100; 
+            },
+            
+            poidsMarchandCalc() { 
+                return this.totalWeight() - this.poidsAvarieCalc(); 
+            },
             
             grpTotal(offset) {
                 let s = 0;
@@ -531,7 +557,7 @@
             },
 
             numberToWords(n) {
-                if (n <= 0) return "";
+                if (n === null || n === undefined || isNaN(n) || n <= 0) return "";
                 const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
                 const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
                 const tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];

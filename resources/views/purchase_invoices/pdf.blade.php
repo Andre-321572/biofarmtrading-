@@ -44,13 +44,13 @@
         /* Summary Section */
         .summary-layout { width: 100%; margin-top: 5px; border-collapse: collapse; }
         .summary-layout td { vertical-align: top; padding: 0; }
-        .summary-left { width: 49%; }
-        .summary-right { width: 49%; text-align: right; }
+        .summary-left { width: 45%; }
+        .summary-right { width: 53%; text-align: right; }
         .spacer { width: 2%; }
         
         .summary-table { width: 100%; border-collapse: collapse; }
         .summary-table td { border: 1px solid #ddd; padding: 3px 8px; font-size: 8px; }
-        .summary-table .label { background: #f8f8f8; font-weight: bold; text-transform: uppercase; color: #555; width: 60%; }
+        .summary-table .label { background: #f8f8f8; font-weight: bold; text-transform: uppercase; color: #555; }
         .summary-table .amount { text-align: right; font-weight: bold; font-size: 9px; color: #000; }
         .summary-table .amount-unit { font-size: 7px; color: #666; }
         
@@ -71,14 +71,11 @@
         .signature-box { border: 0.5px dotted #ccc; height: 90px; padding: 10px; vertical-align: top; text-align: center; }
         .signature-title { font-weight: bold; text-transform: uppercase; font-size: 9px; display: block; margin-bottom: 40px; }
         .signature-hint { font-size: 7px; color: #999; border-top: 0.5px solid #eee; padding-top: 5px; }
-
-
     </style>
 </head>
 <body>
 
-    <!-- Header SCOOPS OFCA style -->
-    <!-- Header SCOOPS OFCA white style -->
+    <!-- Header SCOOPS OFCA -->
     <div class="header-outer">
         <div class="header-inner">
             <div class="header-logo-cell">
@@ -125,7 +122,7 @@
                 <td class="label" style="background: #fff8ed; color: #c2410c;">% AVARIE</td>
                 <td class="value" style="color: #c2410c; font-weight: 900;">{{ number_format($purchaseInvoice->avarie_pct ?? 0, 2, ',', ' ') }} %</td>
                 <td class="label" style="background: #fff8ed; color: #c2410c;">POIDS MARCHAND</td>
-                <td class="value" style="color: #374151; font-weight: 900;">{{ number_format($purchaseInvoice->poids_marchand_total, 2, ',', ' ') }} kg</td>
+                <td class="value" style="color: #374151; font-weight: 900;">{{ number_format($purchaseInvoice->poids_marchand, 2, ',', ' ') }} kg</td>
             </tr>
         </table>
 
@@ -135,8 +132,29 @@
         @php 
             $allWeights = $purchaseInvoice->weights->sortBy('position')->values();
             $count = $allWeights->count();
+            
+            // Calcul des poids par calibre
+            $poidsPF = $allWeights->where('calibre', 'PF')->sum('weight');
+            $poidsGF = $allWeights->where('calibre', 'GF')->sum('weight');
+            
+            // Calcul des montants
+            $montantPF = $poidsPF * ($purchaseInvoice->pu_pf ?? 0);
+            $montantGF = $poidsGF * ($purchaseInvoice->pu_gf ?? 0);
+            $montantTotal = $montantPF + $montantGF;
+            
+            // Calcul de la prime
+            $totalPrime = $purchaseInvoice->total_weight * ($purchaseInvoice->prime_bio_kg ?? 0);
+            
+            // Calcul du net à payer
+            $netAPayer = $montantTotal + $totalPrime - ($purchaseInvoice->total_credit ?? 0);
+            
+            // Poids marchand par calibre (après avarie)
+            $avariePct = $purchaseInvoice->avarie_pct ?? 0;
+            $poidsMarchandPF = $poidsPF * (1 - $avariePct / 100);
+            $poidsMarchandGF = $poidsGF * (1 - $avariePct / 100);
+            
             $numCols = 8;
-            $rowsPerCol = ceil($count / $numCols);
+            $rowsPerCol = (int) ceil($count / $numCols);
             if ($rowsPerCol < 10) $rowsPerCol = 10;
         @endphp
 
@@ -152,13 +170,16 @@
                 @for($row=0; $row < $rowsPerCol; $row++)
                 <tr>
                     @for($c = 0; $c < $numCols; $c++)
-                        @php $idx = $row + ($c * $rowsPerCol); @endphp
-                        <td class="num">{{ isset($allWeights[$idx]) ? str_pad($allWeights[$idx]->position, 3, '0', STR_PAD_LEFT) : '' }}</td>
+                        @php 
+                            $idx = (int) ($row + ($c * $rowsPerCol));
+                            $weightItem = $allWeights->get($idx);
+                        @endphp
+                        <td class="num">{{ $weightItem ? str_pad($weightItem->position, 3, '0', STR_PAD_LEFT) : '' }}</td>
                         <td class="weight" style="font-size: 6.5px;">
-                            @if(isset($allWeights[$idx]))
-                                {{ number_format($allWeights[$idx]->weight, 2, ',', ' ') }}
-                                <span style="font-size: 5px; font-weight: bold; {{ $allWeights[$idx]->calibre == 'GF' ? 'color: #c2410c;' : 'color: #4338ca;' }}">
-                                    [{{ $allWeights[$idx]->calibre }}]
+                            @if($weightItem)
+                                {{ number_format($weightItem->weight, 2, ',', ' ') }}
+                                <span style="font-size: 5px; font-weight: bold; {{ $weightItem->calibre == 'GF' ? 'color: #c2410c;' : 'color: #4338ca;' }}">
+                                    [{{ $weightItem->calibre }}]
                                 </span>
                             @else
                                 &nbsp;
@@ -174,7 +195,7 @@
                     <td style="background: #fdfdfd; color: #000; border-top: 1px solid #4a5568;">T</td>
                     <td style="background: #fdfdfd; color: #000; border-top: 1px solid #4a5568;">
                         @php
-                            $colSum = $allWeights->slice($c * $rowsPerCol, $rowsPerCol)->sum('weight');
+                            $colSum = $allWeights->slice((int)($c * $rowsPerCol), (int)$rowsPerCol)->sum('weight');
                         @endphp
                         {{ number_format($colSum, 2, ',', ' ') }}
                     </td>
@@ -202,11 +223,11 @@
                         </tr>
                         <tr>
                             <td class="label" style="background: #f9fafb;">MONTANT TOTAL</td>
-                            <td class="amount" style="color: #15803d;">{{ number_format($purchaseInvoice->montant_total, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
+                            <td class="amount" style="color: #15803d;">{{ number_format($montantTotal, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
                         </tr>
                         <tr class="net-payable-row">
                             <td class="label" style="background: #e1f5fe !important; font-weight: 800; color: #01579b !important;">NET À PAYER</td>
-                            <td class="amount" style="background: #e1f5fe !important; font-weight: 800; color: #01579b;">{{ number_format($purchaseInvoice->net_a_payer, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
+                            <td class="amount" style="background: #e1f5fe !important; font-weight: 800; color: #01579b;">{{ number_format($netAPayer, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
                         </tr>
                         <tr>
                             <td class="label" style="background: #f9fafb;">PRIME BIO/KG</td>
@@ -218,12 +239,12 @@
                 <td class="summary-right" style="width: 53%;">
                     <table class="summary-table">
                         <tr>
-                            <td class="label right-label" style="background: #f9fafb;">Poids marchand petit fruit</td>
-                            <td class="amount" style="color: #4338ca;">{{ number_format($purchaseInvoice->poids_marchand_pf, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
+                            <td class="label right-label" style="background: #f9fafb;">Poids marchand petit fruit (PF)</td>
+                            <td class="amount" style="color: #4338ca;">{{ number_format($poidsMarchandPF, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
-                            <td class="label right-label" style="background: #f9fafb;">Poids marchand gros fruit</td>
-                            <td class="amount" style="color: #c2410c;">{{ number_format($purchaseInvoice->poids_marchand_gf, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
+                            <td class="label right-label" style="background: #f9fafb;">Poids marchand gros fruit (GF)</td>
+                            <td class="amount" style="color: #c2410c;">{{ number_format($poidsMarchandGF, 2, ',', ' ') }} <span class="amount-unit">kg</span></td>
                         </tr>
                         <tr>
                             <td class="label right-label" style="background: #f9fafb;">TOTAL CRÉDIT</td>
@@ -237,7 +258,7 @@
                         </tr>
                         <tr>
                             <td class="label right-label" style="background: #f9fafb;">MONTANT TOTAL DE LA PRIME</td>
-                            <td class="amount" style="color: #4338ca;">{{ number_format($purchaseInvoice->montant_total_prime, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
+                            <td class="amount" style="color: #4338ca;">{{ number_format($totalPrime, 0, ',', ' ') }} <span class="amount-unit">FCFA</span></td>
                         </tr>
                     </table>
                 </td>
