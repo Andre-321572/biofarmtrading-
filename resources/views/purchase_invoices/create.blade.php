@@ -44,7 +44,7 @@
         </div>
         @endif
 
-        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm" @submit.prevent="syncValues() && $el.submit()">
+        <form action="{{ route('purchase_invoices.store') }}" method="POST" id="mainForm" x-ref="form">
             @csrf
 
             <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden" style="font-family:'Courier New',monospace">
@@ -235,21 +235,20 @@
                                             {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
                                         </div>
                                         <div style="flex: 1; padding: 4px 6px; position: relative;">
-                                            <input type="number" step="0.01" name="weights[{{ $absIdx }}]" x-model.number="weights[{{ $absIdx }}]" @input="updateAll()"
-                                                :class="calibres[{{ $absIdx }}] === 'GF' ? 'border-orange-400 focus:ring-orange-200 text-orange-900 border-2' : 'border-slate-200 focus:ring-blue-200 text-blue-900'"
-                                                class="w-full text-center py-1.5 text-[11px] font-black bg-white border rounded focus:border-indigo-500 transition-all shadow-sm" 
+                                            <input type="number" step="0.01" x-model.number="weights[{{ $absIdx }}]" @input="updateAll()"
+                                                :class="calibres[{{ $absIdx }}] === 'GF' ? 'border-orange-500 ring-2 ring-orange-200 border-2 text-orange-900 font-black' : 'border-slate-200 focus:ring-blue-200 text-blue-900'"
+                                                class="w-full text-center py-1.5 text-[11px] bg-white border rounded transition-all shadow-sm" 
                                                 placeholder="0">
                                             
-                                            {{-- Badge de calibre cliquable pour changer individuellement --}}
                                             <div class="absolute right-0 top-0 mt-1 mr-1">
                                                 <button type="button" 
                                                         @click="toggleCalibre({{ $absIdx }})"
-                                                        :class="calibres[{{ $absIdx }}] === 'GF' ? 'bg-orange-500 text-white border-orange-600' : 'bg-indigo-100 text-indigo-700 border-indigo-200'"
+                                                        :class="calibres[{{ $absIdx }}] === 'GF' ? 'bg-orange-600 text-white border-orange-700' : 'bg-indigo-100 text-indigo-700 border-indigo-200'"
                                                         class="text-[7px] font-black px-1 rounded border shadow-sm uppercase transition-colors">
                                                     <span x-text="calibres[{{ $absIdx }}]"></span>
                                                 </button>
                                             </div>
-                                            <input type="hidden" name="calibres[{{ $absIdx }}]" :value="calibres[{{ $absIdx }}]">
+                                            <input type="hidden" :value="calibres[{{ $absIdx }}]">
                                         </div>
                                     </div>
                                     @endfor
@@ -366,7 +365,7 @@
 
             <div class="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
                 <a href="{{ route('purchase_invoices.index') }}" class="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">Annuler</a>
-                <button type="submit" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
+                <button type="button" @click="submitForm()" class="px-8 py-2.5 bg-indigo-600 rounded-xl text-sm font-black text-white hover:bg-indigo-700 shadow-lg transition flex items-center gap-2">
                     <i class="fa-solid fa-check"></i> Enregistrer la Facture
                 </button>
             </div>
@@ -459,21 +458,25 @@
                 if (sigPads[id]) sigPads[id].clear();
             },
 
-            syncValues() {
-                try {
-                    // Sync signatures
-                    if (sigPads['signature-resp']) 
-                        document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
-                    if (sigPads['signature-prod'])
-                        document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
-                    
-                    // Final update of CSVs and Words
-                    this.updateAll();
-                    return true;
-                } catch (e) {
-                    console.error("Sync Error", e);
-                    return true; // Still allow submit fallback
+            submitForm() {
+                this.updateAll();
+                
+                // Final weight validation
+                if (this.totalWeight() <= 0) {
+                    alert("ERREUR : Vous n'avez saisi aucun poids !");
+                    return;
                 }
+
+                // Sync signatures
+                if (sigPads['signature-resp']) 
+                    document.getElementById('signature_resp_input').value = sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
+                if (sigPads['signature-prod'])
+                    document.getElementById('signature_prod_input').value = sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+
+                // Final sync before native submit
+                this.$nextTick(() => {
+                    this.$refs.form.submit();
+                });
             },
 
             totalWeight() {
