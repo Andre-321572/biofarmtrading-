@@ -2,300 +2,215 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Facture #{{ str_pad($purchaseInvoice->id, 7, '0', STR_PAD_LEFT) }}</title>
+    <title>Bordereau #{{ $purchaseInvoice->bon_no }}</title>
     <style>
-        @page { margin: 0.8cm 1cm; }
-        body { 
-            font-family: 'Helvetica', sans-serif; 
-            font-size: 8.5px; 
-            color: #333;
-            line-height: 1.2;
-        }
+        @page { margin: 1cm; }
+        body { font-family: 'Helvetica', sans-serif; font-size: 8.5px; color: #333; line-height: 1.1; }
         
-        /* Header Section */
-        .header-container { width: 100%; margin-bottom: 5px; position: relative; height: 80px; }
-        .logo-box { position: absolute; left: 0; top: 0; }
-        .logo { width: 75px; } 
-        .header-center { text-align: center; width: 100%; }
-        .company-name { font-size: 22px; font-weight: 1000; letter-spacing: 4px; margin-bottom: 0px; margin-top: 5px; color: #1a1a1a; }
-        .company-desc { font-size: 7.5px; color: #555; margin-bottom: 8px; font-style: italic; }
-        .document-title { 
-            font-size: 13px; 
-            font-weight: bold; 
-            border-top: 1.5px solid #000; 
-            border-bottom: 1.5px solid #000;
-            padding: 4px 0;
-            margin: 5px auto;
-            width: 70%;
-            text-transform: uppercase;
-        }
-        .bon-info { position: absolute; right: 0; top: 0; text-align: right; }
-        .bon-label { font-size: 7px; color: #999; font-weight: bold; text-transform: uppercase; }
-        .bon-number { font-size: 15px; font-weight: 900; margin-bottom: 5px; }
-        .bon-date { font-size: 10px; font-weight: bold; }
+        .header { width: 100%; margin-bottom: 5px; }
+        .logo { width: 90px; vertical-align: middle; }
+        .company-info { text-align: center; vertical-align: middle; padding-bottom: 10px; }
+        .company-name { font-size: 26px; font-weight: 900; color: #38a169; letter-spacing: 2px; }
+        .company-desc { font-size: 9px; color: #4a5568; font-weight: 1000; margin-top: 2px; }
+        .date-box { text-align: right; vertical-align: top; width: 100px; }
+        .date-label { font-size: 7px; font-weight: bold; color: #999; text-transform: uppercase; }
+        .date-val { font-size: 11px; font-weight: 900; margin-top: 2px; border-bottom: 1px solid #333; padding-bottom: 2px; }
 
-        /* Info Grid */
-        .info-grid { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 1.5px solid #333; }
-        .info-grid td { 
-            border: 1px solid #999; 
-            padding: 3px 6px; 
-        }
-        .info-label { font-weight: bold; text-transform: uppercase; font-size: 7.5px; background-color: #f0f0f0; width: 18%; }
-        .info-value { font-weight: bold; color: #000; font-size: 9px; width: 32%; }
+        .doc-title-container { border: 2.5px solid #1a202c; padding: 4px; border-radius: 4px; text-align: center; margin: 10px 0; }
+        .doc-title { font-size: 18px; font-weight: 1000; letter-spacing: 12px; text-transform: uppercase; margin: 0; }
 
-        /* Table Title */
-        .weight-log-title { 
-            background-color: #1e293b; 
-            color: white; 
-            text-align: center; 
-            font-weight: bold; 
-            padding: 5px; 
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            font-size: 10px;
-            margin-bottom: 0px;
-        }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 1.5px solid #1a202c; }
+        .info-table td { border: 1px solid #718096; padding: 3.5px 6px; font-size: 9px; }
+        .info-label { font-weight: bold; text-transform: uppercase; color: #4a5568; width: 15%; font-size: 8.5px; }
+        .info-value { font-weight: 1000; color: #000; width: 35%; }
+        .highlight-label { color: #dd6b20; font-weight: bold; }
+        .highlight-value { color: #dd6b20; font-weight: 1000; }
 
-        /* Weight Table */
+        .weight-header { background-color: #1a202c; color: white; text-align: center; padding: 5px; font-size: 11px; font-weight: 1000; letter-spacing: 10px; text-transform: uppercase; margin-bottom: 0px; }
+
         .weight-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .weight-table th { 
-            background-color: #f2f2f2; 
-            border: 1px solid #1e293b; 
-            padding: 4px; 
-            font-size: 8px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-        .weight-table td { 
-            border: 1px solid #ddd; 
-            padding: 2.5px 5px; 
-            text-align: center;
-            height: 12px;
-            font-size: 7.5px;
-        }
-        .weight-table .index-col { font-weight: bold; color: #3b82f6; background-color: #fbfbfb; border-left: 1px solid #ccc; width: 15%; }
-        .weight-table .poids-col { width: 18.3%; font-weight: bold; }
-        .weight-table .cal-tag { font-size: 5px; margin-left: 2px; }
-        
-        /* Total Row */
-        .total-row td { 
-            background-color: #334155; 
-            color: white; 
-            font-weight: bold; 
-            border: 1px solid #1e293b;
-            padding: 3px;
-        }
+        .weight-table th { background-color: #4a5568; color: white; font-size: 6.5px; padding: 3px; border: 1px solid #1a202c; text-align: center; }
+        .weight-table td { border: 1px solid #cbd5e0; padding: 1.5px 4px; text-align: center; height: 11px; font-size: 7.5px; font-weight: 1000; }
+        .index-cell { color: #3182ce; font-weight: 900; background-color: #f7fafc; width: 12%; }
+        .poids-cell { width: 13%; }
+        .total-row td { background-color: #edf2f7; font-weight: 1000; border: 1.2px solid #1a202c; padding: 3px; }
 
-        /* Financial Section */
-        .financial-container { width: 100%; margin-top: 5px; border-collapse: collapse; }
-        .financial-box { border: 1.5px solid #1e293b; padding: 0; vertical-align: top; }
-        .financial-table { width: 100%; border-collapse: collapse; }
-        .financial-table td { border-bottom: 0.5px solid #eee; padding: 4px 10px; font-size: 8.5px; }
-        .financial-table tr:last-child td { border-bottom: none; }
-        .fin-label { font-weight: bold; text-transform: uppercase; color: #64748b; font-size: 7.5px; width: 65%; }
-        .fin-value { text-align: right; font-weight: 1000; font-size: 9px; color: #0f172a; }
-        
-        .net-payable-box { background-color: #ecfdf5; border-top: 1.5px solid #1e293b; padding: 6px 10px; }
-        .net-label { font-size: 10px; font-weight: 1000; text-transform: uppercase; color: #065f46; letter-spacing: 1px; }
-        .net-value { font-size: 14px; font-weight: 1000; color: #065f46; float: right; }
+        .financial-grid { width: 100%; margin-top: 10px; }
+        .fin-box { width: 49%; vertical-align: top; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 0; }
+        .fin-table { width: 100%; border-collapse: collapse; }
+        .fin-table td { padding: 5px 8px; border-bottom: 0.5px solid #e2e8f0; font-size: 9px; }
+        .fin-table tr:last-child td { border-bottom: none; }
+        .fin-label { font-weight: bold; text-transform: uppercase; color: #718096; font-size: 8px; }
+        .fin-val { text-align: right; font-weight: 1000; font-size: 10px; }
+        .net-a-payer-row { background-color: #ebf8ff; color: #2b6cb0; border-top: 2px solid #2b6cb0; }
+        .net-label { font-size: 10px; font-weight: 1000; text-transform: uppercase; }
+        .net-val { font-size: 13px; font-weight: 1000; }
+        .letter-box { padding: 8px; border-bottom: 0.5px solid #e2e8f0; font-style: italic; color: #4a5568; }
 
-        .in-words-box { padding: 4px 10px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }
-        .words-label { font-size: 6px; color: #94a3b8; font-style: italic; text-transform: uppercase; }
-        .words-value { font-weight: bold; font-style: italic; font-size: 9px; color: #334155; display: block; margin-top: 2px; }
+        .sign-container { width: 100%; margin-top: 10px; }
+        .sign-box { width: 49%; height: 80px; border: 0.5px solid #edf2f7; vertical-align: top; text-align: center; padding: 5px; }
+        .sign-title { font-weight: 1000; text-transform: uppercase; color: #2d3748; font-size: 9px; margin-bottom: 10px; display: block; }
+        .sign-img { height: 45px; max-width: 100%; mix-blend-multiply: multiply; }
+        .sign-footer { font-size: 6.5px; color: #a0aec0; border-top: 0.5px dotted #e2e8f0; margin-top: 5px; padding-top: 3px; }
 
-        /* Signature Section */
-        .signature-table { width: 100%; margin-top: 15px; border-collapse: collapse; }
-        .signature-box { width: 48%; border: 1px dotted #cbd5e1; height: 75px; padding: 5px; vertical-align: top; position: relative; }
-        .signature-title { font-weight: bold; text-transform: uppercase; font-size: 8px; color: #475569; margin-bottom: 5px; display: block; }
-        .signature-img { height: 45px; width: auto; mix-blend-multiply: multiply; display: block; margin: 0 auto; }
-        .signature-hint { position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; font-size: 6.5px; color: #94a3b8; border-top: 0.5px solid #f1f5f9; padding-top: 2px; margin: 0 10px; }
-
-        /* Bottom Footer */
-        .small-footer { text-align: center; margin-top: 15px; font-size: 7px; color: #94a3b8; border-top: 0.5px solid #f1f5f9; padding-top: 5px; }
+        .footer { text-align: center; font-size: 7px; color: #a0aec0; margin-top: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <div class="logo-box">
-            <img src="{{ public_path('images/logo.jpg') }}" class="logo">
-        </div>
-        <div class="header-center">
-            <div class="company-name">BIO FARM TRADING</div>
-            <div class="company-desc">Production-Commercialisation de produits agricoles biologiques - Conseils - Formations en Agrobusiness</div>
-            <div class="document-title">Facture d'Achat N° {{ str_pad($purchaseInvoice->id, 10, '0', STR_PAD_LEFT) }}</div>
-        </div>
-        <div class="bon-info">
-            <div class="bon-label">BON N°</div>
-            <div class="bon-number">#{{ $purchaseInvoice->bon_no }}</div>
-            <div class="bon-label">DATE</div>
-            <div class="bon-date">{{ $purchaseInvoice->date_invoice->format('d/m/Y') }}</div>
-        </div>
+    <table class="header">
+        <tr>
+            <td width="120"><img src="{{ public_path('images/logo.jpg') }}" class="logo"></td>
+            <td class="company-info">
+                <div class="company-name">BIO FARM TRADING</div>
+                <div class="company-desc">Production-Commercialisation de produits agricoles biologiques</div>
+            </td>
+            <td class="date-box">
+                <div class="date-label">Date</div>
+                <div class="date-val">{{ $purchaseInvoice->date_invoice->format('d/m/Y') }}</div>
+                <div class="date-label" style="margin-top:5px">Bon N°</div>
+                <div class="date-val" style="border:none">{{ $purchaseInvoice->bon_no }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="doc-title-container">
+        <h2 class="doc-title">FACTURE D'ACHAT</h2>
     </div>
 
-    <table class="info-grid">
+    <table class="info-table">
         <tr>
-            <td class="info-label">Producteur / OP</td>
-            <td class="info-value" colspan="3">{{ $purchaseInvoice->producteur ?: '—' }}</td>
-        </tr>
-        <tr>
-            <td class="info-label">Préfecture / Zone</td>
-            <td class="info-value" colspan="3">{{ $purchaseInvoice->zone ?: '—' }}</td>
+            <td class="info-label">Zone</td>
+            <td class="info-value">{{ $purchaseInvoice->zone ?: '—' }}</td>
+            <td class="info-label">Producteur</td>
+            <td class="info-value">{{ $purchaseInvoice->producteur ?: '—' }}</td>
         </tr>
         <tr>
             <td class="info-label">Chauffeur</td>
             <td class="info-value">{{ $purchaseInvoice->chauffeur ?: '—' }}</td>
-            <td class="info-label">Matricule Camion</td>
+            <td class="info-label">Matricule</td>
             <td class="info-value">{{ $purchaseInvoice->code_parcelle_matricule ?: '—' }}</td>
         </tr>
         <tr>
             <td class="info-label">Fruit</td>
-            <td class="info-value">{{ $purchaseInvoice->fruit ?: '—' }}</td>
-            <td class="info-label" style="background-color:#fff5f5; color:#b91c1c">% Avarie</td>
-            <td class="info-value" style="color:#b91c1c">{{ number_format($purchaseInvoice->avarie_pct, 1) }} %</td>
+            <td class="info-value" colspan="3">{{ $purchaseInvoice->fruit ?: '—' }}</td>
+        </tr>
+        <tr>
+            <td class="info-label highlight-label">% Avarie</td>
+            <td class="info-value highlight-value">{{ number_format($purchaseInvoice->avarie_pct, 2) }} %</td>
+            <td class="info-label highlight-label" style="background-color: #fffaf0">Poids Marchand</td>
+            <td class="info-value highlight-value" style="background-color: #fffaf0">{{ number_format($purchaseInvoice->poids_marchand_total, 2, ',', ' ') }} kg</td>
         </tr>
     </table>
 
-    <div class="weight-log-title">Relevé de Poids</div>
-
-    @php 
+    <div class="weight-header">Relevé de Poids</div>
+    
+    @php
         $allWeights = $purchaseInvoice->weights->sortBy('position')->values();
-        $count = $allWeights->count();
-        $rowsPerCol = ceil($count / 3);
-        if ($rowsPerCol < 10) $rowsPerCol = 10;
-        
-        $poidsPF = $allWeights->where('calibre', 'PF')->sum('weight');
-        $poidsGF = $allWeights->where('calibre', 'GF')->sum('weight');
-        $avarieMod = (1 - ($purchaseInvoice->avarie_pct / 100));
-        $poidsMarchandPF = $poidsPF * $avarieMod;
-        $poidsMarchandGF = $poidsGF * $avarieMod;
-        $totalPrime = $purchaseInvoice->total_weight * ($purchaseInvoice->prime_bio_kg ?? 0);
-        $montantMarchand = ($poidsMarchandPF * ($purchaseInvoice->pu_pf ?? 0)) + ($poidsMarchandGF * ($purchaseInvoice->pu_gf ?? 0));
+        $cols = 8;
+        $maxRows = 25; // 200 / 8
     @endphp
 
     <table class="weight-table">
         <thead>
             <tr>
-                <th width="8%">N°</th><th width="25.33%">Poids kg</th>
-                <th width="8%">N°</th><th width="25.33%">Poids kg</th>
-                <th width="8%">N°</th><th width="25.34%">Poids kg</th>
+                @for($c=0; $c < $cols; $c++)
+                    <th width="4%">N°</th><th width="8.5%">Poids/Cal</th>
+                @endfor
             </tr>
         </thead>
         <tbody>
-            @for($i = 0; $i < $rowsPerCol; $i++)
+            @for($r=0; $r < $maxRows; $r++)
             <tr>
-                {{-- Column 1 --}}
-                @php $idx1 = $i; $item1 = $allWeights->get($idx1); @endphp
-                <td class="index-col">{{ $item1 ? str_pad($item1->position, 2, '0', STR_PAD_LEFT) : '' }}</td>
-                <td class="poids-col">
-                    {{ $item1 ? number_format($item1->weight, 2) : '—' }}
-                    @if($item1)<span class="cal-tag" style="color: {{ $item1->calibre == 'GF' ? '#b45309' : '#4f46e5' }};">[{{ $item1->calibre }}]</span>@endif
-                </td>
-                
-                {{-- Column 2 --}}
-                @php $idx2 = $i + $rowsPerCol; $item2 = $allWeights->get($idx2); @endphp
-                <td class="index-col">{{ $item2 ? str_pad($item2->position, 2, '0', STR_PAD_LEFT) : '' }}</td>
-                <td class="poids-col">
-                    {{ $item2 ? number_format($item2->weight, 2) : '—' }}
-                    @if($item2)<span class="cal-tag" style="color: {{ $item2->calibre == 'GF' ? '#b45309' : '#4f46e5' }};">[{{ $item2->calibre }}]</span>@endif
-                </td>
-                
-                {{-- Column 3 --}}
-                @php $idx3 = $i + (2 * $rowsPerCol); $item3 = $allWeights->get($idx3); @endphp
-                <td class="index-col">{{ $item3 ? str_pad($item3->position, 2, '0', STR_PAD_LEFT) : '' }}</td>
-                <td class="poids-col">
-                    {{ $item3 ? number_format($item3->weight, 2) : '—' }}
-                    @if($item3)<span class="cal-tag" style="color: {{ $item3->calibre == 'GF' ? '#b45309' : '#4f46e5' }};">[{{ $item3->calibre }}]</span>@endif
-                </td>
+                @for($c=0; $c < $cols; $c++)
+                    @php 
+                        $idx = $r + ($c * $maxRows);
+                        $w = $allWeights->get($idx);
+                    @endphp
+                    <td class="index-cell">{{ $w ? str_pad($w->position, 3, '0', STR_PAD_LEFT) : '' }}</td>
+                    <td class="poids-cell">
+                        @if($w && $w->weight > 0)
+                            {{ number_format($w->weight, 1) }}<span style="font-size: 4.5px; opacity:0.6">[{{ $w->calibre }}]</span>
+                        @endif
+                    </td>
+                @endfor
             </tr>
             @endfor
-            
             <tr class="total-row">
-                @php
-                    $sum1 = $allWeights->slice(0, $rowsPerCol)->sum('weight');
-                    $sum2 = $allWeights->slice($rowsPerCol, $rowsPerCol)->sum('weight');
-                    $sum3 = $allWeights->slice(2 * $rowsPerCol)->sum('weight');
-                @endphp
-                <td>T</td><td>{{ number_format($sum1, 2) }}</td>
-                <td>T</td><td>{{ number_format($sum2, 2) }}</td>
-                <td>T</td><td>{{ number_format($sum3, 2) }}</td>
+                @for($c=0; $c < $cols; $c++)
+                    @php $colSum = $allWeights->slice($c * $maxRows, $maxRows)->sum('weight'); @endphp
+                    <td>T</td><td>{{ number_format($colSum, 2) }}</td>
+                @endfor
             </tr>
         </tbody>
     </table>
 
-    <table class="financial-container">
+    @php
+        $avarieMod = (1 - ($purchaseInvoice->avarie_pct / 100));
+        $weightPF = $allWeights->where('calibre', 'PF')->sum('weight');
+        $weightGF = $allWeights->where('calibre', 'GF')->sum('weight');
+        $poidsMarchandPF = $weightPF * $avarieMod;
+        $poidsMarchandGF = $weightGF * $avarieMod;
+        $montantTotalFruis = ($poidsMarchandPF * ($purchaseInvoice->pu_pf ?? 0)) + ($poidsMarchandGF * ($purchaseInvoice->pu_gf ?? 0));
+        $totalPrime = $purchaseInvoice->total_weight * ($purchaseInvoice->prime_bio_kg ?? 0);
+        $montantTotalBrut = $montantTotalFruis + $totalPrime;
+    @endphp
+
+    <table class="financial-grid">
         <tr>
-            <td class="financial-box" style="width: 48%; border-right: none;">
-                <table class="financial-table">
-                    <tr>
-                        <td class="fin-label">Poids Brut Total</td>
-                        <td class="fin-value">{{ number_format($purchaseInvoice->total_weight, 2) }} kg</td>
+            <td class="fin-box" style="border-right:none">
+                <table class="fin-table">
+                    <tr><td class="fin-label">Poids Total</td><td class="fin-val">{{ number_format($purchaseInvoice->total_weight, 2, ',', ' ') }} kg</td></tr>
+                    <tr><td class="fin-label">P.U PF</td><td class="fin-val" style="color:#3182ce">{{ number_format($purchaseInvoice->pu_pf) }} <small>FCFA/kg</small></td></tr>
+                    <tr><td class="fin-label">P.U GF</td><td class="fin-val" style="color:#dd6b20">{{ number_format($purchaseInvoice->pu_gf) }} <small>FCFA/kg</small></td></tr>
+                    <tr><td class="fin-label">Montant Total Fruits</td><td class="fin-val">{{ number_format($montantTotalFruis, 0, ',', ' ') }} FCFA</td></tr>
+                    <tr class="net-a-payer-row">
+                        <td class="net-label">Net à Payer</td>
+                        <td class="net-val">{{ number_format($purchaseInvoice->net_a_payer, 0, ',', ' ') }} FCFA</td>
                     </tr>
-                    <tr>
-                        <td class="fin-label">Poids Marchand PF <span style="font-weight: normal; text-transform: none;">({{ number_format($purchaseInvoice->pu_pf ?? 0) }} /kg)</span></td>
-                        <td class="fin-value">{{ number_format($poidsMarchandPF, 2) }} kg</td>
-                    </tr>
-                    <tr>
-                        <td class="fin-label">Poids Marchand GF <span style="font-weight: normal; text-transform: none;">({{ number_format($purchaseInvoice->pu_gf ?? 0) }} /kg)</span></td>
-                        <td class="fin-value">{{ number_format($poidsMarchandGF, 2) }} kg</td>
-                    </tr>
-                    <tr>
-                        <td class="fin-label">Prime Biologique total</td>
-                        <td class="fin-value" style="color:#059669">+ {{ number_format($totalPrime, 0, ',', ' ') }} FCFA</td>
-                    </tr>
+                    <tr><td class="fin-label">Prime Bio/kg</td><td class="fin-val">{{ number_format($purchaseInvoice->prime_bio_kg) }} <small>FCFA/kg</small></td></tr>
                 </table>
             </td>
-            <td style="width: 4%;"></td>
-            <td class="financial-box" style="width: 48%;">
-                <table class="financial-table">
+            <td width="2%"></td>
+            <td class="fin-box">
+                <table class="fin-table">
+                    <tr><td class="fin-label">Poids Marchand Petit Fruit</td><td class="fin-val" style="color:#3182ce">{{ number_format($poidsMarchandPF, 2, ',', ' ') }} kg</td></tr>
+                    <tr><td class="fin-label">Poids Marchand Gros Fruit</td><td class="fin-val" style="color:#dd6b20">{{ number_format($poidsMarchandGF, 2, ',', ' ') }} kg</td></tr>
+                    <tr><td class="fin-label">Total Crédit</td><td class="fin-val" style="color:#e53e3e">{{ number_format($purchaseInvoice->total_credit, 0, ',', ' ') }} FCFA</td></tr>
                     <tr>
-                        <td class="fin-label">Retrait Crédit / Avance</td>
-                        <td class="fin-value" style="color:#dc2626">- {{ number_format($purchaseInvoice->total_credit, 0, ',', ' ') }} FCFA</td>
-                    </tr>
-                    <tr>
-                        <td class="fin-label">Valeur Marchandises</td>
-                        <td class="fin-value">{{ number_format($montantMarchand, 0, ',', ' ') }} FCFA</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="net-payable-box">
-                            <span class="net-label">Net à Payer</span>
-                            <span class="net-value">{{ number_format($purchaseInvoice->net_a_payer, 0, ',', ' ') }} FCFA</span>
+                        <td colspan="2">
+                            <div style="font-size: 7px; color: #999; text-transform: uppercase;">Net à payer en lettre :</div>
+                            <div style="font-weight: 1000; font-size: 9px; margin-top: 2px;">{{ $purchaseInvoice->net_payer_lettre ?: '—' }}</div>
                         </td>
                     </tr>
-                    <tr>
-                        <td colspan="2" class="in-words-box">
-                            <span class="words-label">Montant en toutes lettres :</span>
-                            <span class="words-value">{{ $purchaseInvoice->net_payer_lettre ?: '—' }}</span>
-                        </td>
-                    </tr>
+                    <tr><td class="fin-label">Montant Total de la Prime</td><td class="fin-val">{{ number_format($totalPrime, 0, ',', ' ') }} FCFA</td></tr>
                 </table>
             </td>
         </tr>
     </table>
 
-    <table class="signature-table">
+    <table class="sign-container">
         <tr>
-            <td class="signature-box">
-                <span class="signature-title">A2C SAM / Responsable</span>
+            <td class="sign-box">
+                <span class="sign-title">Bio Farm Trading / Responsable</span>
                 @if($purchaseInvoice->signature_resp)
-                    <img src="{{ $purchaseInvoice->signature_resp }}" class="signature-img">
+                    <img src="{{ $purchaseInvoice->signature_resp }}" class="sign-img">
                 @endif
-                <span class="signature-hint">Signature & Cachet</span>
+                <div class="sign-footer">Signature & Cachet</div>
             </td>
-            <td style="width: 4%;"></td>
-            <td class="signature-box">
-                <span class="signature-title">Le Producteur / Livreur</span>
+            <td width="2%"></td>
+            <td class="sign-box">
+                <span class="sign-title">Le Producteur</span>
                 @if($purchaseInvoice->signature_prod)
-                    <img src="{{ $purchaseInvoice->signature_prod }}" class="signature-img">
+                    <img src="{{ $purchaseInvoice->signature_prod }}" class="sign-img">
                 @endif
-                <span class="signature-hint">Signature</span>
+                <div class="sign-footer">Signature</div>
             </td>
         </tr>
     </table>
 
-    <div class="small-footer">
-        BIO FARM TRADING - NIF 1002966783 - Tél : (+229) 97562640 / 97264340 - Capital 51 000 000 FCFA - www.biofarmtrading.com<br>
-        Généré le {{ now()->format('d/m/Y à H:i') }} par {{ Auth::user()->name ?? 'Système' }} · Document Officiel Bio Farm
+    <div class="footer">
+        Généré le {{ now()->format('d/m/Y à H:i') }} par {{ Auth::user()->name ?? 'Achat Coopérative' }} - BIO FARM TRADING
     </div>
 
 </body>
