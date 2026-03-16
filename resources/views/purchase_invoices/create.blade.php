@@ -235,8 +235,8 @@
                                             {{ str_pad($absIdx+1, 3, '0', STR_PAD_LEFT) }}
                                         </div>
                                         <div style="flex: 1; padding: 4px 6px; position: relative;">
-                                            <input type="number" step="0.01" x-model.number="weights[{{ $absIdx }}]"
-                                                :class="calibres[{{ $absIdx }}] === 'GF' ? 'border-orange-400 focus:ring-orange-200 text-orange-900' : 'border-slate-200 focus:ring-blue-200 text-blue-900'"
+                                            <input type="number" step="0.01" x-model.number="weights[{{ $absIdx }}]" @input="updateAll()"
+                                                :class="calibres[{{ $absIdx }}] === 'GF' ? 'border-orange-400 focus:ring-orange-200 text-orange-900 border-2' : 'border-slate-200 focus:ring-blue-200 text-blue-900'"
                                                 class="w-full text-center py-1.5 text-[11px] font-black bg-white border rounded focus:border-indigo-500 transition-all shadow-sm" 
                                                 placeholder="0">
                                             
@@ -372,9 +372,9 @@
             </div>
 
             {{-- Hidden fields for CSV transport (Nuclear Option for Reliability) --}}
-            <input type="hidden" name="weights_csv" :value="weights.map(v => v === null ? '' : v).join(',')">
-            <input type="hidden" name="calibres_csv" :value="calibres.join(',')">
-            <input type="hidden" name="net_payer_lettre" :value="netAPayerLettre">
+            <input type="hidden" name="weights_csv" x-model="weightsCSV">
+            <input type="hidden" name="calibres_csv" x-model="calibresCSV">
+            <input type="hidden" name="net_payer_lettre" x-model="netAPayerLettre">
         </form>
     </div>
 </div>
@@ -437,6 +437,8 @@
 
             updateAll() {
                 this.netAPayerLettre = this.numberToWords(this.netAPayer());
+                this.weightsCSV = this.weights.map(v => (v === null || v === undefined || v === '') ? '' : v).join(',');
+                this.calibresCSV = this.calibres.join(',');
             },
 
             toggleCalibre(idx) {
