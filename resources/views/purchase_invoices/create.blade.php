@@ -14,14 +14,20 @@
         pointer-events: auto !important;
         cursor: pointer !important;
     }
+    .weight-input {
+        transition: all 0.2s;
+    }
+    .weight-input:focus {
+        outline: none;
+        ring: 2px solid #3b82f6;
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="min-h-screen bg-slate-100 py-5" 
      x-data="purchaseInvoiceForm()" 
-     x-init="initForm()"
-     @keydown.escape="open = false">
+     x-init="initForm">
     
     <div class="max-w-6xl mx-auto px-4">
         {{-- TOP BAR --}}
@@ -220,19 +226,28 @@
                                 @php $idx = $colOffset + $row; @endphp
                                 <div class="flex items-center p-1 border-b border-slate-100 last:border-0">
                                     <span class="w-8 text-[9px] font-bold text-slate-400">{{ str_pad($idx+1, 3, '0', STR_PAD_LEFT) }}</span>
-                                    <input type="number" step="0.01" 
+                                    
+                                    {{-- Input de poids avec liaison bidirectionnelle Alpine et nom pour PHP --}}
+                                    <input type="number" 
+                                           step="0.01" 
                                            name="weights[{{ $idx }}]"
                                            x-model="weights[{{ $idx }}]"
                                            @input="updateStats"
-                                           class="w-16 text-center text-[10px] font-bold border rounded py-1"
+                                           class="w-16 text-center text-[10px] font-bold border rounded py-1 weight-input"
                                            :class="calibres[{{ $idx }}] === 'GF' ? 'border-orange-300 bg-orange-50' : 'border-blue-200'">
+                                    
+                                    {{-- Bouton pour changer le calibre --}}
                                     <button type="button"
                                             @click="toggleCalibre({{ $idx }})"
                                             class="ml-1 px-1.5 py-0.5 text-[8px] font-black rounded"
                                             :class="calibres[{{ $idx }}] === 'GF' ? 'bg-orange-600 text-white' : 'bg-blue-600 text-white'">
                                         <span x-text="calibres[{{ $idx }}]"></span>
                                     </button>
-                                    <input type="hidden" name="calibres[{{ $idx }}]" :value="calibres[{{ $idx }}]">
+                                    
+                                    {{-- Hidden pour envoyer le calibre au serveur --}}
+                                    <input type="hidden" 
+                                           name="calibres[{{ $idx }}]" 
+                                           :value="calibres[{{ $idx }}]">
                                 </div>
                                 @endfor
                             </div>
@@ -484,6 +499,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Initialiser les signatures
         ['signature-resp', 'signature-prod'].forEach(id => {
             const canvas = document.getElementById(id);
             if (canvas) {
@@ -494,30 +510,35 @@
         window.addEventListener("resize", resizeCanvas);
         
         // Gestionnaire de soumission
-        document.getElementById('mainForm').addEventListener('submit', function(e) {
-            // Récupérer les signatures
-            if (sigPads['signature-resp']) {
-                document.getElementById('signature_resp_input').value = 
-                    sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
-            }
-            if (sigPads['signature-prod']) {
-                document.getElementById('signature_prod_input').value = 
-                    sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
-            }
-            
-            // Vérifier les poids
-            const weights = document.querySelectorAll('input[name^="weights"]');
-            let hasWeight = false;
-            weights.forEach(w => {
-                if (parseFloat(w.value) > 0) hasWeight = true;
+        const form = document.getElementById('mainForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Récupérer les signatures
+                if (sigPads['signature-resp']) {
+                    document.getElementById('signature_resp_input').value = 
+                        sigPads['signature-resp'].isEmpty() ? '' : sigPads['signature-resp'].toDataURL();
+                }
+                if (sigPads['signature-prod']) {
+                    document.getElementById('signature_prod_input').value = 
+                        sigPads['signature-prod'].isEmpty() ? '' : sigPads['signature-prod'].toDataURL();
+                }
+                
+                // Vérifier les poids
+                const weightInputs = document.querySelectorAll('input[name^="weights"]');
+                let hasWeight = false;
+                weightInputs.forEach(input => {
+                    if (parseFloat(input.value) > 0) {
+                        hasWeight = true;
+                    }
+                });
+                
+                if (!hasWeight) {
+                    e.preventDefault();
+                    alert('ERREUR : Vous n\'avez saisi aucun poids !');
+                    return false;
+                }
             });
-            
-            if (!hasWeight) {
-                e.preventDefault();
-                alert('ERREUR : Vous n\'avez saisi aucun poids !');
-                return false;
-            }
-        });
+        }
     });
 </script>
 @endpush
