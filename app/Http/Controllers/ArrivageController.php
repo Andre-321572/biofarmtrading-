@@ -95,4 +95,31 @@ class ArrivageController extends Controller
         $arrivage->load('details');
         return Excel::download(new ArrivageExport($arrivage), 'arrivage-' . $arrivage->id . '.xlsx');
     }
+
+    public function edit(Arrivage $arrivage)
+    {
+        return view('arrivages.edit', compact('arrivage'));
+    }
+
+    public function update(Request $request, Arrivage $arrivage)
+    {
+        $validated = $request->validate([
+            'chauffeur' => 'required|string|max:255',
+            'matricule_camion' => 'required|string|max:255',
+            'date_arrivage' => 'required|date',
+            'zone_provenance' => 'required|string|max:255',
+            'ph' => 'nullable|string|max:20',
+            'brix' => 'nullable|string|max:20',
+        ]);
+
+        $arrivage->update($validated);
+
+        return redirect()->route('arrivages.index')->with('success', 'Entête de l\'arrivage modifiée avec succès.');
+    }
+
+    public function destroy(Arrivage $arrivage)
+    {
+        $arrivage->delete();
+        return redirect()->route('arrivages.index')->with('success', 'Arrivage supprimé avec succès.');
+    }
 }

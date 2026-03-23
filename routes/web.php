@@ -65,6 +65,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/arrivages/create', [\App\Http\Controllers\ArrivageController::class, 'create'])->name('arrivages.create');
         Route::post('/arrivages', [\App\Http\Controllers\ArrivageController::class, 'store'])->name('arrivages.store');
         Route::get('/arrivages/{arrivage}', [\App\Http\Controllers\ArrivageController::class, 'show'])->name('arrivages.show');
+        Route::get('/arrivages/{arrivage}/edit', [\App\Http\Controllers\ArrivageController::class, 'edit'])->name('arrivages.edit');
+        Route::put('/arrivages/{arrivage}', [\App\Http\Controllers\ArrivageController::class, 'update'])->name('arrivages.update');
+        Route::delete('/arrivages/{arrivage}', [\App\Http\Controllers\ArrivageController::class, 'destroy'])->name('arrivages.destroy');
         Route::get('/arrivages/{arrivage}/pdf', [\App\Http\Controllers\ArrivageController::class, 'pdf'])->name('arrivages.pdf');
         Route::get('/arrivages/{arrivage}/excel', [\App\Http\Controllers\ArrivageController::class, 'excel'])->name('arrivages.excel');
     });
