@@ -104,6 +104,7 @@ class ArrivageController extends Controller
     public function update(Request $request, Arrivage $arrivage)
     {
         $validated = $request->validate([
+            'custom_bon_ref' => 'nullable|string|max:255',
             'chauffeur' => 'required|string|max:255',
             'matricule_camion' => 'required|string|max:255',
             'date_arrivage' => 'required|date',

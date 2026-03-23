@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Arrivage extends Model
 {
     protected $fillable = [
+        'custom_bon_ref',
         'chauffeur',
         'matricule_camion',
         'date_arrivage',
@@ -78,6 +79,10 @@ class Arrivage extends Model
 
     public function getBonRefAttribute()
     {
+        if ($this->custom_bon_ref) {
+            return $this->custom_bon_ref;
+        }
+
         $firstDetail = $this->details->first();
         $fruit_c = $firstDetail ? strtoupper($firstDetail->fruit) : 'DIV';
         

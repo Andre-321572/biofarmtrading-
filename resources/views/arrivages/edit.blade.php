@@ -44,6 +44,18 @@
 
                 <div class="p-6 sm:p-8 space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- N° de Bon / Ref (Optionnel) -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-slate-700">N° de Bon / Référence <span class="text-slate-400 font-normal text-xs">(Optionnel)</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-hashtag"></i>
+                                </span>
+                                <input type="text" name="custom_bon_ref" value="{{ old('custom_bon_ref', $arrivage->custom_bon_ref) }}" autocomplete="off"
+                                       class="pl-10 w-full rounded-xl border-slate-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm text-sm uppercase-input" placeholder="{{ $arrivage->bon_ref }}">
+                            </div>
+                        </div>
+
                         <!-- Date -->
                         <div class="space-y-2">
                             <label class="block text-sm font-bold text-slate-700">Date de l'arrivage <span class="text-red-500">*</span></label>
