@@ -130,6 +130,12 @@
                                             <i class="fa-solid fa-eye"></i>
                                         </a>
 
+                                        <a href="{{ route('arrivages.edit', $arrivage) }}" 
+                                           class="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors group-hover:bg-white" 
+                                           title="Modifier l'entête">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+
                                         <a href="{{ route('arrivages.pdf', $arrivage) }}" 
                                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors group-hover:bg-white"
                                            title="Télécharger PDF">
@@ -141,6 +147,14 @@
                                            title="Exporter Excel">
                                             <i class="fa-solid fa-file-excel"></i>
                                         </a>
+
+                                        <form action="{{ route('arrivages.destroy', $arrivage) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet arrivage ?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors group-hover:bg-white" title="Supprimer">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
