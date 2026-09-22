@@ -159,7 +159,11 @@ class AttendanceController extends Controller
         ]);
         
         foreach ($request->workers as $workerData) {
-            Worker::create($workerData);
+            Worker::create([
+                'first_name' => trim($workerData['first_name']),
+                'last_name' => trim(mb_strtoupper($workerData['last_name'])),
+                'shift' => $workerData['shift'],
+            ]);
         }
         
         return back()->with('success', count($request->workers) . ' ouvriers ajoutés avec succès.');
@@ -176,7 +180,11 @@ class AttendanceController extends Controller
             'shift' => 'required|in:day,night',
         ]);
 
-        $worker->update($request->all());
+        $worker->update([
+            'first_name' => trim($request->first_name),
+            'last_name' => trim(mb_strtoupper($request->last_name)),
+            'shift' => $request->shift,
+        ]);
 
         return back()->with('success', 'Ouvrier mis à jour avec succès.');
     }
