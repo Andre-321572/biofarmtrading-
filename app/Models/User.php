@@ -45,6 +45,11 @@ class User extends Authenticatable
         return $this->role === 'rh';
     }
 
+    public function isRp()
+    {
+        return $this->role === 'rp';
+    }
+
     public function isAchatCooperative()
     {
         return $this->role === 'achat_cooperative';

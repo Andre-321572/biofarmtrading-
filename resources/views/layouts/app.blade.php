@@ -145,6 +145,20 @@
                             </x-nav-link-custom>
                         </li>
                     @endif
+
+                    @if(Auth::user()->role === 'rp' || Auth::user()->role === 'admin')
+                        <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Responsable Production (RP)</li>
+                        <li>
+                            <x-nav-link-custom href="{{ route('rp.dashboard') }}" :active="request()->routeIs('rp.dashboard')" icon="dashboard">
+                                {{ __('Tableau de bord') }}
+                            </x-nav-link-custom>
+                        </li>
+                        <li>
+                            <x-nav-link-custom href="{{ route('rp.production-reports.index') }}" :active="request()->routeIs('rp.production-reports.*')" icon="reports">
+                                {{ __('Rapports Journaliers') }}
+                            </x-nav-link-custom>
+                        </li>
+                    @endif
                 </ul>
             </nav>
             

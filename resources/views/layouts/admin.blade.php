@@ -74,6 +74,14 @@
                     </x-nav-link-custom>
                 </li>
 
+                <!-- Production Section -->
+                <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Production</li>
+                <li>
+                    <x-nav-link-custom href="{{ route('rp.production-reports.index') }}" :active="request()->routeIs('rp.production-reports.*')" icon="reports">
+                        {{ __('Rapports de Production') }}
+                    </x-nav-link-custom>
+                </li>
+
                 <!-- HR Section -->
                 <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Ressources Humaines</li>
                 <li>

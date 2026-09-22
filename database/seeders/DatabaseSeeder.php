@@ -35,6 +35,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Responsable Production (RP) User
+        $this->call(RpUserSeeder::class);
+
         // Shops
         \App\Models\Shop::create([
             'name' => 'Boutique Cacaveli',

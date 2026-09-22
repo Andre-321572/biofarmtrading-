@@ -54,6 +54,15 @@
                             {{ __('Achat Coopérative') }}
                         </x-nav-link>
                     @endif
+
+                    @if(Auth::user()->role === 'rp' || Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('rp.dashboard')" :active="request()->routeIs('rp.dashboard')">
+                            {{ __('Dashboard RP') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('rp.production-reports.index')" :active="request()->routeIs('rp.production-reports.*')">
+                            {{ __('Rapports de Production') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -146,6 +155,15 @@
             @if(Auth::user()->role === 'achat_cooperative' || Auth::user()->role === 'admin')
                 <x-responsive-nav-link :href="route('purchase_invoices.index')" :active="request()->routeIs('purchase_invoices.*')">
                     {{ __('Achat Coopérative') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(Auth::user()->role === 'rp' || Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('rp.dashboard')" :active="request()->routeIs('rp.dashboard')">
+                    {{ __('Dashboard RP') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('rp.production-reports.index')" :active="request()->routeIs('rp.production-reports.*')">
+                    {{ __('Rapports de Production') }}
                 </x-responsive-nav-link>
             @endif
         </div>

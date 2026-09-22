@@ -35,10 +35,13 @@ class AttendanceController extends Controller
 
         $allWorkers = Worker::with(['attendances' => function($q) use ($startOfWeek, $endOfWeek) {
             $q->whereBetween('date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')]);
-        }])->orderBy('last_name')->get();
+        }])
+        ->orderBy('last_name', 'asc')
+        ->orderBy('first_name', 'asc')
+        ->get();
 
-        $dayWorkers = $allWorkers->where('shift', 'day');
-        $nightWorkers = $allWorkers->where('shift', 'night');
+        $dayWorkers = $allWorkers->where('shift', 'day')->sortBy([['last_name', 'asc'], ['first_name', 'asc']]);
+        $nightWorkers = $allWorkers->where('shift', 'night')->sortBy([['last_name', 'asc'], ['first_name', 'asc']]);
         $workers = $allWorkers;
 
         return view('admin.attendance.index', compact('dayWorkers', 'nightWorkers', 'workers', 'days', 'startOfWeek', 'endOfWeek', 'prevWeek', 'nextWeek'));
@@ -198,10 +201,13 @@ class AttendanceController extends Controller
 
         $allWorkers = Worker::with(['attendances' => function($q) use ($startOfWeek, $endOfWeek) {
             $q->whereBetween('date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')]);
-        }])->orderBy('last_name')->get();
+        }])
+        ->orderBy('last_name', 'asc')
+        ->orderBy('first_name', 'asc')
+        ->get();
 
-        $dayWorkers = $allWorkers->where('shift', 'day');
-        $nightWorkers = $allWorkers->where('shift', 'night');
+        $dayWorkers = $allWorkers->where('shift', 'day')->sortBy([['last_name', 'asc'], ['first_name', 'asc']]);
+        $nightWorkers = $allWorkers->where('shift', 'night')->sortBy([['last_name', 'asc'], ['first_name', 'asc']]);
 
         $pdf = Pdf::loadView('admin.attendance.pdf_weekly', compact('dayWorkers', 'nightWorkers', 'days', 'startOfWeek', 'endOfWeek'))
                   ->setPaper('a4', 'landscape'); // Landscape to fit the week

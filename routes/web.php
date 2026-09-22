@@ -24,6 +24,18 @@ Route::post('/caisse', [OrderController::class, 'store'])->middleware('throttle:
 Route::get('/commande/succes/{id}', [OrderController::class, 'success'])->name('order.success');
 
 Route::get('/dashboard', function () {
+    if (Illuminate\Support\Facades\Auth::check()) {
+        $role = Illuminate\Support\Facades\Auth::user()->role;
+        if ($role === 'rp') {
+            return redirect()->route('rp.dashboard');
+        } elseif ($role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($role === 'manager') {
+            return redirect()->route('manager.sales.index');
+        } elseif ($role === 'rh') {
+            return redirect()->route('rh.attendance.index');
+        }
+    }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -102,6 +114,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/workers', [\App\Http\Controllers\AttendanceController::class, 'storeWorkers'])->name('attendance.store_workers');
         Route::patch('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'updateWorker'])->name('attendance.update_worker');
         Route::delete('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'destroyWorker'])->name('attendance.destroy_worker');
+    });
+
+    // Responsable Production (RP) Routes
+    Route::middleware(['auth', 'rp'])->prefix('rp')->name('rp.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Rp\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/production-reports/{production_report}/pdf', [\App\Http\Controllers\Rp\ProductionReportController::class, 'pdf'])->name('production-reports.pdf');
+        Route::get('/production-reports/{production_report}/excel', [\App\Http\Controllers\Rp\ProductionReportController::class, 'excel'])->name('production-reports.excel');
+        Route::resource('production-reports', \App\Http\Controllers\Rp\ProductionReportController::class);
     });
 });
 

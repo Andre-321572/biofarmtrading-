@@ -297,8 +297,8 @@
 </div>
 
 <datalist id="zones_list"><option value="Avé"><option value="Zio"><option value="Vo"><option value="Danyi"></datalist>
-<datalist id="chauffeurs_list"><option value="SOUMAGBO Yao"><option value="AGBADZI Komi Victor"></datalist>
-<datalist id="matricules_list"><option value="TG 7151 BL"><option value="TG 7238 BL"></datalist>
+<datalist id="chauffeurs_list"><option value="SOUMAGBO Yao"><option value="AGBADZI Komi Victor"> <option value="MORKLEY Komi"><option value="AMEGBETO K. Promise"></datalist>
+<datalist id="matricules_list"><option value="TG 7151 BL"><option value="TG 7238 BL"><option value="BD 2671"><option value="BH 5895"><option value="BH 5588"><option value="EL 2473"></datalist>
 <datalist id="fruits_list"><option value="Ananas Cayenne"><option value="Ananas Braza"></datalist>
 
 @push('scripts')
