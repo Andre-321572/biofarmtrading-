@@ -18,7 +18,17 @@ class RhUserSeeder extends Seeder
             ['email' => 'rh@biofarm.com'],
             [
                 'name' => 'Ressources Humaines',
-                'password' => 'rh123456',
+                'password' => Hash::make('rh123456'),
+                'role' => 'rh',
+                'email_verified_at' => Carbon::now(),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'rh@biofarmtrading.com'],
+            [
+                'name' => 'Ressources Humaines (Trading)',
+                'password' => Hash::make('rh123456'),
                 'role' => 'rh',
                 'email_verified_at' => Carbon::now(),
             ]

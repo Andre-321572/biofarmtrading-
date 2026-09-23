@@ -19,7 +19,7 @@
             <div class="mb-6 flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 gap-4">
                 <div class="flex items-center gap-4">
                     <div class="p-2 bg-slate-50 rounded-2xl">
-                        <img src="{{ public_path('images/biofarm_logo.jpg') }}" class="w-12 h-12 object-contain" onerror="this.src='/images/biofarm_logo.jpg'">
+                        <img src="{{ asset('images/biofarm_logo.jpg') }}" class="w-12 h-12 object-contain" onerror="this.src='/images/biofarm_logo.jpg'">
                     </div>
                     <div>
                         <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">
@@ -118,12 +118,12 @@
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto custom-scrollbar shadow-inner">
-                        <table class="w-full border-collapse text-[11px] font-medium leading-none min-w-[1000px]">
+                        <table class="w-full border-collapse text-[11px] font-medium leading-none min-w-[1200px]">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100 italic">
-                                    <th rowspan="2" class="px-2 py-4 w-10 text-center text-slate-400 border-r border-slate-100 md:sticky md:left-0 bg-slate-50 z-20">N°</th>
-                                    <th rowspan="2" class="px-4 py-4 text-left w-32 md:w-48 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 md:sticky md:left-10 bg-slate-50 z-20">Nom</th>
-                                    <th rowspan="2" class="px-4 py-4 text-left w-40 md:w-56 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 md:sticky md:left-[14.5rem] bg-slate-50 z-20">Prénoms</th>
+                                    <th rowspan="2" class="px-2 py-4 w-10 min-w-[40px] max-w-[40px] text-center text-slate-400 border-r border-slate-100 sticky left-0 bg-slate-50 z-20">N°</th>
+                                    <th rowspan="2" class="px-3 py-4 text-left w-36 min-w-[144px] max-w-[144px] border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[40px] bg-slate-50 z-20">Nom</th>
+                                    <th rowspan="2" class="px-3 py-4 text-left w-40 min-w-[160px] max-w-[160px] border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[184px] bg-slate-50 z-20">Prénoms</th>
                                     @foreach($days as $day)
                                         <th colspan="2" class="px-1 py-3 text-center border-r border-slate-100 {{ $day->isToday() ? 'bg-green-50/50' : '' }}">
                                             <span class="block uppercase font-black text-slate-700 tracking-tighter text-[10px] md:text-[11px]">{{ $day->translatedFormat('D') }}</span>
@@ -135,8 +135,8 @@
                                 </tr>
                                 <tr class="bg-slate-50/30 border-b border-slate-100">
                                     @foreach($days as $day)
-                                        <th class="py-1.5 text-center w-12 border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">ARR.</th>
-                                        <th class="py-1.5 text-center w-12 border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">DÉP.</th>
+                                        <th class="py-1.5 text-center w-14 min-w-[56px] max-w-[56px] border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">ARR.</th>
+                                        <th class="py-1.5 text-center w-14 min-w-[56px] max-w-[56px] border-r border-slate-100 text-[9px] font-black text-slate-400 {{ $day->isToday() ? 'bg-green-50/80 text-green-700' : '' }}">DÉP.</th>
                                     @endforeach
                                 </tr>
                             </thead>
@@ -169,9 +169,9 @@
                                         $totalHours = $h . 'h' . ($m > 0 ? sprintf('%02d', $m) : '');
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
-                                        <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] md:sticky md:left-0 bg-white group-hover:bg-slate-50 z-10">{{ $loop->iteration }}</td>
-                                        <td class="px-4 py-3 font-black text-slate-800 uppercase tracking-tighter border-r border-slate-100 md:sticky md:left-10 bg-white group-hover:bg-slate-50 z-10 truncate max-w-[120px] md:max-w-none">{{ $worker->last_name }}</td>
-                                        <td class="px-4 py-3 text-slate-500 font-bold italic border-r border-slate-100 md:sticky md:left-[14.5rem] bg-white group-hover:bg-slate-50 z-10 truncate max-w-[140px] md:max-w-none">{{ $worker->first_name }}</td>
+                                        <td class="py-3 w-10 min-w-[40px] max-w-[40px] text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $loop->iteration }}</td>
+                                        <td class="px-3 py-3 w-36 min-w-[144px] max-w-[144px] font-black text-slate-800 uppercase tracking-tighter border-r border-slate-100 sticky left-[40px] bg-white group-hover:bg-slate-50 z-10 truncate" title="{{ $worker->last_name }}">{{ $worker->last_name }}</td>
+                                        <td class="px-3 py-3 w-40 min-w-[160px] max-w-[160px] text-slate-500 font-bold italic border-r border-slate-100 sticky left-[184px] bg-white group-hover:bg-slate-50 z-10 truncate" title="{{ $worker->first_name }}">{{ $worker->first_name }}</td>
                                         
                                         @foreach($days as $day)
                                             @php
@@ -237,12 +237,12 @@
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto custom-scrollbar shadow-inner">
-                        <table class="w-full border-collapse text-[11px] font-medium leading-none min-w-[1000px]">
+                        <table class="w-full border-collapse text-[11px] font-medium leading-none min-w-[900px]">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100 italic">
-                                    <th class="px-2 py-4 w-10 text-center text-slate-400 border-r border-slate-100 md:sticky md:left-0 bg-slate-50 z-20">N°</th>
-                                    <th class="px-4 py-4 text-left w-32 md:w-48 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 md:sticky md:left-10 bg-slate-50 z-20">Nom</th>
-                                    <th class="px-4 py-4 text-left w-40 md:w-56 border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 md:sticky md:left-[14.5rem] bg-slate-50 z-20">Prénoms</th>
+                                    <th class="px-2 py-4 w-10 min-w-[40px] max-w-[40px] text-center text-slate-400 border-r border-slate-100 sticky left-0 bg-slate-50 z-20">N°</th>
+                                    <th class="px-3 py-4 text-left w-36 min-w-[144px] max-w-[144px] border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[40px] bg-slate-50 z-20">Nom</th>
+                                    <th class="px-3 py-4 text-left w-40 min-w-[160px] max-w-[160px] border-r border-slate-100 uppercase tracking-wider font-black text-slate-600 sticky left-[184px] bg-slate-50 z-20">Prénoms</th>
                                     @foreach($days as $day)
                                         <th class="px-1 py-3 text-center border-r border-slate-100 {{ $day->isToday() ? 'bg-green-50/50' : '' }}">
                                             <span class="block uppercase font-black text-slate-700 tracking-tighter text-[10px] md:text-[11px]">{{ $day->translatedFormat('D') }}</span>
@@ -268,9 +268,9 @@
                                         $totalHoursNight = floor($totalMinutesNight / 60) . 'h' . ($totalMinutesNight % 60 > 0 ? sprintf('%02d', $totalMinutesNight % 60) : '');
                                     @endphp
                                     <tr class="hover:bg-slate-50/50 transition-colors group">
-                                        <td class="py-3 text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] md:sticky md:left-0 bg-white group-hover:bg-slate-50 z-10">{{ $loop->iteration }}</td>
-                                        <td class="px-4 py-3 font-black text-slate-800 uppercase tracking-tighter border-r border-slate-100 md:sticky md:left-10 bg-white group-hover:bg-slate-50 z-10 truncate max-w-[120px] md:max-w-none">{{ $worker->last_name }}</td>
-                                        <td class="px-4 py-3 text-slate-500 font-bold italic border-r border-slate-100 md:sticky md:left-[14.5rem] bg-white group-hover:bg-slate-50 z-10 truncate max-w-[140px] md:max-w-none">{{ $worker->first_name }}</td>
+                                        <td class="py-3 w-10 min-w-[40px] max-w-[40px] text-center font-bold text-slate-300 border-r border-slate-100 text-[10px] sticky left-0 bg-white group-hover:bg-slate-50 z-10">{{ $loop->iteration }}</td>
+                                        <td class="px-3 py-3 w-36 min-w-[144px] max-w-[144px] font-black text-slate-800 uppercase tracking-tighter border-r border-slate-100 sticky left-[40px] bg-white group-hover:bg-slate-50 z-10 truncate" title="{{ $worker->last_name }}">{{ $worker->last_name }}</td>
+                                        <td class="px-3 py-3 w-40 min-w-[160px] max-w-[160px] text-slate-500 font-bold italic border-r border-slate-100 sticky left-[184px] bg-white group-hover:bg-slate-50 z-10 truncate" title="{{ $worker->first_name }}">{{ $worker->first_name }}</td>
                                         
                                         @foreach($days as $day)
                                             @php

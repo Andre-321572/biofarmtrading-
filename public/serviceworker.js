@@ -1,27 +1,23 @@
-var staticCacheName = "pwa-v" + new Date().getTime();
+var staticCacheName = "pwa-v1";
 var filesToCache = [
     '/offline',
-    '/build/assets/app.css', // Adjust based on Vite build
-    '/build/assets/app.js',
-    '/images/icons/icon-72x72.png',
-    '/images/icons/icon-96x96.png',
-    '/images/icons/icon-128x128.png',
-    '/images/icons/icon-144x144.png',
-    '/images/icons/icon-152x152.png',
-    '/images/icons/icon-192x192.png',
-    '/images/icons/icon-384x384.png',
-    '/images/icons/icon-512x512.png',
+    '/images/logo.jpg',
+    '/images/biofarm_logo.jpg',
+    '/images/admin_sidebar_logo.jpg',
 ];
 
 // Cache on install
 self.addEventListener("install", event => {
-    this.skipWaiting();
+    self.skipWaiting();
     event.waitUntil(
-        caches.open(staticCacheName)
-            .then(cache => {
-                return cache.addAll(filesToCache);
-            })
-    )
+        caches.open(staticCacheName).then(cache => {
+            return Promise.allSettled(
+                filesToCache.map(url => 
+                    cache.add(url).catch(err => console.warn('PWA: Skipped uncacheable asset ' + url, err))
+                )
+            );
+        })
+    );
 });
 
 // Clear cache on activate

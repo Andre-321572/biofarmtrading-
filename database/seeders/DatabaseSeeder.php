@@ -38,6 +38,9 @@ class DatabaseSeeder extends Seeder
         // Responsable Production (RP) User
         $this->call(RpUserSeeder::class);
 
+        // Ressources Humaines (RH) User
+        $this->call(RhUserSeeder::class);
+
         // Shops
         \App\Models\Shop::create([
             'name' => 'Boutique Cacaveli',
