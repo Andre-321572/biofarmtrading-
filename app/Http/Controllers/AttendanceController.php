@@ -159,11 +159,18 @@ class AttendanceController extends Controller
         ]);
         
         foreach ($request->workers as $workerData) {
-            Worker::create([
-                'first_name' => trim($workerData['first_name']),
-                'last_name' => trim(mb_strtoupper($workerData['last_name'])),
-                'shift' => $workerData['shift'],
-            ]);
+            $lastName = trim(mb_strtoupper($workerData['last_name']));
+            $firstName = trim($workerData['first_name']);
+
+            Worker::firstOrCreate(
+                [
+                    'last_name' => $lastName,
+                    'first_name' => $firstName,
+                ],
+                [
+                    'shift' => $workerData['shift'],
+                ]
+            );
         }
         
         return back()->with('success', count($request->workers) . ' ouvriers ajoutés avec succès.');
