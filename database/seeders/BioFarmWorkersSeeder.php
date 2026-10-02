@@ -17,15 +17,19 @@ class BioFarmWorkersSeeder extends Seeder
             ["last_name" => "ADJOYI", "first_name" => "Olive", "shift" => "day"],
             ["last_name" => "AGBETY", "first_name" => "Adzo Audrey", "shift" => "day"],
             ["last_name" => "AGEDZI", "first_name" => "Wotsa", "shift" => "day"],
+            ["last_name" => "AHIAVOR", "first_name" => "Komi Amen", "shift" => "day"],
             ["last_name" => "AHOLOU", "first_name" => "Emilie", "shift" => "day"],
             ["last_name" => "AKOE", "first_name" => "Afi Sintia", "shift" => "day"],
             ["last_name" => "AKOGO", "first_name" => "Benjamin", "shift" => "day"],
             ["last_name" => "AKOGO", "first_name" => "Blaise", "shift" => "day"],
+            ["last_name" => "AKOHIN", "first_name" => "Yao Victorien", "shift" => "day"],
+            ["last_name" => "AKOTO", "first_name" => "Aku", "shift" => "day"],
             ["last_name" => "AKPAKA", "first_name" => "K Anicet", "shift" => "day"],
             ["last_name" => "AKPO", "first_name" => "Eyavi Fidele", "shift" => "day"],
             ["last_name" => "ALABA", "first_name" => "Mawulawoè", "shift" => "day"],
             ["last_name" => "ALKISSAN", "first_name" => "E.Bernard", "shift" => "day"],
             ["last_name" => "AMEGBLETO", "first_name" => "Mabelle", "shift" => "day"],
+            ["last_name" => "AMEKO", "first_name" => "Abla Esther", "shift" => "day"],
             ["last_name" => "ATCHIN", "first_name" => "Yao Ferdinand", "shift" => "day"],
             ["last_name" => "ATIGAN", "first_name" => "K.Charles Sélom", "shift" => "day"],
             ["last_name" => "ATIVON", "first_name" => "fidèle", "shift" => "day"],
@@ -99,11 +103,16 @@ class BioFarmWorkersSeeder extends Seeder
             ["last_name" => "YAKA", "first_name" => "K.Paul", "shift" => "night"]
         ];
 
+        $keptIds = [];
         foreach (array_merge($dayWorkers, $nightWorkers) as $worker) {
-            Worker::updateOrCreate(
+            $w = Worker::updateOrCreate(
                 ['last_name' => $worker['last_name'], 'first_name' => $worker['first_name']],
                 $worker
             );
+            $keptIds[] = $w->id;
         }
+
+        // Remove stale/duplicate worker records that are not in the master list
+        Worker::whereNotIn('id', $keptIds)->delete();
     }
 }
