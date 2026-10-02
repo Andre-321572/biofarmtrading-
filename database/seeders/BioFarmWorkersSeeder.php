@@ -104,15 +104,34 @@ class BioFarmWorkersSeeder extends Seeder
         ];
 
         $keptIds = [];
-        foreach (array_merge($dayWorkers, $nightWorkers) as $worker) {
-            $w = Worker::updateOrCreate(
-                ['last_name' => $worker['last_name'], 'first_name' => $worker['first_name']],
-                $worker
-            );
-            $keptIds[] = $w->id;
+
+        foreach (array_merge($dayWorkers, $nightWorkers) as $workerData) {
+            $lastName = trim(mb_strtoupper($workerData['last_name']));
+            $firstName = trim($workerData['first_name']);
+
+            // Search case-insensitively to prevent any casing duplication
+            $worker = Worker::whereRaw('LOWER(TRIM(last_name)) = ?', [mb_strtolower($lastName)])
+                ->whereRaw('LOWER(TRIM(first_name)) = ?', [mb_strtolower($firstName)])
+                ->first();
+
+            if ($worker) {
+                $worker->update([
+                    'last_name' => $lastName,
+                    'first_name' => $firstName,
+                    'shift' => $workerData['shift'],
+                ]);
+            } else {
+                $worker = Worker::create([
+                    'last_name' => $lastName,
+                    'first_name' => $firstName,
+                    'shift' => $workerData['shift'],
+                ]);
+            }
+
+            $keptIds[] = $worker->id;
         }
 
-        // Remove stale/duplicate worker records that are not in the master list
+        // Purge any extra, duplicate, or stale worker records not in the official list
         Worker::whereNotIn('id', $keptIds)->delete();
     }
 }
