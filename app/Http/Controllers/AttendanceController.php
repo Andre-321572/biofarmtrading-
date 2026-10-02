@@ -83,7 +83,7 @@ class AttendanceController extends Controller
             [
                 'worker_id' => $request->worker_id,
                 'date' => $request->date,
-                'session' => $request->session
+                'session' => $request->input('session')
             ],
             $data
         );
