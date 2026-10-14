@@ -12,7 +12,186 @@
     </x-slot>
 
     <div class="space-y-6 sm:space-y-8">
-        
+
+        <!-- Flash Success Notification -->
+        @if(session('success'))
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between shadow-sm animate-fade-in" x-data="{ show: true }" x-show="show">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold shadow-sm shadow-emerald-500/20 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-wider text-emerald-900">Paramétrage actualisé</p>
+                        <p class="text-xs font-semibold text-emerald-700 mt-0.5">{{ session('success') }}</p>
+                    </div>
+                </div>
+                <button @click="show = false" class="text-emerald-500 hover:text-emerald-800 p-1.5 rounded-lg hover:bg-emerald-100 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 flex items-center justify-between shadow-sm" x-data="{ show: true }" x-show="show">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center font-bold shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-wider text-red-900">Erreur de saisie</p>
+                        <ul class="text-xs font-medium text-red-700 mt-0.5 list-disc list-inside">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+                <button @click="show = false" class="text-red-500 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-100 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        @endif
+
+        <!-- Card Paramétrage Taux Horaire des Ouvriers (Admin) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden" 
+             x-data="{ rateInput: {{ $hourlyRate ?? 275 }} }">
+            
+            <!-- Header de la section avec bandeau vert clair délicat -->
+            <div class="px-6 py-4 bg-gradient-to-r from-emerald-50/70 via-slate-50/40 to-white border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black shadow-sm shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-extrabold text-gray-900 uppercase tracking-tight">
+                                Rémunération & Taux Horaire des Ouvriers
+                            </h3>
+                            <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                Direction Bio Farm
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 font-medium mt-0.5">
+                            Paramètre officiel appliqué aux fiches de paie et aux calculs des salaires mensuels
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Taux actif : <strong class="text-emerald-950 font-black">{{ number_format($hourlyRate ?? 275, 0, ',', ' ') }} FCFA / h</strong>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">
+                        {{ $workersCount ?? 0 }} ouvriers
+                    </span>
+                </div>
+            </div>
+
+            <!-- Corps de la carte en 2 colonnes équilibrées -->
+            <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                
+                <!-- Colonne Gauche : Taux Actuel & Navigation rapide -->
+                <div class="md:col-span-5 flex flex-col justify-between space-y-4 pr-0 md:pr-4 md:border-r md:border-gray-100">
+                    <div>
+                        <span class="text-[11px] font-black uppercase tracking-wider text-gray-400">Taux Horaire Officiel en Vigueur</span>
+                        <div class="flex items-baseline gap-2 mt-1.5">
+                            <span class="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
+                                {{ number_format($hourlyRate ?? 275, 0, ',', ' ') }}
+                            </span>
+                            <span class="text-base font-bold text-emerald-600">
+                                FCFA / heure
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                            Toute modification enregistrée ici par l'administrateur s'applique <strong>automatiquement</strong>. Le compte <strong>RH</strong> édite l'état des salaires et génère les fiches PDF sur cette base exacte.
+                        </p>
+                    </div>
+
+                    <!-- Boutons d'accès directs -->
+                    <div class="pt-1 flex flex-wrap gap-2.5">
+                        <a href="{{ route('admin.salaries.index') }}" 
+                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Consulter l'État des Salaires</span>
+                        </a>
+                        <a href="{{ route('admin.attendance.index') }}" 
+                           class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all border border-gray-200">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Pointage</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Colonne Droite : Formulaire interactif de modification du taux -->
+                <div class="md:col-span-7 bg-gray-50 rounded-2xl p-5 border border-gray-200/80 space-y-4">
+                    <form method="POST" action="{{ route('admin.salaries.update_rate') }}" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
+                                Modifier le taux horaire (en FCFA / h)
+                            </label>
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                                <div class="relative flex-1">
+                                    <input type="number" 
+                                           name="hourly_rate" 
+                                           x-model.number="rateInput" 
+                                           min="1" 
+                                           max="100000" 
+                                           step="1" 
+                                           required 
+                                           class="w-full text-lg sm:text-xl font-black text-gray-900 pl-4 pr-16 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-left">
+                                    <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 pointer-events-none">
+                                        FCFA / h
+                                    </span>
+                                </div>
+                                <button type="submit" 
+                                        class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Appliquer le taux</span>
+                                </button>
+                            </div>
+                            @error('hourly_rate')
+                                <p class="text-xs text-red-600 mt-1.5 font-bold">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Suggestions rapides (Presets) -->
+                        <div>
+                            <span class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                                Valeurs prédéfinies :
+                            </span>
+                            <div class="flex flex-wrap gap-1.5">
+                                @foreach([250, 275, 300, 325, 350, 400, 500] as $preset)
+                                    <button type="button" 
+                                            @click="rateInput = {{ $preset }}"
+                                            class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all border"
+                                            :class="rateInput === {{ $preset }} ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'">
+                                        {{ $preset }} F
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Aperçu dynamique de simulation -->
+                        <div class="bg-white rounded-xl p-3 border border-gray-200/80 grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <span class="text-gray-500 font-medium block text-[11px]">Pour 100h travaillées :</span>
+                                <span class="font-extrabold text-gray-900 text-sm" x-text="new Intl.NumberFormat('fr-FR').format(rateInput * 100) + ' FCFA'"></span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 font-medium block text-[11px]">Mois équipe nuit (120h) :</span>
+                                <span class="font-extrabold text-emerald-700 text-sm" x-text="new Intl.NumberFormat('fr-FR').format(rateInput * 120) + ' FCFA'"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">

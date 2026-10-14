@@ -50,8 +50,9 @@ class AttendanceController extends Controller
             ->get();
 
         $workers = $dayWorkers->concat($nightWorkers);
+        $hourlyRate = \App\Services\PayrollService::getHourlyRate();
 
-        return view('admin.attendance.index', compact('dayWorkers', 'nightWorkers', 'workers', 'days', 'startOfWeek', 'endOfWeek', 'prevWeek', 'nextWeek'));
+        return view('admin.attendance.index', compact('dayWorkers', 'nightWorkers', 'workers', 'days', 'startOfWeek', 'endOfWeek', 'prevWeek', 'nextWeek', 'hourlyRate'));
     }
 
     /**

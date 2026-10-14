@@ -20,6 +20,9 @@ class DashboardController extends Controller
         $lowStockProducts = \App\Models\Product::where('stock', '<', 10)->get();
         $recentOrders = \App\Models\Order::with('items')->latest()->take(10)->get();
 
-        return view('admin.dashboard', compact('stats', 'recentOrders', 'lowStockProducts'));
+        $hourlyRate = \App\Services\PayrollService::getHourlyRate();
+        $workersCount = \App\Models\Worker::count();
+
+        return view('admin.dashboard', compact('stats', 'recentOrders', 'lowStockProducts', 'hourlyRate', 'workersCount'));
     }
 }

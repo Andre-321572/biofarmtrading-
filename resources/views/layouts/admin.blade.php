@@ -89,6 +89,11 @@
                         {{ __('Pointage') }}
                     </x-nav-link-custom>
                 </li>
+                <li>
+                    <x-nav-link-custom href="{{ route('admin.salaries.index') }}" :active="request()->routeIs('admin.salaries.*')" icon="reports">
+                        {{ __('Salaires Ouvriers') }}
+                    </x-nav-link-custom>
+                </li>
             </ul>
         </nav>
         

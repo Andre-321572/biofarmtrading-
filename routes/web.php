@@ -69,6 +69,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/workers', [\App\Http\Controllers\AttendanceController::class, 'storeWorkers'])->name('workers.store');
         Route::patch('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'updateWorker'])->name('workers.update');
         Route::delete('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'destroyWorker'])->name('workers.destroy');
+
+        // Worker Salaries Management
+        Route::get('/salaires', [\App\Http\Controllers\SalaryController::class, 'index'])->name('salaries.index');
+        Route::get('/salaires/pdf', [\App\Http\Controllers\SalaryController::class, 'pdf'])->name('salaries.pdf');
+        Route::post('/salaires/taux-horaire', [\App\Http\Controllers\SalaryController::class, 'updateRate'])->name('salaries.update_rate');
+        Route::get('/run-migrations', function() {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            return redirect()->back()->with('success', 'Base de données synchronisée et migrations exécutées avec succès.');
+        })->name('run_migrations');
     });
 
     // Arrivage Routes
@@ -114,6 +123,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/workers', [\App\Http\Controllers\AttendanceController::class, 'storeWorkers'])->name('attendance.store_workers');
         Route::patch('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'updateWorker'])->name('attendance.update_worker');
         Route::delete('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'destroyWorker'])->name('attendance.destroy_worker');
+
+        // Worker Salaries Management
+        Route::get('/salaires', [\App\Http\Controllers\SalaryController::class, 'index'])->name('salaries.index');
+        Route::get('/salaires/pdf', [\App\Http\Controllers\SalaryController::class, 'pdf'])->name('salaries.pdf');
     });
 
     // Responsable Production (RP) Routes
