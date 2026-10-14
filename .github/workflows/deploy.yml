@@ -22,9 +22,7 @@ jobs:
 
       - name: Clear problematic cache files
         run: |
-          rm -f bootstrap/cache/packages.php
-          rm -f bootstrap/cache/services.php
-          rm -f bootstrap/cache/config.php
+          rm -f bootstrap/cache/*.php
 
       - name: sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -43,5 +41,11 @@ jobs:
             - 'README.md'
             - 'tests/**'
             - 'vendor.zip'
+
+      - name: Trigger Remote Cache Flush
+        continue-on-error: true
+        run: |
+          curl -s -k https://biofarmtrading.digitalforges.org/system/cache-flush || true
+          curl -s -k https://biofarmtrading.digitalforges.org/index.php/system/cache-flush || true
 
             

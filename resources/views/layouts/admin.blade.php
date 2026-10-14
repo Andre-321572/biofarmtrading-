@@ -90,7 +90,7 @@
                     </x-nav-link-custom>
                 </li>
                 <li>
-                    <x-nav-link-custom href="{{ route('admin.salaries.index') }}" :active="request()->routeIs('admin.salaries.*')" icon="reports">
+                    <x-nav-link-custom href="{{ Route::has('admin.salaries.index') ? route('admin.salaries.index') : url('/admin/salaires') }}" :active="request()->routeIs('admin.salaries.*')" icon="reports">
                         {{ __('Salaires Ouvriers') }}
                     </x-nav-link-custom>
                 </li>

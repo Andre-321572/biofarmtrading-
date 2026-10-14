@@ -35,7 +35,7 @@
                         <x-nav-link :href="route('admin.attendance.index')" :active="request()->routeIs('admin.attendance.index')">
                             {{ __('Pointage') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.salaries.index')" :active="request()->routeIs('admin.salaries.*')">
+                        <x-nav-link :href="Route::has('admin.salaries.index') ? route('admin.salaries.index') : url('/admin/salaires')" :active="request()->routeIs('admin.salaries.*')">
                             {{ __('Salaires Ouvriers') }}
                         </x-nav-link>
                     @endif
@@ -44,7 +44,7 @@
                         <x-nav-link :href="route('rh.attendance.index')" :active="request()->routeIs('rh.attendance.index')">
                             {{ __('Pointage RH') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('rh.salaries.index')" :active="request()->routeIs('rh.salaries.*')">
+                        <x-nav-link :href="Route::has('rh.salaries.index') ? route('rh.salaries.index') : url('/rh/salaires')" :active="request()->routeIs('rh.salaries.*')">
                             {{ __('Salaires Ouvriers') }}
                         </x-nav-link>
                     @endif
@@ -144,7 +144,7 @@
                 <x-responsive-nav-link :href="route('admin.attendance.index')" :active="request()->routeIs('admin.attendance.index')">
                     {{ __('Pointage') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.salaries.index')" :active="request()->routeIs('admin.salaries.*')">
+                <x-responsive-nav-link :href="Route::has('admin.salaries.index') ? route('admin.salaries.index') : url('/admin/salaires')" :active="request()->routeIs('admin.salaries.*')">
                     {{ __('Salaires Ouvriers') }}
                 </x-responsive-nav-link>
             @endif
@@ -153,7 +153,7 @@
                 <x-responsive-nav-link :href="route('rh.attendance.index')" :active="request()->routeIs('rh.attendance.index')">
                     {{ __('Pointage RH') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('rh.salaries.index')" :active="request()->routeIs('rh.salaries.*')">
+                <x-responsive-nav-link :href="Route::has('rh.salaries.index') ? route('rh.salaries.index') : url('/rh/salaires')" :active="request()->routeIs('rh.salaries.*')">
                     {{ __('Salaires Ouvriers') }}
                 </x-responsive-nav-link>
             @endif

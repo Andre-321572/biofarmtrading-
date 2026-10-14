@@ -43,8 +43,7 @@
                         </a>
                     </div>
 
-                    <!-- Salaires Mensuels Button -->
-                    <a href="{{ route($prefix . 'salaries.index', ['month' => $startOfWeek->format('Y-m')]) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2 active:scale-95">
+                    <a href="{{ Route::has($prefix . 'salaries.index') ? route($prefix . 'salaries.index', ['month' => $startOfWeek->format('Y-m')]) : url('/' . trim($prefix, '.') . '/salaires?month=' . $startOfWeek->format('Y-m')) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2 active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         <span class="hidden sm:inline">SALAIRES ({{ number_format($hourlyRate ?? \App\Services\PayrollService::getHourlyRate(), 0, ',', ' ') }} F/H)</span>
                         <span class="sm:hidden">SALAIRES</span>

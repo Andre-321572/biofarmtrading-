@@ -78,6 +78,10 @@ Route::middleware('auth')->group(function () {
             \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             return redirect()->back()->with('success', 'Base de données synchronisée et migrations exécutées avec succès.');
         })->name('run_migrations');
+        Route::get('/clear-cache', function() {
+            \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+            return redirect()->back()->with('success', 'Tous les caches applicatifs ont été réinitialisés avec succès.');
+        })->name('clear_cache');
     });
 
     // Arrivage Routes
@@ -140,6 +144,15 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/offline', function () {
     return view('offline');
+});
+
+Route::get('/system/cache-flush', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Cache applicatif réinitialisé avec succès (routes, vues, config).',
+        'timestamp' => now()->toIso8601String()
+    ]);
 });
 
 require __DIR__.'/auth.php';
