@@ -148,9 +148,24 @@ Route::get('/offline', function () {
 
 Route::get('/system/cache-flush', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? null;
+    $source = public_path('.htaccess');
+    $copied = false;
+    $target = null;
+    if ($docRoot && is_dir($docRoot)) {
+        $target = rtrim($docRoot, '/\\') . '/.htaccess';
+        if (file_exists($source)) {
+            $copied = @copy($source, $target);
+        }
+    }
     return response()->json([
         'status' => 'success',
         'message' => 'Cache applicatif réinitialisé avec succès (routes, vues, config).',
+        'doc_root' => $docRoot,
+        'target_htaccess' => $target,
+        'copied' => $copied,
+        'target_exists' => $target ? file_exists($target) : false,
+        'source_exists' => file_exists($source),
         'timestamp' => now()->toIso8601String()
     ]);
 });
