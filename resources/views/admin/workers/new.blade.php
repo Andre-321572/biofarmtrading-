@@ -73,12 +73,17 @@
 
             <!-- Grille d'information des taux & automatisation -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div class="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-6 text-white shadow-lg shadow-purple-600/15">
-                    <span class="text-xs font-black uppercase tracking-wider text-purple-200">Taux Période d'Essai (14 jours)</span>
-                    <div class="text-3xl font-black mt-2">
-                        {{ number_format($defaultNewRate, 2, ',', ' ') }} <span class="text-lg font-bold text-purple-200">FCFA / h</span>
+                <div class="bg-white rounded-3xl p-6 border-2 border-purple-300 shadow-xs relative overflow-hidden" style="background-color: #ffffff; border-color: #d8b4fe;">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black uppercase tracking-wider text-purple-700" style="color: #7e22ce;">Taux Période d'Essai (14 jours)</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200" style="background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff;">
+                            Nouveaux
+                        </span>
                     </div>
-                    <p class="text-[11px] text-purple-100 mt-2">Appliqué durant les deux premières semaines suivant l'embauche</p>
+                    <div class="text-3xl font-black text-slate-900 mt-2" style="color: #0f172a;">
+                        {{ number_format($defaultNewRate, 2, ',', ' ') }} <span class="text-lg font-bold text-purple-600" style="color: #9333ea;">FCFA / h</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-2" style="color: #64748b;">Appliqué durant les 14 premiers jours d'intégration</p>
                 </div>
 
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
@@ -265,7 +270,7 @@
                 <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl border border-slate-200 relative z-10">
                     <form method="POST" action="{{ route($prefix . 'salaries.update_rate') }}">
                         @csrf
-                        <div class="px-6 py-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex justify-between items-center">
+                        <div class="px-6 py-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex justify-between items-center" style="background-color: #581c87; color: #ffffff;">
                             <div>
                                 <h3 class="text-base font-black uppercase tracking-tight">Paramétrer les Taux Horaires</h3>
                                 <p class="text-[11px] text-purple-200">Définir les tarifs par heure selon la période d'essai (14 jours)</p>
@@ -346,7 +351,7 @@
                         @csrf
                         @method('PATCH')
 
-                        <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-purple-950 text-white flex justify-between items-center">
+                        <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-purple-950 text-white flex justify-between items-center" style="background-color: #0f172a; color: #ffffff;">
                             <div>
                                 <h3 class="text-base font-black uppercase tracking-tight" x-text="workerForm.name"></h3>
                                 <p class="text-[11px] text-purple-200">Date d'embauche & Conditions salariales</p>

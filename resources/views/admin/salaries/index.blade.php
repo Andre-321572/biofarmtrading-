@@ -175,7 +175,7 @@
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
                 <!-- Total Masse Salariale Nette -->
-                <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-6 text-white shadow-lg shadow-emerald-600/15 relative overflow-hidden">
+                <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-6 text-white shadow-lg shadow-emerald-600/15 relative overflow-hidden" style="background-color: #059669; color: #ffffff;">
                     <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-black uppercase tracking-wider text-emerald-100">Masse Salariale Nette</span>
