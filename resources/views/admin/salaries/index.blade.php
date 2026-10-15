@@ -85,7 +85,7 @@
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                Gestion Salaires &bull; {{ number_format($hourly_rate, 0, ',', ' ') }} F/h (Anciens) &bull; {{ number_format($new_hourly_rate ?? 250, 0, ',', ' ') }} F/h (Nouveaux)
+                                Gestion Salaires &bull; {{ number_format($hourly_rate, 2, ',', ' ') }} F/h (Anciens) &bull; {{ number_format($new_hourly_rate ?? 218.75, 2, ',', ' ') }} F/h (Essai 14j)
                             </span>
                             @if($canEditRate ?? true)
                                 <button type="button" 
@@ -395,10 +395,23 @@
 
                                     <!-- Taux Appliqué -->
                                     <td class="py-4 px-4 text-center">
-                                        <span class="font-black text-xs {{ $isNew ? 'text-purple-700' : 'text-slate-700' }}">
-                                            {{ number_format($item['hourly_rate'], 0, ',', ' ') }} F
-                                        </span>
-                                        <span class="block text-[9px] font-bold text-slate-400">/ heure</span>
+                                        @if(!empty($item['is_split_rate']))
+                                            <div class="inline-flex flex-col items-center gap-1">
+                                                <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200" title="Heures effectuées pendant la période d'essai de 14 jours">
+                                                    {{ $item['trial_hours_formatted'] }} &bull; {{ number_format($item['trial_rate'], 2, ',', ' ') }} F
+                                                </span>
+                                                <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200" title="Heures effectuées après titularisation">
+                                                    {{ $item['regular_hours_formatted'] }} &bull; {{ number_format($item['regular_rate'], 2, ',', ' ') }} F
+                                                </span>
+                                            </div>
+                                        @else
+                                            <span class="font-black text-xs {{ $isNew ? 'text-purple-700' : 'text-slate-700' }}">
+                                                {{ number_format($item['hourly_rate'], 2, ',', ' ') }} F
+                                            </span>
+                                            <span class="block text-[9px] font-bold text-slate-400">
+                                                {{ $isNew ? '(Essai 14j)' : '/ heure' }}
+                                            </span>
+                                        @endif
                                     </td>
 
                                     <!-- Salaire de Base -->
@@ -568,7 +581,7 @@
                                            x-model.number="newHourlyRate" 
                                            min="1" 
                                            max="100000" 
-                                           step="1" 
+                                           step="0.01" 
                                            required 
                                            class="w-full text-2xl font-black text-slate-900 px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-slate-400">
@@ -577,33 +590,46 @@
                                 </div>
                             </div>
 
-                            <!-- Taux Nouveaux Ouvriers -->
+                            <!-- Taux Nouveaux Ouvriers (Période d'essai 14 jours) -->
                             <div>
-                                <label class="block text-xs font-black uppercase tracking-wider text-purple-700 mb-2">
-                                    Taux Horaire des NOUVEAUX Ouvriers (FCFA / h)
-                                </label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-black uppercase tracking-wider text-purple-700">
+                                        Taux Horaire d'ESSAI Nouveaux Ouvriers (FCFA / h)
+                                    </label>
+                                    <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                                        Période d'essai de 14 jours
+                                    </span>
+                                </div>
                                 <div class="relative">
                                     <input type="number" 
                                            name="new_hourly_rate" 
                                            x-model.number="newRecruitsRate" 
                                            min="1" 
                                            max="100000" 
-                                           step="1" 
+                                           step="0.01" 
                                            required 
                                            class="w-full text-2xl font-black text-purple-800 px-4 py-3 bg-purple-50 border-2 border-purple-200 rounded-2xl focus:bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-purple-400">
                                         FCFA / h
                                     </span>
                                 </div>
+                                <p class="text-[11px] text-slate-500 mt-1.5">
+                                    Appliqué automatiquement durant les 14 premiers jours d'essai. Dès le 15ème jour, le taux bascule automatiquement au taux standard (275 FCFA/h).
+                                </p>
                             </div>
 
                             <!-- Quick preset pills -->
                             <div>
                                 <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                    Suggestions rapides
+                                    Suggestions rapides (Nouveaux / Anciens)
                                 </span>
                                 <div class="flex flex-wrap gap-2">
-                                    <template x-for="preset in [200, 225, 250, 275, 300, 350, 400, 500]" :key="preset">
+                                    <button type="button" 
+                                            @click="newRecruitsRate = 218.75; newHourlyRate = 275.00" 
+                                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100">
+                                        Standard Bio Farm : 218.75 F / 275 F
+                                    </button>
+                                    <template x-for="preset in [200, 218.75, 250, 275, 300, 350]" :key="preset">
                                         <button type="button" 
                                                 @click="newHourlyRate = preset" 
                                                 class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border"

@@ -13,28 +13,28 @@ class PayrollService
     /**
      * Taux horaire standard par défaut pour les anciens ouvriers (en FCFA).
      */
-    public const DEFAULT_HOURLY_RATE = 275;
-    public const HOURLY_RATE = 275;
+    public const DEFAULT_HOURLY_RATE = 275.0;
+    public const HOURLY_RATE = 275.0;
 
     /**
-     * Taux horaire standard par défaut pour les nouveaux ouvriers (en FCFA).
+     * Taux horaire standard par défaut pour les nouveaux ouvriers en période d'essai de 14 jours (en FCFA).
      */
-    public const DEFAULT_NEW_HOURLY_RATE = 250;
+    public const DEFAULT_NEW_HOURLY_RATE = 218.75;
 
     /**
      * Récupère le taux horaire standard (anciens ouvriers).
      */
-    public static function getHourlyRate(): int
+    public static function getHourlyRate(): float
     {
-        return (int) \App\Models\Setting::get('worker_hourly_rate', self::DEFAULT_HOURLY_RATE);
+        return (float) \App\Models\Setting::get('worker_hourly_rate', self::DEFAULT_HOURLY_RATE);
     }
 
     /**
-     * Récupère le taux horaire pour les nouveaux ouvriers.
+     * Récupère le taux horaire pour les nouveaux ouvriers (période d'essai).
      */
-    public static function getNewHourlyRate(): int
+    public static function getNewHourlyRate(): float
     {
-        return (int) \App\Models\Setting::get('worker_new_hourly_rate', self::DEFAULT_NEW_HOURLY_RATE);
+        return (float) \App\Models\Setting::get('worker_new_hourly_rate', self::DEFAULT_NEW_HOURLY_RATE);
     }
 
     /**
@@ -43,19 +43,19 @@ class PayrollService
      * @param Carbon $month
      * @param string|null $shift ('all', 'day', 'night')
      * @param string|null $search
-     * @param int|null $customRate Taux horaire optionnel pour anciens
-     * @param int|null $customNewRate Taux horaire optionnel pour nouveaux
+     * @param float|null $customRate Taux horaire optionnel pour anciens
+     * @param float|null $customNewRate Taux horaire optionnel pour nouveaux
      * @return array
      */
     public function getMonthlyPayroll(
         Carbon $month, 
         ?string $shift = null, 
         ?string $search = null, 
-        ?int $customRate = null,
-        ?int $customNewRate = null
+        ?float $customRate = null,
+        ?float $customNewRate = null
     ): array {
         $regularRate = $customRate ?? self::getHourlyRate();
-        $newRate = $customNewRate ?? self::getNewHourlyRate();
+        $trialRate = $customNewRate ?? self::getNewHourlyRate();
         $monthStr = $month->format('Y-m');
         $startOfMonth = $month->copy()->startOfMonth()->format('Y-m-d');
         $endOfMonth = $month->copy()->endOfMonth()->format('Y-m-d');
@@ -110,9 +110,6 @@ class PayrollService
                 $regularWorkersCount++;
             }
 
-            // Calcul du taux effectif de cet ouvrier
-            $effectiveRate = $worker->getEffectiveHourlyRate($regularRate, $newRate);
-
             // Récupérer les primes de cet ouvrier pour ce mois
             $workerBonusesList = $monthlyBonuses->get($worker->id, collect());
             $workerBonusTotal = (int) $workerBonusesList->sum('amount');
@@ -120,8 +117,8 @@ class PayrollService
                 $workersWithBonusCount++;
             }
 
-            $calc = $this->calculateWorkerPayrollForMonth($worker, $effectiveRate, $workerBonusTotal);
-            $calc['is_new'] = $isNew;
+            // Calcul journalier précis prenant en compte le passage automatique d'essai à ancien
+            $calc = $this->calculateWorkerPayrollForMonth($worker, $regularRate, $trialRate, $workerBonusTotal);
             $calc['bonuses_list'] = $workerBonusesList;
 
             if ($calc['total_minutes'] > 0) {
@@ -155,7 +152,7 @@ class PayrollService
             'start_of_month' => $startOfMonth,
             'end_of_month' => $endOfMonth,
             'hourly_rate' => $regularRate,
-            'new_hourly_rate' => $newRate,
+            'new_hourly_rate' => $trialRate,
             'items' => collect($payrollItems),
             'summary' => [
                 'total_workers' => $workers->count(),
@@ -179,20 +176,30 @@ class PayrollService
     }
 
     /**
-     * Calcule le détail et le salaire d'un ouvrier pour ses présences chargées.
+     * Calcule le détail et le salaire d'un ouvrier pour ses présences chargées avec gestion journalière de la période d'essai (14 jours).
      *
      * @param Worker $worker
-     * @param int|null $rate
+     * @param float|null $regularRate Taux horaire standard (anciens ouvriers)
+     * @param float|null $trialRate Taux horaire d'essai (nouveaux ouvriers)
      * @param int $bonusAmount
      * @return array
      */
-    public function calculateWorkerPayrollForMonth(Worker $worker, ?int $rate = null, int $bonusAmount = 0): array
-    {
-        $rate = $rate ?? $worker->getEffectiveHourlyRate();
+    public function calculateWorkerPayrollForMonth(
+        Worker $worker, 
+        ?float $regularRate = null, 
+        ?float $trialRate = null, 
+        int $bonusAmount = 0
+    ): array {
+        $regularRate = $regularRate ?? self::getHourlyRate();
+        $trialRate = $trialRate ?? self::getNewHourlyRate();
+
         $attendances = $worker->attendances;
         $totalMinutes = 0;
+        $trialMinutes = 0;
+        $regularMinutes = 0;
         $daysPresent = 0;
         $dailyDetails = [];
+        $totalExactBaseSalary = 0.0;
 
         if ($worker->shift === 'night') {
             // Équipe de nuit : chaque jour présent équivaut à 4h de travail forfaitaire (240 min)
@@ -208,6 +215,22 @@ class PayrollService
                     $minutesForDay = 240; // 4 heures
                     $totalMinutes += $minutesForDay;
 
+                    // Détermination du taux applicable pour ce jour précis
+                    $isTrialDay = $worker->isInTrialOnDate($date);
+                    if ($worker->hourly_rate !== null && $worker->hourly_rate > 0) {
+                        $dayRate = (float) $worker->hourly_rate;
+                        $regularMinutes += $minutesForDay;
+                    } elseif ($isTrialDay) {
+                        $dayRate = $trialRate;
+                        $trialMinutes += $minutesForDay;
+                    } else {
+                        $dayRate = $regularRate;
+                        $regularMinutes += $minutesForDay;
+                    }
+
+                    $daySalary = ($minutesForDay * $dayRate) / 60;
+                    $totalExactBaseSalary += $daySalary;
+
                     $dailyDetails[] = [
                         'date' => $date,
                         'status' => 'present',
@@ -217,6 +240,9 @@ class PayrollService
                         'pause_minutes' => 0,
                         'net_minutes' => 240,
                         'net_hours_text' => '4h00',
+                        'is_trial' => $isTrialDay,
+                        'applied_rate' => $dayRate,
+                        'day_salary' => round($daySalary, 2),
                     ];
                 } else {
                     $firstAtt = $dayAtts->first();
@@ -229,6 +255,9 @@ class PayrollService
                         'pause_minutes' => 0,
                         'net_minutes' => 0,
                         'net_hours_text' => '0h00',
+                        'is_trial' => $worker->isInTrialOnDate($date),
+                        'applied_rate' => 0,
+                        'day_salary' => 0,
                     ];
                 }
             }
@@ -259,6 +288,22 @@ class PayrollService
 
                     $totalMinutes += $netDuration;
 
+                    // Détermination du taux applicable pour ce jour précis
+                    $isTrialDay = $worker->isInTrialOnDate($date);
+                    if ($worker->hourly_rate !== null && $worker->hourly_rate > 0) {
+                        $dayRate = (float) $worker->hourly_rate;
+                        $regularMinutes += $netDuration;
+                    } elseif ($isTrialDay) {
+                        $dayRate = $trialRate;
+                        $trialMinutes += $netDuration;
+                    } else {
+                        $dayRate = $regularRate;
+                        $regularMinutes += $netDuration;
+                    }
+
+                    $daySalary = ($netDuration * $dayRate) / 60;
+                    $totalExactBaseSalary += $daySalary;
+
                     $h = floor($netDuration / 60);
                     $m = $netDuration % 60;
 
@@ -271,6 +316,9 @@ class PayrollService
                         'pause_minutes' => 120,
                         'net_minutes' => $netDuration,
                         'net_hours_text' => sprintf('%dh%02d', $h, $m),
+                        'is_trial' => $isTrialDay,
+                        'applied_rate' => $dayRate,
+                        'day_salary' => round($daySalary, 2),
                     ];
                 } elseif ($att && $att->status === 'present') {
                     $daysPresent++;
@@ -283,6 +331,9 @@ class PayrollService
                         'pause_minutes' => 0,
                         'net_minutes' => 0,
                         'net_hours_text' => '0h00',
+                        'is_trial' => $worker->isInTrialOnDate($date),
+                        'applied_rate' => 0,
+                        'day_salary' => 0,
                     ];
                 } elseif ($att) {
                     $dailyDetails[] = [
@@ -294,6 +345,9 @@ class PayrollService
                         'pause_minutes' => 0,
                         'net_minutes' => 0,
                         'net_hours_text' => '0h00',
+                        'is_trial' => $worker->isInTrialOnDate($date),
+                        'applied_rate' => 0,
+                        'day_salary' => 0,
                     ];
                 }
             }
@@ -304,22 +358,43 @@ class PayrollService
         $hoursFormatted = sprintf('%dh%02d', $h, $m);
         $hoursDecimal = round($totalMinutes / 60, 2);
 
-        // Calcul du salaire de base : (Total minutes / 60) * taux horaire effectif
-        $exactBaseSalary = ($totalMinutes * $rate) / 60;
-        $roundedBaseSalary = (int) round($exactBaseSalary);
+        $trialH = floor($trialMinutes / 60);
+        $trialM = $trialMinutes % 60;
+        $trialHoursFormatted = sprintf('%dh%02d', $trialH, $trialM);
+
+        $regH = floor($regularMinutes / 60);
+        $regM = $regularMinutes % 60;
+        $regularHoursFormatted = sprintf('%dh%02d', $regH, $regM);
+
+        // Arrondi du salaire de base total en FCFA
+        $roundedBaseSalary = (int) round($totalExactBaseSalary);
 
         // Salaire net total = Salaire de base + Prime
         $totalSalary = $roundedBaseSalary + $bonusAmount;
+
+        // Statut et affichage du taux
+        $isSplit = ($trialMinutes > 0 && $regularMinutes > 0);
+        $effectiveRate = $worker->getEffectiveHourlyRate($regularRate, $trialRate);
 
         return [
             'worker' => $worker,
             'shift' => $worker->shift,
             'is_new' => $worker->isNew(),
+            'is_in_trial' => $worker->isCurrentlyInTrial(),
             'days_present' => $daysPresent,
             'total_minutes' => $totalMinutes,
             'hours_decimal' => $hoursDecimal,
             'hours_formatted' => $hoursFormatted,
-            'hourly_rate' => $rate,
+            'trial_minutes' => $trialMinutes,
+            'trial_hours_formatted' => $trialHoursFormatted,
+            'trial_hours_decimal' => round($trialMinutes / 60, 2),
+            'regular_minutes' => $regularMinutes,
+            'regular_hours_formatted' => $regularHoursFormatted,
+            'regular_hours_decimal' => round($regularMinutes / 60, 2),
+            'trial_rate' => $trialRate,
+            'regular_rate' => $regularRate,
+            'is_split_rate' => $isSplit,
+            'hourly_rate' => $effectiveRate,
             'base_salary' => $roundedBaseSalary,
             'bonus_amount' => $bonusAmount,
             'salary' => $totalSalary,

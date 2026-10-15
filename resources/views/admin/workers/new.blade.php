@@ -1,11 +1,26 @@
 <x-app-layout>
     <div class="py-8 bg-slate-50 min-h-screen" x-data="{
         showNewRateModal: false,
+        showEditWorkerModal: false,
         newRecruitRate: {{ $defaultNewRate }},
         regularRate: {{ $defaultRate }},
-        selectedWorker: null,
-        showWorkerModal: false,
-        workerRateInput: ''
+        currentWorker: null,
+        workerForm: {
+            id: null,
+            name: '',
+            hired_at: '',
+            is_new: 'null',
+            hourly_rate: ''
+        },
+        openEditWorker(worker) {
+            this.currentWorker = worker;
+            this.workerForm.id = worker.id;
+            this.workerForm.name = worker.last_name + ' ' + worker.first_name;
+            this.workerForm.hired_at = worker.hired_at_raw || '';
+            this.workerForm.is_new = worker.is_new_raw === null ? 'null' : (worker.is_new_raw ? '1' : '0');
+            this.workerForm.hourly_rate = worker.hourly_rate_raw || '';
+            this.showEditWorkerModal = true;
+        }
     }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
@@ -28,14 +43,14 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
-                                Ressources Humaines &bull; Recrues
+                                Ressources Humaines &bull; Recrues & Période d'Essai
                             </span>
                         </div>
                         <h1 class="text-2xl font-black text-slate-800 tracking-tight mt-1">
-                            Nouveaux Ouvriers <span class="text-purple-600">Bio Farm</span>
+                            Période d'Essai & <span class="text-purple-600">Nouveaux Ouvriers</span>
                         </h1>
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">
-                            Gestion des recrues récentes et paramétrage du taux horaire d'intégration
+                            Période d'essai automatique de 14 jours ({{ number_format($defaultNewRate, 2, ',', ' ') }} FCFA/h) &bull; Titularisation automatique dès J+15 ({{ number_format($defaultRate, 2, ',', ' ') }} FCFA/h)
                         </p>
                     </div>
                 </div>
@@ -45,7 +60,7 @@
                             @click="showNewRateModal = true"
                             class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black text-xs shadow-md shadow-purple-600/20 transition-all flex items-center gap-2 active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                        <span>PARAMÉTRER TAUX NOUVEAUX</span>
+                        <span>CONFIGURER LES TAUX</span>
                     </button>
 
                     <a href="{{ route($prefix . 'salaries.index') }}" 
@@ -56,39 +71,39 @@
                 </div>
             </div>
 
-            <!-- Grille d'information des taux -->
+            <!-- Grille d'information des taux & automatisation -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div class="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-6 text-white shadow-lg shadow-purple-600/15">
-                    <span class="text-xs font-black uppercase tracking-wider text-purple-200">Taux Nouveaux Ouvriers</span>
+                    <span class="text-xs font-black uppercase tracking-wider text-purple-200">Taux Période d'Essai (14 jours)</span>
                     <div class="text-3xl font-black mt-2">
-                        {{ number_format($defaultNewRate, 0, ',', ' ') }} <span class="text-lg font-bold text-purple-200">FCFA / h</span>
+                        {{ number_format($defaultNewRate, 2, ',', ' ') }} <span class="text-lg font-bold text-purple-200">FCFA / h</span>
                     </div>
-                    <p class="text-[11px] text-purple-100 mt-2">Appliqué automatiquement aux ouvriers en période d'intégration</p>
+                    <p class="text-[11px] text-purple-100 mt-2">Appliqué durant les deux premières semaines suivant l'embauche</p>
                 </div>
 
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Taux Anciens Ouvriers</span>
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Taux Titularisé (Anciens)</span>
                     <div class="text-3xl font-black text-slate-800 mt-2">
-                        {{ number_format($defaultRate, 0, ',', ' ') }} <span class="text-lg font-bold text-slate-400">FCFA / h</span>
+                        {{ number_format($defaultRate, 2, ',', ' ') }} <span class="text-lg font-bold text-slate-400">FCFA / h</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2">Rémunération standard des ouvriers titularisés</p>
+                    <p class="text-[11px] text-slate-500 mt-2">Bascule automatique après les 14 jours d'essai sans action requise</p>
                 </div>
 
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Nouveaux Ouvriers Détectés</span>
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Ouvriers Détectés Récemment</span>
                     <div class="text-3xl font-black text-purple-600 mt-2">
                         {{ $newWorkers->count() }} <span class="text-lg font-bold text-slate-400">ouvrier(s)</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2">Ajoutés récemment ou avec statut spécifique</p>
+                    <p class="text-[11px] text-slate-500 mt-2">En période d'essai ou récemment embauchés</p>
                 </div>
             </div>
 
-            <!-- Tableau des Nouveaux Ouvriers -->
+            <!-- Tableau des Recrues et Suivi de Période d'Essai -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Liste des Recrues & Nouveaux Ouvriers</h2>
-                        <p class="text-xs text-slate-400">Consultez et modifiez les conditions d'intégration pour chaque ouvrier</p>
+                        <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Suivi des Recrues & Évolution Période d'Essai</h2>
+                        <p class="text-xs text-slate-400">Contrôlez les dates d'embauche, les fins de période d'essai (14 jours) et les taux appliqués</p>
                     </div>
                 </div>
 
@@ -98,26 +113,42 @@
                             <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase tracking-wider text-slate-500">
                                 <th class="py-4 px-6">N°</th>
                                 <th class="py-4 px-6">Ouvrier</th>
-                                <th class="py-4 px-6">Équipe</th>
-                                <th class="py-4 px-6">Date d'Ajout</th>
-                                <th class="py-4 px-6">Taux Applicable</th>
-                                <th class="py-4 px-6">Statut Actuel</th>
+                                <th class="py-4 px-4 text-center">Équipe</th>
+                                <th class="py-4 px-4 text-center">Date Embauche</th>
+                                <th class="py-4 px-4 text-center">Fin Essai (14j)</th>
+                                <th class="py-4 px-4 text-center">Taux Applicable</th>
+                                <th class="py-4 px-4 text-center">Statut Actuel</th>
                                 <th class="py-4 px-6 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse($newWorkers as $index => $worker)
                                 @php
+                                    $hiredAt = $worker->getHiredAt();
+                                    $trialEndsAt = $worker->getTrialEndsAt();
+                                    $inTrial = $worker->isCurrentlyInTrial();
+                                    $remainingDays = $worker->getTrialDaysRemaining();
                                     $effectiveRate = $worker->getEffectiveHourlyRate($defaultRate, $defaultNewRate);
                                     $hasCustomRate = $worker->hourly_rate !== null && $worker->hourly_rate > 0;
+                                    
+                                    $workerData = [
+                                        'id' => $worker->id,
+                                        'first_name' => $worker->first_name,
+                                        'last_name' => $worker->last_name,
+                                        'hired_at_raw' => $worker->hired_at ? $worker->hired_at->format('Y-m-d') : ($worker->created_at ? $worker->created_at->format('Y-m-d') : ''),
+                                        'is_new_raw' => $worker->is_new,
+                                        'hourly_rate_raw' => $worker->hourly_rate,
+                                    ];
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition-colors">
                                     <td class="py-4 px-6 font-bold text-slate-400 text-xs">{{ $index + 1 }}</td>
+                                    
                                     <td class="py-4 px-6">
                                         <div class="font-black text-slate-900 uppercase">{{ $worker->last_name }}</div>
                                         <div class="text-xs text-slate-500">{{ $worker->first_name }}</div>
                                     </td>
-                                    <td class="py-4 px-6">
+
+                                    <td class="py-4 px-4 text-center">
                                         @if($worker->shift === 'night')
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Nuit
@@ -128,42 +159,82 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="py-4 px-6 text-xs text-slate-600 font-medium">
-                                        {{ $worker->created_at ? $worker->created_at->format('d/m/Y') : '-' }}
-                                        <span class="text-slate-400 text-[10px] block">
-                                            ({{ $worker->created_at ? $worker->created_at->diffForHumans() : '' }})
+
+                                    <!-- Date Embauche -->
+                                    <td class="py-4 px-4 text-center text-xs text-slate-700 font-bold">
+                                        {{ $hiredAt->format('d/m/Y') }}
+                                        <span class="text-[10px] text-slate-400 block font-normal">
+                                            ({{ $hiredAt->diffForHumans() }})
                                         </span>
                                     </td>
-                                    <td class="py-4 px-6">
-                                        <span class="font-black text-slate-900">{{ number_format($effectiveRate, 0, ',', ' ') }} FCFA/h</span>
+
+                                    <!-- Fin Essai (14j) -->
+                                    <td class="py-4 px-4 text-center text-xs">
+                                        <span class="font-bold text-slate-800">{{ $trialEndsAt->format('d/m/Y') }}</span>
+                                        @if($inTrial)
+                                            <span class="block text-[10px] font-bold text-purple-600">
+                                                Reste {{ $remainingDays }} jour(s)
+                                            </span>
+                                        @else
+                                            <span class="block text-[10px] font-bold text-emerald-600">
+                                                Période achevée
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Taux Applicable -->
+                                    <td class="py-4 px-4 text-center">
+                                        <span class="font-black text-slate-900">{{ number_format($effectiveRate, 2, ',', ' ') }} F</span>
                                         @if($hasCustomRate)
                                             <span class="block text-[10px] font-bold text-blue-600">Taux personnalisé</span>
+                                        @elseif($worker->isNew())
+                                            <span class="block text-[10px] font-bold text-purple-600">Taux Essai</span>
                                         @else
-                                            <span class="block text-[10px] font-bold text-purple-600">Taux Recrue</span>
+                                            <span class="block text-[10px] font-bold text-emerald-600">Taux Titularisé</span>
                                         @endif
                                     </td>
-                                    <td class="py-4 px-6">
-                                        @if($worker->isNew())
-                                            <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
-                                                Nouveau
+
+                                    <!-- Statut Actuel -->
+                                    <td class="py-4 px-4 text-center">
+                                        @if($worker->is_new === true)
+                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
+                                                Essai forcé (RH)
+                                            </span>
+                                        @elseif($worker->is_new === false)
+                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                Titularisé (RH)
+                                            </span>
+                                        @elseif($inTrial)
+                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-300">
+                                                En essai ({{ $remainingDays }}j)
                                             </span>
                                         @else
-                                            <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
-                                                Ancien
+                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                                                Titularisé auto
                                             </span>
                                         @endif
                                     </td>
+
+                                    <!-- Actions -->
                                     <td class="py-4 px-6 text-right">
                                         <div class="inline-flex items-center gap-2">
-                                            <!-- Titulariser / Basculer en Ancien -->
+                                            <!-- Bouton Modifier profil et date d'embauche -->
+                                            <button type="button" 
+                                                    @click="openEditWorker({{ json_encode($workerData) }})"
+                                                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-100 hover:bg-purple-50 hover:text-purple-700 text-slate-700 border border-slate-200 hover:border-purple-200 flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                                <span>Ajuster</span>
+                                            </button>
+
+                                            <!-- Bascule rapide -->
                                             <form method="POST" action="{{ route($prefix . 'workers.update_status', $worker->id) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="is_new" value="{{ $worker->isNew() ? '0' : '1' }}">
                                                 <button type="submit" 
                                                         class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border {{ $worker->isNew() ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200' }}"
-                                                        title="{{ $worker->isNew() ? 'Passer cet ouvrier au statut Ancien' : 'Marquer comme Nouveau' }}">
-                                                    {{ $worker->isNew() ? 'Titulariser (Ancien)' : 'Remettre Nouveau' }}
+                                                        title="{{ $worker->isNew() ? 'Titulariser immédiatement' : 'Remettre en période d\'essai' }}">
+                                                    {{ $worker->isNew() ? 'Titulariser' : 'Mettre Essai' }}
                                                 </button>
                                             </form>
                                         </div>
@@ -171,9 +242,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-12 text-center text-slate-400">
-                                        <p class="font-bold text-base">Aucun nouvel ouvrier enregistré récemment.</p>
-                                        <p class="text-xs mt-1">Tous les ouvriers ont été titularisés ou sont créés depuis plus de 60 jours.</p>
+                                    <td colspan="8" class="py-12 text-center text-slate-400">
+                                        <p class="font-bold text-base">Aucun ouvrier en période d'essai ou récemment embauché.</p>
+                                        <p class="text-xs mt-1">Tous les ouvriers ont achevé leurs 14 jours d'essai et sont rémunérés au tarif standard.</p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -184,7 +255,9 @@
 
         </div>
 
-        <!-- Modal de paramétrage du Taux Horaire Nouveaux & Anciens -->
+        <!-- ==================================================== -->
+        <!-- MODAL 1 : CONFIGURATION GÉNÉRALE DES TAUX (RH/ADMIN) -->
+        <!-- ==================================================== -->
         <div x-show="showNewRateModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="showNewRateModal = false"></div>
@@ -195,7 +268,7 @@
                         <div class="px-6 py-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex justify-between items-center">
                             <div>
                                 <h3 class="text-base font-black uppercase tracking-tight">Paramétrer les Taux Horaires</h3>
-                                <p class="text-[11px] text-purple-200">Définir les tarifs par heure selon l'ancienneté</p>
+                                <p class="text-[11px] text-purple-200">Définir les tarifs par heure selon la période d'essai (14 jours)</p>
                             </div>
                             <button type="button" @click="showNewRateModal = false" class="text-purple-300 hover:text-white p-1 rounded-xl">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -204,15 +277,21 @@
 
                         <div class="p-6 space-y-5">
                             <div>
-                                <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
-                                    Taux Horaire des NOUVEAUX Ouvriers (FCFA / h)
-                                </label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-black uppercase tracking-wider text-purple-700">
+                                        Taux Période d'Essai (14 premiers jours)
+                                    </label>
+                                    <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                                        Défaut : 218.75 FCFA
+                                    </span>
+                                </div>
                                 <div class="relative">
                                     <input type="number" 
                                            name="new_hourly_rate" 
                                            x-model.number="newRecruitRate" 
                                            min="1" 
                                            max="100000" 
+                                           step="0.01" 
                                            required 
                                            class="w-full text-2xl font-black text-purple-700 px-4 py-3 bg-purple-50 border-2 border-purple-200 rounded-2xl focus:bg-white focus:border-purple-600 focus:ring-4 focus:ring-purple-600/20 text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-purple-400">FCFA / h</span>
@@ -220,15 +299,21 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
-                                    Taux Horaire des ANCIENS Ouvriers (FCFA / h)
-                                </label>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-700">
+                                        Taux Standard (Anciens ouvriers dès J+15)
+                                    </label>
+                                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                                        Défaut : 275.00 FCFA
+                                    </span>
+                                </div>
                                 <div class="relative">
                                     <input type="number" 
                                            name="hourly_rate" 
                                            x-model.number="regularRate" 
                                            min="1" 
                                            max="100000" 
+                                           step="0.01" 
                                            required 
                                            class="w-full text-2xl font-black text-slate-900 px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/20 text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-slate-400">FCFA / h</span>
@@ -241,6 +326,92 @@
                                 </button>
                                 <button type="submit" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-black shadow-md shadow-purple-600/20">
                                     Enregistrer les Taux
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MODAL 2 : AJUSTEMENT INDIVIDUEL D'UN OUVRIER         -->
+        <!-- ==================================================== -->
+        <div x-show="showEditWorkerModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="showEditWorkerModal = false"></div>
+
+                <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl border border-slate-200 relative z-10">
+                    <form method="POST" :action="'{{ url($prefix . 'workers') }}/' + workerForm.id + '/status'">
+                        @csrf
+                        @method('PATCH')
+
+                        <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-purple-950 text-white flex justify-between items-center">
+                            <div>
+                                <h3 class="text-base font-black uppercase tracking-tight" x-text="workerForm.name"></h3>
+                                <p class="text-[11px] text-purple-200">Date d'embauche & Conditions salariales</p>
+                            </div>
+                            <button type="button" @click="showEditWorkerModal = false" class="text-slate-400 hover:text-white p-1 rounded-xl">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="p-6 space-y-4">
+                            <!-- Date d'embauche -->
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Date d'embauche de l'ouvrier
+                                </label>
+                                <input type="date" 
+                                       name="hired_at" 
+                                       x-model="workerForm.hired_at" 
+                                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
+                                <p class="text-[11px] text-slate-400 mt-1">
+                                    La période d'essai de 14 jours démarre à cette date.
+                                </p>
+                            </div>
+
+                            <!-- Statut de l'ouvrier -->
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Règle de Statut
+                                </label>
+                                <select name="is_new" 
+                                        x-model="workerForm.is_new" 
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
+                                    <option value="null">Automatique (Période d'essai de 14 jours)</option>
+                                    <option value="1">Forcer en Période d'Essai (Taux Nouveaux)</option>
+                                    <option value="0">Titulariser immédiatement (Taux Anciens)</option>
+                                </select>
+                            </div>
+
+                            <!-- Taux horaire individuel optionnel -->
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Taux horaire spécifique personnalisé (optionnel)
+                                </label>
+                                <div class="relative">
+                                    <input type="number" 
+                                           name="hourly_rate" 
+                                           x-model="workerForm.hourly_rate" 
+                                           placeholder="Ex : 300 (laisser vide pour appliquer le tarif standard)" 
+                                           min="0" 
+                                           max="100000" 
+                                           step="0.01" 
+                                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
+                                    <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">FCFA/h</span>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-1">
+                                    Si spécifié, ce taux sera appliqué de manière prioritaire pour cet ouvrier.
+                                </p>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                                <button type="button" @click="showEditWorkerModal = false" class="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+                                    Annuler
+                                </button>
+                                <button type="submit" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-black shadow-md shadow-purple-600/20">
+                                    Mettre à jour l'Ouvrier
                                 </button>
                             </div>
                         </div>

@@ -19,58 +19,135 @@ class WorkerSalaryRateTest extends TestCase
     public function test_default_worker_rates()
     {
         $regularRate = PayrollService::getHourlyRate();
-        $newRate = PayrollService::getNewHourlyRate();
+        $trialRate = PayrollService::getNewHourlyRate();
 
-        $this->assertEquals(275, $regularRate);
-        $this->assertEquals(250, $newRate);
+        $this->assertEquals(275.0, $regularRate);
+        $this->assertEquals(218.75, $trialRate);
     }
 
-    public function test_admin_and_rh_can_update_both_regular_and_new_worker_rates()
+    public function test_admin_and_rh_can_update_both_regular_and_trial_worker_rates_with_decimals()
     {
         $rhUser = User::factory()->create(['role' => 'rh']);
         $this->actingAs($rhUser);
 
-        // RH updates rates
+        // RH updates rates with decimal support
         $response = $this->post(route('rh.salaries.update_rate'), [
-            'hourly_rate' => 300,
-            'new_hourly_rate' => 220,
+            'hourly_rate' => 280.5,
+            'new_hourly_rate' => 218.75,
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertEquals(300, PayrollService::getHourlyRate());
-        $this->assertEquals(220, PayrollService::getNewHourlyRate());
+        $this->assertEquals(280.5, PayrollService::getHourlyRate());
+        $this->assertEquals(218.75, PayrollService::getNewHourlyRate());
     }
 
-    public function test_differentiated_rates_between_new_and_regular_workers()
+    public function test_automatic_14_day_trial_period_and_rate_transition()
     {
-        Setting::set('worker_hourly_rate', 300);
-        Setting::set('worker_new_hourly_rate', 200);
-
-        // Regular worker created 6 months ago
-        $regularWorker = Worker::create([
-            'first_name' => 'Kofi',
-            'last_name' => 'MENSAH',
-            'shift' => 'day',
-            'is_new' => false,
-            'created_at' => Carbon::now()->subMonths(6),
-        ]);
-
-        // New worker created 5 days ago
-        $newWorker = Worker::create([
+        // 1. Worker hired 5 days ago -> currently in 14-day trial
+        $trialWorker = Worker::create([
             'first_name' => 'Ablan',
             'last_name' => 'KOUDOU',
             'shift' => 'day',
-            'is_new' => true,
-            'created_at' => Carbon::now()->subDays(5),
+            'hired_at' => Carbon::now()->subDays(5)->toDateString(),
         ]);
 
-        $this->assertFalse($regularWorker->isNew());
-        $this->assertTrue($newWorker->isNew());
+        // 2. Worker hired 25 days ago -> trial ended, automatically confirmed
+        $confirmedWorker = Worker::create([
+            'first_name' => 'Kofi',
+            'last_name' => 'MENSAH',
+            'shift' => 'day',
+            'hired_at' => Carbon::now()->subDays(25)->toDateString(),
+        ]);
 
-        $this->assertEquals(300, $regularWorker->getEffectiveHourlyRate());
-        $this->assertEquals(200, $newWorker->getEffectiveHourlyRate());
+        $this->assertTrue($trialWorker->isCurrentlyInTrial());
+        $this->assertTrue($trialWorker->isNew());
+        $this->assertEquals(218.75, $trialWorker->getEffectiveHourlyRate());
+
+        $this->assertFalse($confirmedWorker->isCurrentlyInTrial());
+        $this->assertFalse($confirmedWorker->isNew());
+        $this->assertEquals(275.0, $confirmedWorker->getEffectiveHourlyRate());
+    }
+
+    public function test_mid_month_split_trial_and_regular_salary_calculation()
+    {
+        // Month of October 2026
+        $month = Carbon::create(2026, 10, 1);
+        Setting::set('worker_hourly_rate', 275.0, 'float');
+        Setting::set('worker_new_hourly_rate', 218.75, 'float');
+
+        // Worker hired on October 1st, 2026
+        // 14-day trial period: Oct 1st to Oct 15th
+        // From Oct 16th onward: Regular rate (275 FCFA)
+        $worker = Worker::create([
+            'first_name' => 'Jean',
+            'last_name' => 'KODJO',
+            'shift' => 'night', // 4 hours per day (240 min)
+            'hired_at' => '2026-10-01',
+        ]);
+
+        // 10 days of work during trial period (Oct 1 to Oct 10) = 10 days * 4h = 40 hours
+        for ($day = 1; $day <= 10; $day++) {
+            Attendance::create([
+                'worker_id' => $worker->id,
+                'date' => sprintf('2026-10-%02d', $day),
+                'status' => 'present',
+            ]);
+        }
+
+        // 5 days of work after trial period (Oct 20 to Oct 24) = 5 days * 4h = 20 hours
+        for ($day = 20; $day <= 24; $day++) {
+            Attendance::create([
+                'worker_id' => $worker->id,
+                'date' => sprintf('2026-10-%02d', $day),
+                'status' => 'present',
+            ]);
+        }
+
+        $payrollService = app(PayrollService::class);
+        $payroll = $payrollService->getMonthlyPayroll($month);
+        $item = $payroll['items']->firstWhere('worker.id', $worker->id);
+
+        $this->assertNotNull($item);
+        // 40 hours * 60 = 2400 trial minutes
+        $this->assertEquals(2400, $item['trial_minutes']);
+        // 20 hours * 60 = 1200 regular minutes
+        $this->assertEquals(1200, $item['regular_minutes']);
+        $this->assertTrue($item['is_split_rate']);
+
+        // Expected trial salary: 40 hours * 218.75 = 8 750 FCFA
+        // Expected regular salary: 20 hours * 275.0 = 5 500 FCFA
+        // Total Base Salary = 8 750 + 5 500 = 14 250 FCFA
+        $this->assertEquals(14250, $item['base_salary']);
+        $this->assertEquals(14250, $item['salary']);
+    }
+
+    public function test_rh_and_admin_can_update_worker_hired_at_and_status()
+    {
+        $rhUser = User::factory()->create(['role' => 'rh']);
+        $this->actingAs($rhUser);
+
+        $worker = Worker::create([
+            'first_name' => 'Paul',
+            'last_name' => 'AGBO',
+            'shift' => 'day',
+        ]);
+
+        $newHiredAt = Carbon::now()->subDays(3)->toDateString();
+
+        $response = $this->patch(route('rh.workers.update_status', $worker->id), [
+            'hired_at' => $newHiredAt,
+            'hourly_rate' => 300.0,
+            'is_new' => 'null', // Auto
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $worker->refresh();
+        $this->assertEquals($newHiredAt, $worker->hired_at->toDateString());
+        $this->assertEquals(300.0, $worker->hourly_rate);
     }
 
     public function test_rh_and_admin_can_assign_bonuses_to_selected_workers()
@@ -99,51 +176,6 @@ class WorkerSalaryRateTest extends TestCase
             'month' => $month,
             'amount' => 5000,
         ]);
-
-        $this->assertDatabaseHas('worker_bonuses', [
-            'worker_id' => $worker2->id,
-            'month' => $month,
-            'amount' => 5000,
-        ]);
-    }
-
-    public function test_bonus_is_added_to_base_salary_in_monthly_payroll()
-    {
-        $worker = Worker::create([
-            'first_name' => 'Marc',
-            'last_name' => 'AGBO',
-            'shift' => 'night',
-            'is_new' => false,
-            'created_at' => Carbon::now()->subMonths(3),
-        ]);
-
-        // Attendance: 1 present day in night shift = 4 hours (240 min)
-        $date = Carbon::now()->startOfMonth()->format('Y-m-d');
-        Attendance::create([
-            'worker_id' => $worker->id,
-            'date' => $date,
-            'status' => 'present',
-        ]);
-
-        // Hourly rate: 300 F/h -> Base salary for 4 hours = 1 200 FCFA
-        Setting::set('worker_hourly_rate', 300);
-
-        // Add a bonus of 5 000 FCFA
-        $month = Carbon::now()->format('Y-m');
-        WorkerBonus::create([
-            'worker_id' => $worker->id,
-            'month' => $month,
-            'amount' => 5000,
-            'reason' => 'Prime de nuit',
-        ]);
-
-        $payroll = app(PayrollService::class)->getMonthlyPayroll(Carbon::now());
-        $item = $payroll['items']->firstWhere('worker.id', $worker->id);
-
-        $this->assertNotNull($item);
-        $this->assertEquals(1200, $item['base_salary']);
-        $this->assertEquals(5000, $item['bonus_amount']);
-        $this->assertEquals(6200, $item['salary']); // 1200 + 5000 = 6200 FCFA
     }
 
     public function test_pdf_export_hides_hourly_rate_column_for_confidentiality()

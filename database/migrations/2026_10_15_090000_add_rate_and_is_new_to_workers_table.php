@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('workers', function (Blueprint $table) {
             if (!Schema::hasColumn('workers', 'is_new')) {
-                $table->boolean('is_new')->default(false)->after('shift')->index();
+                $table->boolean('is_new')->nullable()->default(null)->after('shift')->index();
             }
             if (!Schema::hasColumn('workers', 'hourly_rate')) {
                 $table->unsignedInteger('hourly_rate')->nullable()->after('is_new');

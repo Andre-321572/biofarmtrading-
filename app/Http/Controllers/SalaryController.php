@@ -88,12 +88,12 @@ class SalaryController extends Controller
         }
 
         $validated = $request->validate([
-            'hourly_rate' => 'nullable|integer|min:1|max:100000',
-            'new_hourly_rate' => 'nullable|integer|min:1|max:100000',
+            'hourly_rate' => 'nullable|numeric|min:1|max:100000',
+            'new_hourly_rate' => 'nullable|numeric|min:1|max:100000',
         ], [
-            'hourly_rate.integer' => 'Le taux horaire standard doit être un nombre entier valide.',
+            'hourly_rate.numeric' => 'Le taux horaire standard doit être un nombre valide.',
             'hourly_rate.min' => 'Le taux horaire standard doit être supérieur ou égal à 1 FCFA.',
-            'new_hourly_rate.integer' => 'Le taux horaire des nouveaux ouvriers doit être un nombre entier valide.',
+            'new_hourly_rate.numeric' => 'Le taux horaire des nouveaux ouvriers doit être un nombre valide.',
             'new_hourly_rate.min' => 'Le taux horaire des nouveaux ouvriers doit être supérieur ou égal à 1 FCFA.',
         ]);
 
@@ -101,26 +101,26 @@ class SalaryController extends Controller
 
         // Mise à jour du taux pour les anciens ouvriers
         if (!empty($validated['hourly_rate'])) {
-            $newRate = (int) $validated['hourly_rate'];
+            $newRate = (float) $validated['hourly_rate'];
             Setting::set(
                 'worker_hourly_rate',
                 $newRate,
-                'integer',
+                'float',
                 'Taux horaire standard des anciens ouvriers Bio Farm Trading (en FCFA)'
             );
-            $messages[] = "Taux régulier : " . number_format($newRate, 0, ',', ' ') . " FCFA/h";
+            $messages[] = "Taux régulier : " . number_format($newRate, 2, ',', ' ') . " FCFA/h";
         }
 
-        // Mise à jour du taux pour les nouveaux ouvriers
+        // Mise à jour du taux pour les nouveaux ouvriers (période d'essai 14 jours)
         if (!empty($validated['new_hourly_rate'])) {
-            $newRecruitRate = (int) $validated['new_hourly_rate'];
+            $newRecruitRate = (float) $validated['new_hourly_rate'];
             Setting::set(
                 'worker_new_hourly_rate',
                 $newRecruitRate,
-                'integer',
-                'Taux horaire des nouveaux ouvriers Bio Farm Trading (en FCFA)'
+                'float',
+                'Taux horaire des nouveaux ouvriers en période d\'essai Bio Farm Trading (en FCFA)'
             );
-            $messages[] = "Taux nouveaux ouvriers : " . number_format($newRecruitRate, 0, ',', ' ') . " FCFA/h";
+            $messages[] = "Taux période d'essai : " . number_format($newRecruitRate, 2, ',', ' ') . " FCFA/h";
         }
 
         $msgText = count($messages) > 0 ? implode(' • ', $messages) : 'Paramètres enregistrés.';
@@ -199,12 +199,18 @@ class SalaryController extends Controller
         $isRh = Auth::check() && Auth::user()->isRh();
         $prefix = $isAdmin ? 'admin.' : ($isRh ? 'rh.' : '');
 
-        // Récupérer les ouvriers créés depuis moins de 60 jours ou explicitement marqués is_new = true
+        // Récupérer les ouvriers : en cours d'essai, explicitement is_new ou embauchés depuis moins de 60 jours
         $cutoffDate = Carbon::now()->subDays(60);
         $newWorkers = Worker::where(function ($q) use ($cutoffDate) {
             $q->where('is_new', true)
-              ->orWhere('created_at', '>=', $cutoffDate);
+              ->orWhere('hired_at', '>=', $cutoffDate->toDateString())
+              ->orWhere(function ($sub) use ($cutoffDate) {
+                  $sub->whereNull('hired_at')
+                      ->where('created_at', '>=', $cutoffDate);
+              });
         })
+        ->orderByRaw('CASE WHEN is_new = 1 THEN 0 ELSE 1 END')
+        ->orderBy('hired_at', 'desc')
         ->orderBy('created_at', 'desc')
         ->orderBy('last_name', 'asc')
         ->get();
@@ -216,7 +222,7 @@ class SalaryController extends Controller
     }
 
     /**
-     * Modifie le statut d'un ouvrier (bascule entre nouveau/ancien ou personnalise son taux horaire).
+     * Modifie le profil d'un ouvrier (statut essai/titularisé, date d'embauche ou taux personnalisé).
      */
     public function updateWorkerStatus(Request $request, Worker $worker)
     {
@@ -225,17 +231,27 @@ class SalaryController extends Controller
         }
 
         $validated = $request->validate([
-            'is_new' => 'nullable|boolean',
-            'hourly_rate' => 'nullable|integer|min:0|max:100000',
+            'is_new' => 'nullable|in:0,1,true,false,null',
+            'hired_at' => 'nullable|date',
+            'hourly_rate' => 'nullable|numeric|min:0|max:100000',
         ]);
 
         if ($request->has('is_new')) {
-            $worker->is_new = (bool) $validated['is_new'];
+            $val = $request->input('is_new');
+            if ($val === '' || $val === 'null' || is_null($val)) {
+                $worker->is_new = null; // Détection automatique 14 jours
+            } else {
+                $worker->is_new = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+            }
+        }
+
+        if ($request->has('hired_at')) {
+            $worker->hired_at = !empty($validated['hired_at']) ? $validated['hired_at'] : null;
         }
 
         if ($request->has('hourly_rate')) {
-            $val = $validated['hourly_rate'];
-            $worker->hourly_rate = ($val !== null && $val > 0) ? (int) $val : null;
+            $rateVal = $validated['hourly_rate'];
+            $worker->hourly_rate = ($rateVal !== null && $rateVal > 0) ? (float) $rateVal : null;
         }
 
         $worker->save();
