@@ -79,6 +79,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/ouvriers/nouveaux', [\App\Http\Controllers\SalaryController::class, 'newWorkers'])->name('workers.new');
         Route::patch('/ouvriers/{worker}/statut', [\App\Http\Controllers\SalaryController::class, 'updateWorkerStatus'])->name('workers.update_status');
 
+        // Postes et Personnel Permanent (Admin)
+        Route::resource('postes', \App\Http\Controllers\JobPositionController::class)->names('job_positions');
+        Route::resource('personnel', \App\Http\Controllers\EmployeeController::class)->names('employees');
+
         Route::get('/run-migrations', function() {
             \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             return redirect()->back()->with('success', 'Base de données synchronisée et migrations exécutées avec succès.');
@@ -141,6 +145,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('/salaires/primes/{bonus}', [\App\Http\Controllers\SalaryController::class, 'destroyBonus'])->name('salaries.bonuses.destroy');
         Route::get('/ouvriers/nouveaux', [\App\Http\Controllers\SalaryController::class, 'newWorkers'])->name('workers.new');
         Route::patch('/ouvriers/{worker}/statut', [\App\Http\Controllers\SalaryController::class, 'updateWorkerStatus'])->name('workers.update_status');
+
+        // Postes et Personnel Permanent (RH)
+        Route::resource('postes', \App\Http\Controllers\JobPositionController::class)->names('job_positions');
+        Route::resource('personnel', \App\Http\Controllers\EmployeeController::class)->names('employees');
     });
 
     // Responsable Production (RP) Routes

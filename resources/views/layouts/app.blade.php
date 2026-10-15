@@ -94,6 +94,16 @@
                             </x-nav-link-custom>
                         </li>
                         <li>
+                            <x-nav-link-custom href="{{ route('admin.job_positions.index') }}" :active="request()->routeIs('admin.job_positions.*')" icon="postes">
+                                {{ __('Postes & Fonctions') }}
+                            </x-nav-link-custom>
+                        </li>
+                        <li>
+                            <x-nav-link-custom href="{{ route('admin.employees.index') }}" :active="request()->routeIs('admin.employees.*')" icon="personnel">
+                                {{ __('Personnel BFT') }}
+                            </x-nav-link-custom>
+                        </li>
+                        <li>
                             <x-nav-link-custom href="{{ route('admin.attendance.index') }}" :active="request()->routeIs('admin.attendance.index')" icon="attendance">
                                 {{ __('Pointage') }}
                             </x-nav-link-custom>
@@ -131,6 +141,16 @@
 
                     @if(Auth::user()->role === 'rh')
                         <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Ressources Humaines</li>
+                        <li>
+                            <x-nav-link-custom href="{{ route('rh.job_positions.index') }}" :active="request()->routeIs('rh.job_positions.*')" icon="postes">
+                                {{ __('Postes & Fonctions') }}
+                            </x-nav-link-custom>
+                        </li>
+                        <li>
+                            <x-nav-link-custom href="{{ route('rh.employees.index') }}" :active="request()->routeIs('rh.employees.*')" icon="personnel">
+                                {{ __('Personnel BFT') }}
+                            </x-nav-link-custom>
+                        </li>
                         <li>
                             <x-nav-link-custom href="{{ route('rh.attendance.index') }}" :active="request()->routeIs('rh.attendance.index')" icon="attendance">
                                 {{ __('Pointage RH') }}

@@ -32,6 +32,12 @@
                         <x-nav-link :href="route('admin.stock.supply_sheet')" :active="request()->routeIs('admin.stock.supply_sheet')">
                             {{ __('Bon de Sortie') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.job_positions.index')" :active="request()->routeIs('admin.job_positions.*')">
+                            {{ __('Postes') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.employees.index')" :active="request()->routeIs('admin.employees.*')">
+                            {{ __('Personnel') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('admin.attendance.index')" :active="request()->routeIs('admin.attendance.index')">
                             {{ __('Pointage') }}
                         </x-nav-link>
@@ -44,6 +50,12 @@
                     @endif
 
                     @if(Auth::user()->role === 'rh')
+                        <x-nav-link :href="route('rh.job_positions.index')" :active="request()->routeIs('rh.job_positions.*')">
+                            {{ __('Postes') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('rh.employees.index')" :active="request()->routeIs('rh.employees.*')">
+                            {{ __('Personnel') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('rh.attendance.index')" :active="request()->routeIs('rh.attendance.index')">
                             {{ __('Pointage RH') }}
                         </x-nav-link>
@@ -147,6 +159,12 @@
                 <x-responsive-nav-link :href="route('admin.stock.supply_sheet')" :active="request()->routeIs('admin.stock.supply_sheet')">
                     {{ __('Bon de Sortie') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.job_positions.index')" :active="request()->routeIs('admin.job_positions.*')">
+                    {{ __('Postes') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.employees.index')" :active="request()->routeIs('admin.employees.*')">
+                    {{ __('Personnel') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.attendance.index')" :active="request()->routeIs('admin.attendance.index')">
                     {{ __('Pointage') }}
                 </x-responsive-nav-link>
@@ -159,6 +177,12 @@
             @endif
 
             @if(Auth::user()->role === 'rh')
+                <x-responsive-nav-link :href="route('rh.job_positions.index')" :active="request()->routeIs('rh.job_positions.*')">
+                    {{ __('Postes') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('rh.employees.index')" :active="request()->routeIs('rh.employees.*')">
+                    {{ __('Personnel') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('rh.attendance.index')" :active="request()->routeIs('rh.attendance.index')">
                     {{ __('Pointage RH') }}
                 </x-responsive-nav-link>
