@@ -30,16 +30,16 @@ class WorkerSalaryRateTest extends TestCase
         $rhUser = User::factory()->create(['role' => 'rh']);
         $this->actingAs($rhUser);
 
-        // RH updates rates with decimal support
+        // RH updates rates with French comma decimal support
         $response = $this->post(route('rh.salaries.update_rate'), [
-            'hourly_rate' => 280.5,
-            'new_hourly_rate' => 218.75,
+            'hourly_rate' => '280,50',
+            'new_hourly_rate' => '218,75',
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertEquals(280.5, PayrollService::getHourlyRate());
+        $this->assertEquals(280.50, PayrollService::getHourlyRate());
         $this->assertEquals(218.75, PayrollService::getNewHourlyRate());
     }
 
@@ -138,7 +138,7 @@ class WorkerSalaryRateTest extends TestCase
 
         $response = $this->patch(route('rh.workers.update_status', $worker->id), [
             'hired_at' => $newHiredAt,
-            'hourly_rate' => 300.0,
+            'hourly_rate' => '218,75',
             'is_new' => 'null', // Auto
         ]);
 
@@ -147,7 +147,7 @@ class WorkerSalaryRateTest extends TestCase
 
         $worker->refresh();
         $this->assertEquals($newHiredAt, $worker->hired_at->toDateString());
-        $this->assertEquals(300.0, $worker->hourly_rate);
+        $this->assertEquals(218.75, $worker->hourly_rate);
     }
 
     public function test_rh_and_admin_can_assign_bonuses_to_selected_workers()

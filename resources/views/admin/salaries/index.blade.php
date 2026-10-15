@@ -12,8 +12,8 @@
         showModal: false,
         showRateModal: false,
         showBonusModal: false,
-        newHourlyRate: {{ $hourly_rate }},
-        newRecruitsRate: {{ $new_hourly_rate ?? \App\Services\PayrollService::getNewHourlyRate() }},
+        newHourlyRate: '{{ number_format($hourly_rate, 2, '.', '') }}',
+        newRecruitsRate: '{{ number_format($new_hourly_rate ?? \App\Services\PayrollService::getNewHourlyRate(), 2, '.', '') }}',
         selectedWorkersForBonus: [],
         bonusAmount: 5000,
         bonusReason: 'Prime de rendement',
@@ -576,12 +576,11 @@
                                     Taux Horaire des ANCIENS Ouvriers (FCFA / h)
                                 </label>
                                 <div class="relative">
-                                    <input type="number" 
+                                    <input type="text" 
+                                           inputmode="decimal" 
                                            name="hourly_rate" 
-                                           x-model.number="newHourlyRate" 
-                                           min="1" 
-                                           max="100000" 
-                                           step="0.01" 
+                                           x-model="newHourlyRate" 
+                                           placeholder="Ex : 275 ou 275,00" 
                                            required 
                                            class="w-full text-2xl font-black text-slate-900 px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-slate-400">
@@ -601,12 +600,11 @@
                                     </span>
                                 </div>
                                 <div class="relative">
-                                    <input type="number" 
+                                    <input type="text" 
+                                           inputmode="decimal" 
                                            name="new_hourly_rate" 
-                                           x-model.number="newRecruitsRate" 
-                                           min="1" 
-                                           max="100000" 
-                                           step="0.01" 
+                                           x-model="newRecruitsRate" 
+                                           placeholder="Ex : 218,75 ou 218.75" 
                                            required 
                                            class="w-full text-2xl font-black text-purple-800 px-4 py-3 bg-purple-50 border-2 border-purple-200 rounded-2xl focus:bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-purple-400">
@@ -625,11 +623,11 @@
                                 </span>
                                 <div class="flex flex-wrap gap-2">
                                     <button type="button" 
-                                            @click="newRecruitsRate = 218.75; newHourlyRate = 275.00" 
+                                            @click="newRecruitsRate = '218,75'; newHourlyRate = '275'" 
                                             class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100">
-                                        Standard Bio Farm : 218.75 F / 275 F
+                                        Standard Bio Farm : 218,75 F / 275 F
                                     </button>
-                                    <template x-for="preset in [200, 218.75, 250, 275, 300, 350]" :key="preset">
+                                    <template x-for="preset in ['200', '218,75', '250', '275', '300', '350']" :key="preset">
                                         <button type="button" 
                                                 @click="newHourlyRate = preset" 
                                                 class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border"

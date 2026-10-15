@@ -87,13 +87,23 @@ class SalaryController extends Controller
             abort(403, "Action non autorisée. Seuls les administrateurs et RH peuvent modifier les taux horaires.");
         }
 
+        // Normalisation automatique des nombres à virgule (remplacement de ',' par '.')
+        if ($request->has('hourly_rate') && !is_null($request->input('hourly_rate'))) {
+            $normalized = str_replace([' ', ','], ['', '.'], (string) $request->input('hourly_rate'));
+            $request->merge(['hourly_rate' => $normalized === '' ? null : $normalized]);
+        }
+        if ($request->has('new_hourly_rate') && !is_null($request->input('new_hourly_rate'))) {
+            $normalized = str_replace([' ', ','], ['', '.'], (string) $request->input('new_hourly_rate'));
+            $request->merge(['new_hourly_rate' => $normalized === '' ? null : $normalized]);
+        }
+
         $validated = $request->validate([
             'hourly_rate' => 'nullable|numeric|min:1|max:100000',
             'new_hourly_rate' => 'nullable|numeric|min:1|max:100000',
         ], [
-            'hourly_rate.numeric' => 'Le taux horaire standard doit être un nombre valide.',
+            'hourly_rate.numeric' => 'Le taux horaire standard doit être un nombre valide (ex : 275 ou 275,50).',
             'hourly_rate.min' => 'Le taux horaire standard doit être supérieur ou égal à 1 FCFA.',
-            'new_hourly_rate.numeric' => 'Le taux horaire des nouveaux ouvriers doit être un nombre valide.',
+            'new_hourly_rate.numeric' => 'Le taux horaire des nouveaux ouvriers doit être un nombre valide (ex : 218,75).',
             'new_hourly_rate.min' => 'Le taux horaire des nouveaux ouvriers doit être supérieur ou égal à 1 FCFA.',
         ]);
 
@@ -228,6 +238,12 @@ class SalaryController extends Controller
     {
         if (!$this->checkAuthorizedUser()) {
             abort(403, "Action non autorisée.");
+        }
+
+        // Normalisation automatique des nombres à virgule pour le taux individuel
+        if ($request->has('hourly_rate') && !is_null($request->input('hourly_rate'))) {
+            $normalized = str_replace([' ', ','], ['', '.'], (string) $request->input('hourly_rate'));
+            $request->merge(['hourly_rate' => $normalized === '' ? null : $normalized]);
         }
 
         $validated = $request->validate([

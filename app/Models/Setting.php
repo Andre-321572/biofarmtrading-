@@ -39,12 +39,14 @@ class Setting extends Model
             return null;
         }
 
+        $cleanValue = str_replace(',', '.', trim($value));
+
         return match ($type) {
-            'integer', 'int' => (int) $value,
-            'float', 'double' => (float) $value,
-            'boolean', 'bool' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            'integer', 'int' => (strpos($cleanValue, '.') !== false) ? (float) $cleanValue : (int) $cleanValue,
+            'float', 'double', 'decimal' => (float) $cleanValue,
+            'boolean', 'bool' => filter_var($cleanValue, FILTER_VALIDATE_BOOLEAN),
             'json', 'array' => json_decode($value, true),
-            default => $value,
+            default => is_numeric($cleanValue) ? (float) $cleanValue : $value,
         };
     }
 

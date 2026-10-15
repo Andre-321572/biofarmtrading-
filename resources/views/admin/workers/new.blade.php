@@ -2,8 +2,8 @@
     <div class="py-8 bg-slate-50 min-h-screen" x-data="{
         showNewRateModal: false,
         showEditWorkerModal: false,
-        newRecruitRate: {{ $defaultNewRate }},
-        regularRate: {{ $defaultRate }},
+        newRecruitRate: '{{ number_format($defaultNewRate, 2, '.', '') }}',
+        regularRate: '{{ number_format($defaultRate, 2, '.', '') }}',
         currentWorker: null,
         workerForm: {
             id: null,
@@ -24,7 +24,20 @@
     }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Flash Messages -->
+            <!-- Flash Error Messages -->
+            @if($errors->any())
+                <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 shadow-xs space-y-1">
+                    <div class="flex items-center gap-2 font-black text-xs uppercase tracking-wider text-rose-900">
+                        <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Erreur de saisie</span>
+                    </div>
+                    @foreach($errors->all() as $error)
+                        <p class="text-xs font-semibold text-rose-700 pl-6">{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
+            <!-- Flash Success Messages -->
             @if(session('success'))
                 <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between shadow-xs">
                     <div class="flex items-center gap-3">
@@ -291,15 +304,19 @@
                                     </span>
                                 </div>
                                 <div class="relative">
-                                    <input type="number" 
+                                    <input type="text" 
+                                           inputmode="decimal" 
                                            name="new_hourly_rate" 
-                                           x-model.number="newRecruitRate" 
-                                           min="1" 
-                                           max="100000" 
-                                           step="0.01" 
+                                           x-model="newRecruitRate" 
+                                           placeholder="Ex : 218,75 ou 218.75" 
                                            required 
                                            class="w-full text-2xl font-black text-purple-700 px-4 py-3 bg-purple-50 border-2 border-purple-200 rounded-2xl focus:bg-white focus:border-purple-600 focus:ring-4 focus:ring-purple-600/20 text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-purple-400">FCFA / h</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button type="button" @click="newRecruitRate = '218,75'" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-purple-100 hover:bg-purple-200 text-purple-800 transition-colors">
+                                        Fixer à 218,75 FCFA
+                                    </button>
                                 </div>
                             </div>
 
@@ -313,15 +330,19 @@
                                     </span>
                                 </div>
                                 <div class="relative">
-                                    <input type="number" 
+                                    <input type="text" 
+                                           inputmode="decimal" 
                                            name="hourly_rate" 
-                                           x-model.number="regularRate" 
-                                           min="1" 
-                                           max="100000" 
-                                           step="0.01" 
+                                           x-model="regularRate" 
+                                           placeholder="Ex : 275 ou 275,00" 
                                            required 
                                            class="w-full text-2xl font-black text-slate-900 px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/20 text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-slate-400">FCFA / h</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button type="button" @click="regularRate = '275'" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors">
+                                        Fixer à 275 FCFA
+                                    </button>
                                 </div>
                             </div>
 
@@ -396,13 +417,11 @@
                                     Taux horaire spécifique personnalisé (optionnel)
                                 </label>
                                 <div class="relative">
-                                    <input type="number" 
+                                    <input type="text" 
+                                           inputmode="decimal" 
                                            name="hourly_rate" 
                                            x-model="workerForm.hourly_rate" 
-                                           placeholder="Ex : 300 (laisser vide pour appliquer le tarif standard)" 
-                                           min="0" 
-                                           max="100000" 
-                                           step="0.01" 
+                                           placeholder="Ex : 218,75 ou 300 (laisser vide pour tarif standard)" 
                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
                                     <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">FCFA/h</span>
                                 </div>
