@@ -70,10 +70,15 @@ Route::middleware('auth')->group(function () {
         Route::patch('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'updateWorker'])->name('workers.update');
         Route::delete('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'destroyWorker'])->name('workers.destroy');
 
-        // Worker Salaries Management
+        // Worker Salaries & Bonuses Management
         Route::get('/salaires', [\App\Http\Controllers\SalaryController::class, 'index'])->name('salaries.index');
         Route::get('/salaires/pdf', [\App\Http\Controllers\SalaryController::class, 'pdf'])->name('salaries.pdf');
         Route::post('/salaires/taux-horaire', [\App\Http\Controllers\SalaryController::class, 'updateRate'])->name('salaries.update_rate');
+        Route::post('/salaires/primes', [\App\Http\Controllers\SalaryController::class, 'storeBonus'])->name('salaries.bonuses.store');
+        Route::delete('/salaires/primes/{bonus}', [\App\Http\Controllers\SalaryController::class, 'destroyBonus'])->name('salaries.bonuses.destroy');
+        Route::get('/ouvriers/nouveaux', [\App\Http\Controllers\SalaryController::class, 'newWorkers'])->name('workers.new');
+        Route::patch('/ouvriers/{worker}/statut', [\App\Http\Controllers\SalaryController::class, 'updateWorkerStatus'])->name('workers.update_status');
+
         Route::get('/run-migrations', function() {
             \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             return redirect()->back()->with('success', 'Base de données synchronisée et migrations exécutées avec succès.');
@@ -128,9 +133,14 @@ Route::middleware('auth')->group(function () {
         Route::patch('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'updateWorker'])->name('attendance.update_worker');
         Route::delete('/workers/{worker}', [\App\Http\Controllers\AttendanceController::class, 'destroyWorker'])->name('attendance.destroy_worker');
 
-        // Worker Salaries Management
+        // Worker Salaries & Bonuses Management (RH)
         Route::get('/salaires', [\App\Http\Controllers\SalaryController::class, 'index'])->name('salaries.index');
         Route::get('/salaires/pdf', [\App\Http\Controllers\SalaryController::class, 'pdf'])->name('salaries.pdf');
+        Route::post('/salaires/taux-horaire', [\App\Http\Controllers\SalaryController::class, 'updateRate'])->name('salaries.update_rate');
+        Route::post('/salaires/primes', [\App\Http\Controllers\SalaryController::class, 'storeBonus'])->name('salaries.bonuses.store');
+        Route::delete('/salaires/primes/{bonus}', [\App\Http\Controllers\SalaryController::class, 'destroyBonus'])->name('salaries.bonuses.destroy');
+        Route::get('/ouvriers/nouveaux', [\App\Http\Controllers\SalaryController::class, 'newWorkers'])->name('workers.new');
+        Route::patch('/ouvriers/{worker}/statut', [\App\Http\Controllers\SalaryController::class, 'updateWorkerStatus'])->name('workers.update_status');
     });
 
     // Responsable Production (RP) Routes
@@ -147,6 +157,7 @@ Route::get('/offline', function () {
 });
 
 Route::get('/system/cache-flush', function () {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
     $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? null;
     $source = public_path('.htaccess');

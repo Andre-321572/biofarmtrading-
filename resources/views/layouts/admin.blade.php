@@ -94,6 +94,11 @@
                         {{ __('Salaires Ouvriers') }}
                     </x-nav-link-custom>
                 </li>
+                <li>
+                    <x-nav-link-custom href="{{ Route::has('admin.workers.new') ? route('admin.workers.new') : url('/admin/ouvriers/nouveaux') }}" :active="request()->routeIs('admin.workers.new')" icon="users">
+                        {{ __('Nouveaux Ouvriers') }}
+                    </x-nav-link-custom>
+                </li>
             </ul>
         </nav>
         

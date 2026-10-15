@@ -103,6 +103,11 @@
                                 {{ __('Salaires Ouvriers') }}
                             </x-nav-link-custom>
                         </li>
+                        <li>
+                            <x-nav-link-custom href="{{ Route::has('admin.workers.new') ? route('admin.workers.new') : url('/admin/ouvriers/nouveaux') }}" :active="request()->routeIs('admin.workers.new')" icon="users">
+                                {{ __('Nouveaux Ouvriers') }}
+                            </x-nav-link-custom>
+                        </li>
                     @endif
 
                     @if(Auth::user()->role === 'manager')
@@ -134,6 +139,11 @@
                         <li>
                             <x-nav-link-custom href="{{ Route::has('rh.salaries.index') ? route('rh.salaries.index') : url('/rh/salaires') }}" :active="request()->routeIs('rh.salaries.*')" icon="reports">
                                 {{ __('Salaires Ouvriers') }}
+                            </x-nav-link-custom>
+                        </li>
+                        <li>
+                            <x-nav-link-custom href="{{ Route::has('rh.workers.new') ? route('rh.workers.new') : url('/rh/ouvriers/nouveaux') }}" :active="request()->routeIs('rh.workers.new')" icon="users">
+                                {{ __('Nouveaux Ouvriers') }}
                             </x-nav-link-custom>
                         </li>
                     @endif

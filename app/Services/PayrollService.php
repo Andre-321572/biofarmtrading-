@@ -4,19 +4,25 @@ namespace App\Services;
 
 use App\Models\Worker;
 use App\Models\Attendance;
+use App\Models\WorkerBonus;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class PayrollService
 {
     /**
-     * Taux horaire standard par défaut pour les ouvriers Bio Farm Trading (en FCFA).
+     * Taux horaire standard par défaut pour les anciens ouvriers (en FCFA).
      */
     public const DEFAULT_HOURLY_RATE = 275;
     public const HOURLY_RATE = 275;
 
     /**
-     * Récupère le taux horaire dynamique défini par l'administrateur.
+     * Taux horaire standard par défaut pour les nouveaux ouvriers (en FCFA).
+     */
+    public const DEFAULT_NEW_HOURLY_RATE = 250;
+
+    /**
+     * Récupère le taux horaire standard (anciens ouvriers).
      */
     public static function getHourlyRate(): int
     {
@@ -24,19 +30,40 @@ class PayrollService
     }
 
     /**
-     * Calcule le récapitulatif complet de la paie mensuelle des ouvriers.
+     * Récupère le taux horaire pour les nouveaux ouvriers.
+     */
+    public static function getNewHourlyRate(): int
+    {
+        return (int) \App\Models\Setting::get('worker_new_hourly_rate', self::DEFAULT_NEW_HOURLY_RATE);
+    }
+
+    /**
+     * Calcule le récapitulatif complet de la paie mensuelle des ouvriers (avec primes et distinction nouveaux/anciens).
      *
      * @param Carbon $month
      * @param string|null $shift ('all', 'day', 'night')
      * @param string|null $search
-     * @param int|null $customRate Taux horaire optionnel
+     * @param int|null $customRate Taux horaire optionnel pour anciens
+     * @param int|null $customNewRate Taux horaire optionnel pour nouveaux
      * @return array
      */
-    public function getMonthlyPayroll(Carbon $month, ?string $shift = null, ?string $search = null, ?int $customRate = null): array
-    {
-        $rate = $customRate ?? self::getHourlyRate();
+    public function getMonthlyPayroll(
+        Carbon $month, 
+        ?string $shift = null, 
+        ?string $search = null, 
+        ?int $customRate = null,
+        ?int $customNewRate = null
+    ): array {
+        $regularRate = $customRate ?? self::getHourlyRate();
+        $newRate = $customNewRate ?? self::getNewHourlyRate();
+        $monthStr = $month->format('Y-m');
         $startOfMonth = $month->copy()->startOfMonth()->format('Y-m-d');
         $endOfMonth = $month->copy()->endOfMonth()->format('Y-m-d');
+
+        // Récupérer les primes du mois groupées par ouvrier
+        $monthlyBonuses = WorkerBonus::where('month', $monthStr)
+            ->get()
+            ->groupBy('worker_id');
 
         // Récupérer les ouvriers avec leurs présences sur le mois
         $query = Worker::query()
@@ -63,15 +90,39 @@ class PayrollService
 
         $payrollItems = [];
         $totalMinutesSum = 0;
-        $totalSalarySum = 0;
+        $totalBaseSalarySum = 0;
+        $totalBonusesSum = 0;
+        $totalNetSalarySum = 0;
         $dayWorkersCount = 0;
         $nightWorkersCount = 0;
         $daySalarySum = 0;
         $nightSalarySum = 0;
         $activeWorkersCount = 0;
+        $newWorkersCount = 0;
+        $regularWorkersCount = 0;
+        $workersWithBonusCount = 0;
 
         foreach ($workers as $worker) {
-            $calc = $this->calculateWorkerPayrollForMonth($worker, $rate);
+            $isNew = $worker->isNew();
+            if ($isNew) {
+                $newWorkersCount++;
+            } else {
+                $regularWorkersCount++;
+            }
+
+            // Calcul du taux effectif de cet ouvrier
+            $effectiveRate = $worker->getEffectiveHourlyRate($regularRate, $newRate);
+
+            // Récupérer les primes de cet ouvrier pour ce mois
+            $workerBonusesList = $monthlyBonuses->get($worker->id, collect());
+            $workerBonusTotal = (int) $workerBonusesList->sum('amount');
+            if ($workerBonusTotal > 0) {
+                $workersWithBonusCount++;
+            }
+
+            $calc = $this->calculateWorkerPayrollForMonth($worker, $effectiveRate, $workerBonusTotal);
+            $calc['is_new'] = $isNew;
+            $calc['bonuses_list'] = $workerBonusesList;
 
             if ($calc['total_minutes'] > 0) {
                 $activeWorkersCount++;
@@ -86,7 +137,9 @@ class PayrollService
             }
 
             $totalMinutesSum += $calc['total_minutes'];
-            $totalSalarySum += $calc['salary'];
+            $totalBaseSalarySum += $calc['base_salary'];
+            $totalBonusesSum += $calc['bonus_amount'];
+            $totalNetSalarySum += $calc['salary'];
 
             $payrollItems[] = $calc;
         }
@@ -98,22 +151,29 @@ class PayrollService
 
         return [
             'month' => $month,
+            'selectedMonth' => $monthStr,
             'start_of_month' => $startOfMonth,
             'end_of_month' => $endOfMonth,
-            'hourly_rate' => $rate,
+            'hourly_rate' => $regularRate,
+            'new_hourly_rate' => $newRate,
             'items' => collect($payrollItems),
             'summary' => [
                 'total_workers' => $workers->count(),
                 'active_workers' => $activeWorkersCount,
+                'new_workers_count' => $newWorkersCount,
+                'regular_workers_count' => $regularWorkersCount,
+                'workers_with_bonuses_count' => $workersWithBonusCount,
                 'total_minutes' => $totalMinutesSum,
                 'total_hours_decimal' => $totalHoursDecimal,
                 'total_hours_formatted' => $totalHoursFormatted,
-                'total_salary' => $totalSalarySum,
+                'total_base_salary' => $totalBaseSalarySum,
+                'total_bonuses' => $totalBonusesSum,
+                'total_salary' => $totalNetSalarySum,
                 'day_workers_count' => $dayWorkersCount,
                 'night_workers_count' => $nightWorkersCount,
                 'day_salary' => $daySalarySum,
                 'night_salary' => $nightSalarySum,
-                'average_salary' => $activeWorkersCount > 0 ? round($totalSalarySum / $activeWorkersCount) : 0,
+                'average_salary' => $activeWorkersCount > 0 ? round($totalNetSalarySum / $activeWorkersCount) : 0,
             ],
         ];
     }
@@ -123,11 +183,12 @@ class PayrollService
      *
      * @param Worker $worker
      * @param int|null $rate
+     * @param int $bonusAmount
      * @return array
      */
-    public function calculateWorkerPayrollForMonth(Worker $worker, ?int $rate = null): array
+    public function calculateWorkerPayrollForMonth(Worker $worker, ?int $rate = null, int $bonusAmount = 0): array
     {
-        $rate = $rate ?? self::getHourlyRate();
+        $rate = $rate ?? $worker->getEffectiveHourlyRate();
         $attendances = $worker->attendances;
         $totalMinutes = 0;
         $daysPresent = 0;
@@ -212,7 +273,6 @@ class PayrollService
                         'net_hours_text' => sprintf('%dh%02d', $h, $m),
                     ];
                 } elseif ($att && $att->status === 'present') {
-                    // Présent mais sans pointage horaire précis
                     $daysPresent++;
                     $dailyDetails[] = [
                         'date' => $date,
@@ -244,19 +304,25 @@ class PayrollService
         $hoursFormatted = sprintf('%dh%02d', $h, $m);
         $hoursDecimal = round($totalMinutes / 60, 2);
 
-        // Calcul du salaire : (Total minutes / 60) * taux horaire (275 FCFA)
-        $exactSalary = ($totalMinutes * $rate) / 60;
-        $roundedSalary = (int) round($exactSalary);
+        // Calcul du salaire de base : (Total minutes / 60) * taux horaire effectif
+        $exactBaseSalary = ($totalMinutes * $rate) / 60;
+        $roundedBaseSalary = (int) round($exactBaseSalary);
+
+        // Salaire net total = Salaire de base + Prime
+        $totalSalary = $roundedBaseSalary + $bonusAmount;
 
         return [
             'worker' => $worker,
             'shift' => $worker->shift,
+            'is_new' => $worker->isNew(),
             'days_present' => $daysPresent,
             'total_minutes' => $totalMinutes,
             'hours_decimal' => $hoursDecimal,
             'hours_formatted' => $hoursFormatted,
             'hourly_rate' => $rate,
-            'salary' => $roundedSalary,
+            'base_salary' => $roundedBaseSalary,
+            'bonus_amount' => $bonusAmount,
+            'salary' => $totalSalary,
             'daily_details' => $dailyDetails,
         ];
     }

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>État Mensuel des Salaires des Ouvriers - Bio Farm Trading</title>
+    <title>État Mensuel des Salaires et Émargement - Bio Farm Trading</title>
     <style>
         @page { 
             margin: 8mm 10mm 15mm 10mm; 
@@ -89,7 +89,7 @@
         table.data-table th, 
         table.data-table td { 
             border: 1px solid #cbd5e1; 
-            padding: 3.5px 5px; 
+            padding: 4px 5px; 
             font-size: 7.5pt; 
             vertical-align: middle; 
         }
@@ -102,15 +102,15 @@
             text-align: center;
         }
 
-        .col-num { width: 3%; text-align: center; }
-        .col-name { width: 17%; text-align: left; font-weight: bold; text-transform: uppercase; }
+        .col-num { width: 4%; text-align: center; }
+        .col-name { width: 18%; text-align: left; font-weight: bold; text-transform: uppercase; }
         .col-prenom { width: 18%; text-align: left; font-style: italic; }
-        .col-shift { width: 8%; text-align: center; }
+        .col-shift { width: 7%; text-align: center; }
         .col-days { width: 7%; text-align: center; }
-        .col-hours { width: 11%; text-align: center; font-weight: bold; }
-        .col-rate { width: 8%; text-align: center; }
-        .col-salary { width: 13%; text-align: right; font-weight: bold; color: #15803d; }
-        .col-sign { width: 15%; text-align: center; color: #94a3b8; font-size: 6.5pt; }
+        .col-hours { width: 12%; text-align: center; font-weight: bold; }
+        .col-bonus { width: 10%; text-align: right; font-weight: bold; color: #b45309; }
+        .col-salary { width: 12%; text-align: right; font-weight: bold; color: #15803d; }
+        .col-sign { width: 12%; text-align: center; height: 28px; }
 
         .section-header {
             background-color: #e2e8f0;
@@ -146,36 +146,36 @@
         }
         .signatures-table td {
             width: 33.33%;
-            border: 1px solid #cbd5e1;
-            padding: 8px;
+            border: 1px dashed #94a3b8;
+            padding: 10px;
             vertical-align: top;
-            font-size: 8pt;
+            height: 75px;
             background-color: #ffffff;
-            height: 70px;
         }
         .sign-title {
+            font-size: 8pt;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 7.5pt;
-            color: #334155;
-            margin-bottom: 30px;
+            color: #0f172a;
+            margin-bottom: 6px;
         }
         .sign-mention {
-            font-size: 6.5pt;
-            color: #94a3b8;
-            font-style: italic;
+            font-size: 7pt;
+            color: #64748b;
+            margin-top: 4px;
         }
 
         /* Footer */
         .footer { 
             position: fixed; 
-            bottom: -8mm; 
+            bottom: -5mm; 
             left: 0; 
             right: 0; 
-            font-size: 7pt; 
+            height: 10mm; 
+            font-size: 6.5pt; 
             color: #64748b; 
-            border-top: 1px solid #e2e8f0;
-            padding-top: 4px;
+            border-top: 1px solid #e2e8f0; 
+            padding-top: 4px; 
         }
         .footer-table { 
             width: 100%; 
@@ -207,10 +207,10 @@
         </table>
     </div>
 
-    <!-- Document Info Box -->
+    <!-- Document Info Box (Taux horaire masqué aux ouvriers) -->
     <div class="doc-title-box">
         <div class="doc-title">
-            ÉTAT RÉCAPITULATIF DES SALAIRES DES OUVRIERS • {{ mb_strtoupper($month->locale('fr')->translatedFormat('F Y')) }}
+            ÉTAT RÉCAPITULATIF DES SALAIRES ET ÉMARGEMENT DES OUVRIERS • {{ mb_strtoupper($month->locale('fr')->translatedFormat('F Y')) }}
         </div>
         <table class="meta-table">
             <tr>
@@ -218,13 +218,16 @@
                     <strong>Période :</strong> {{ \Carbon\Carbon::parse($start_of_month)->format('d/m/Y') }} au {{ \Carbon\Carbon::parse($end_of_month)->format('d/m/Y') }}
                 </td>
                 <td style="width: 25%;">
-                    <strong>Taux appliqué :</strong> <span class="kpi-badge">{{ number_format($hourly_rate, 0, ',', ' ') }} FCFA / heure</span>
-                </td>
-                <td style="width: 25%;">
                     <strong>Effectif rémunéré :</strong> {{ $summary['active_workers'] }} / {{ $summary['total_workers'] }} ouvriers
                 </td>
+                <td style="width: 25%;">
+                    <strong>Total Primes :</strong> 
+                    <span class="kpi-badge" style="background-color: #fef3c7; color: #92400e;">
+                        {{ number_format($summary['total_bonuses'], 0, ',', ' ') }} FCFA
+                    </span>
+                </td>
                 <td style="width: 25%; text-align: right;">
-                    <strong>Masse Salariale :</strong> 
+                    <strong>Net Total à Décaisser :</strong> 
                     <span style="font-size: 9.5pt; font-weight: bold; color: #15803d;">
                         {{ number_format($summary['total_salary'], 0, ',', ' ') }} FCFA
                     </span>
@@ -233,7 +236,7 @@
         </table>
     </div>
 
-    <!-- Data Table -->
+    <!-- Data Table (Sans la colonne de taux horaire pour confidentialité lors de l'émargement) -->
     <table class="data-table">
         <thead>
             <tr>
@@ -243,9 +246,9 @@
                 <th class="col-shift">Équipe</th>
                 <th class="col-days">Présences</th>
                 <th class="col-hours">Heures Effectives</th>
-                <th class="col-rate">Taux Horaire</th>
+                <th class="col-bonus">Prime</th>
                 <th class="col-salary">Net à Payer</th>
-                <th class="col-sign">Émargement / Date</th>
+                <th class="col-sign">Émargement / Signature</th>
             </tr>
         </thead>
         <tbody>
@@ -269,7 +272,13 @@
                             {{ $item['hours_formatted'] }}
                             <span style="font-size: 6.5pt; color: #64748b;">({{ number_format($item['hours_decimal'], 1, ',', ' ') }}h)</span>
                         </td>
-                        <td class="col-rate">{{ number_format($item['hourly_rate'], 0, ',', ' ') }} F</td>
+                        <td class="col-bonus">
+                            @if($item['bonus_amount'] > 0)
+                                +{{ number_format($item['bonus_amount'], 0, ',', ' ') }} F
+                            @else
+                                <span style="color: #cbd5e1;">-</span>
+                            @endif
+                        </td>
                         <td class="col-salary">
                             {{ number_format($item['salary'], 0, ',', ' ') }} F
                         </td>
@@ -280,7 +289,7 @@
                     <td colspan="4" style="text-align: right; padding-right: 10px;">SOUS-TOTAL ÉQUIPE DE JOUR :</td>
                     <td class="col-days">{{ $dayItems->sum('days_present') }} j</td>
                     <td class="col-hours">{{ floor($dayItems->sum('total_minutes') / 60) }}h{{ sprintf('%02d', $dayItems->sum('total_minutes') % 60) }}</td>
-                    <td class="col-rate">{{ number_format($hourly_rate, 0, ',', ' ') }} F</td>
+                    <td class="col-bonus">{{ number_format($dayItems->sum('bonus_amount'), 0, ',', ' ') }} F</td>
                     <td class="col-salary">{{ number_format($summary['day_salary'], 0, ',', ' ') }} FCFA</td>
                     <td></td>
                 </tr>
@@ -304,7 +313,13 @@
                             {{ $item['hours_formatted'] }}
                             <span style="font-size: 6.5pt; color: #64748b;">({{ number_format($item['hours_decimal'], 1, ',', ' ') }}h)</span>
                         </td>
-                        <td class="col-rate">{{ number_format($item['hourly_rate'], 0, ',', ' ') }} F</td>
+                        <td class="col-bonus">
+                            @if($item['bonus_amount'] > 0)
+                                +{{ number_format($item['bonus_amount'], 0, ',', ' ') }} F
+                            @else
+                                <span style="color: #cbd5e1;">-</span>
+                            @endif
+                        </td>
                         <td class="col-salary">
                             {{ number_format($item['salary'], 0, ',', ' ') }} F
                         </td>
@@ -315,7 +330,7 @@
                     <td colspan="4" style="text-align: right; padding-right: 10px;">SOUS-TOTAL ÉQUIPE DE NUIT :</td>
                     <td class="col-days">{{ $nightItems->sum('days_present') }} j</td>
                     <td class="col-hours">{{ floor($nightItems->sum('total_minutes') / 60) }}h{{ sprintf('%02d', $nightItems->sum('total_minutes') % 60) }}</td>
-                    <td class="col-rate">{{ number_format($hourly_rate, 0, ',', ' ') }} F</td>
+                    <td class="col-bonus">{{ number_format($nightItems->sum('bonus_amount'), 0, ',', ' ') }} F</td>
                     <td class="col-salary">{{ number_format($summary['night_salary'], 0, ',', ' ') }} FCFA</td>
                     <td></td>
                 </tr>
@@ -332,8 +347,8 @@
                 <td class="col-hours" style="font-weight: bold;">
                     {{ $summary['total_hours_formatted'] }}
                 </td>
-                <td class="col-rate" style="font-weight: bold;">
-                    {{ number_format($hourly_rate, 0, ',', ' ') }} F
+                <td class="col-bonus" style="font-weight: bold;">
+                    {{ number_format($summary['total_bonuses'], 0, ',', ' ') }} F
                 </td>
                 <td class="col-salary" style="font-size: 10pt; font-weight: bold;">
                     {{ number_format($summary['total_salary'], 0, ',', ' ') }} FCFA
@@ -372,7 +387,7 @@
         <table class="footer-table">
             <tr>
                 <td style="width: 60%; text-align: left;">
-                    Bio Farm Trading SARL - Document officiel de paie mensuelle ouvriers • Généré le {{ $generationDate->format('d/m/Y à H:i') }}
+                    Bio Farm Trading SARL - Fiche d'émargement et de paie mensuelle • Généré le {{ $generationDate->format('d/m/Y à H:i') }}
                 </td>
                 <td style="width: 40%; text-align: right;">
                     Certifié biologique par Ecocert International • TG-BIO-154

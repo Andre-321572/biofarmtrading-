@@ -7,8 +7,9 @@ use Carbon\Carbon;
 use App\Services\PayrollService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
-
 use App\Models\Setting;
+use App\Models\Worker;
+use App\Models\WorkerBonus;
 
 class SalaryController extends Controller
 {
@@ -17,6 +18,19 @@ class SalaryController extends Controller
     public function __construct(PayrollService $payrollService)
     {
         $this->payrollService = $payrollService;
+    }
+
+    /**
+     * Vérifie si l'utilisateur connecté a le droit de gérer les salaires (Admin ou RH).
+     */
+    protected function checkAuthorizedUser(): bool
+    {
+        if (!Auth::check()) {
+            return false;
+        }
+
+        $user = Auth::user();
+        return $user->isAdmin() || $user->isRh();
     }
 
     /**
@@ -45,7 +59,12 @@ class SalaryController extends Controller
 
         // Détection du préfixe de route selon le rôle (rh ou admin)
         $isAdmin = Auth::check() && Auth::user()->isAdmin();
-        $prefix = $isAdmin ? 'admin.' : 'rh.';
+        $isRh = Auth::check() && Auth::user()->isRh();
+        $prefix = $isAdmin ? 'admin.' : ($isRh ? 'rh.' : '');
+        $canEdit = $isAdmin || $isRh;
+
+        // Ouvriers disponibles pour modal d'attribution des primes
+        $allWorkers = Worker::orderBy('last_name', 'asc')->orderBy('first_name', 'asc')->get();
 
         return view('admin.salaries.index', array_merge($payrollData, [
             'selectedMonth' => $monthCarbon->format('Y-m'),
@@ -54,42 +73,179 @@ class SalaryController extends Controller
             'selectedShift' => $shift,
             'search' => $search,
             'prefix' => $prefix,
-            'canEditRate' => $isAdmin,
+            'canEditRate' => $canEdit,
+            'allWorkers' => $allWorkers,
         ]));
     }
 
     /**
-     * Met à jour le taux horaire appliqué aux ouvriers (réservé à l'Admin).
+     * Met à jour le taux horaire appliqué aux ouvriers (Accessible à l'Admin et au RH).
      */
     public function updateRate(Request $request)
     {
-        if (!Auth::check() || !Auth::user()->isAdmin()) {
-            abort(403, "Action non autorisée. Seul l'administrateur peut modifier le taux horaire.");
+        if (!$this->checkAuthorizedUser()) {
+            abort(403, "Action non autorisée. Seuls les administrateurs et RH peuvent modifier les taux horaires.");
         }
 
         $validated = $request->validate([
-            'hourly_rate' => 'required|integer|min:1|max:100000',
+            'hourly_rate' => 'nullable|integer|min:1|max:100000',
+            'new_hourly_rate' => 'nullable|integer|min:1|max:100000',
         ], [
-            'hourly_rate.required' => 'Le taux horaire est obligatoire.',
-            'hourly_rate.integer' => 'Le taux horaire doit être un nombre entier valide.',
-            'hourly_rate.min' => 'Le taux horaire doit être supérieur ou égal à 1 FCFA.',
-            'hourly_rate.max' => 'Le taux horaire ne peut pas dépasser 100 000 FCFA.',
+            'hourly_rate.integer' => 'Le taux horaire standard doit être un nombre entier valide.',
+            'hourly_rate.min' => 'Le taux horaire standard doit être supérieur ou égal à 1 FCFA.',
+            'new_hourly_rate.integer' => 'Le taux horaire des nouveaux ouvriers doit être un nombre entier valide.',
+            'new_hourly_rate.min' => 'Le taux horaire des nouveaux ouvriers doit être supérieur ou égal à 1 FCFA.',
         ]);
 
-        $newRate = (int) $validated['hourly_rate'];
+        $messages = [];
 
-        Setting::set(
-            'worker_hourly_rate',
-            $newRate,
-            'integer',
-            'Taux horaire standard des ouvriers Bio Farm Trading (en FCFA)'
-        );
+        // Mise à jour du taux pour les anciens ouvriers
+        if (!empty($validated['hourly_rate'])) {
+            $newRate = (int) $validated['hourly_rate'];
+            Setting::set(
+                'worker_hourly_rate',
+                $newRate,
+                'integer',
+                'Taux horaire standard des anciens ouvriers Bio Farm Trading (en FCFA)'
+            );
+            $messages[] = "Taux régulier : " . number_format($newRate, 0, ',', ' ') . " FCFA/h";
+        }
 
-        return redirect()->back()->with('success', "Le taux horaire a été mis à jour à " . number_format($newRate, 0, ',', ' ') . " FCFA/heure avec succès. Tous les salaires ont été automatiquement recalculés.");
+        // Mise à jour du taux pour les nouveaux ouvriers
+        if (!empty($validated['new_hourly_rate'])) {
+            $newRecruitRate = (int) $validated['new_hourly_rate'];
+            Setting::set(
+                'worker_new_hourly_rate',
+                $newRecruitRate,
+                'integer',
+                'Taux horaire des nouveaux ouvriers Bio Farm Trading (en FCFA)'
+            );
+            $messages[] = "Taux nouveaux ouvriers : " . number_format($newRecruitRate, 0, ',', ' ') . " FCFA/h";
+        }
+
+        $msgText = count($messages) > 0 ? implode(' • ', $messages) : 'Paramètres enregistrés.';
+
+        return redirect()->back()->with('success', "Paramétrage des salaires mis à jour avec succès ({$msgText}). Tous les calculs ont été actualisés.");
     }
 
     /**
-     * Génère et télécharge la fiche de paie mensuelle au format PDF pour le comptable.
+     * Attribue une prime mensuelle à un ou plusieurs ouvriers cochés.
+     */
+    public function storeBonus(Request $request)
+    {
+        if (!$this->checkAuthorizedUser()) {
+            abort(403, "Action non autorisée.");
+        }
+
+        $validated = $request->validate([
+            'worker_ids' => 'required|array|min:1',
+            'worker_ids.*' => 'exists:workers,id',
+            'month' => 'required|date_format:Y-m',
+            'amount' => 'required|integer|min:1|max:1000000',
+            'reason' => 'nullable|string|max:255',
+        ], [
+            'worker_ids.required' => 'Veuillez sélectionner au moins un ouvrier.',
+            'worker_ids.min' => 'Veuillez cocher au moins un ouvrier pour la prime.',
+            'amount.required' => 'Le montant de la prime est obligatoire.',
+            'amount.integer' => 'Le montant doit être un entier en FCFA.',
+            'amount.min' => 'Le montant de la prime doit être au moins 1 FCFA.',
+        ]);
+
+        $workerIds = $validated['worker_ids'];
+        $month = $validated['month'];
+        $amount = (int) $validated['amount'];
+        $reason = $validated['reason'] ?? 'Prime mensuelle';
+        $userId = Auth::id();
+
+        $count = 0;
+        foreach ($workerIds as $wId) {
+            WorkerBonus::updateOrCreate(
+                [
+                    'worker_id' => $wId,
+                    'month' => $month,
+                ],
+                [
+                    'amount' => $amount,
+                    'reason' => $reason,
+                    'created_by' => $userId,
+                ]
+            );
+            $count++;
+        }
+
+        return redirect()->back()->with('success', "Prime de " . number_format($amount, 0, ',', ' ') . " FCFA attribuée avec succès à {$count} ouvrier(s) pour le mois {$month}.");
+    }
+
+    /**
+     * Supprime une prime mensuelle d'un ouvrier.
+     */
+    public function destroyBonus(WorkerBonus $bonus)
+    {
+        if (!$this->checkAuthorizedUser()) {
+            abort(403, "Action non autorisée.");
+        }
+
+        $bonus->delete();
+
+        return redirect()->back()->with('success', "La prime a été supprimée avec succès.");
+    }
+
+    /**
+     * Affiche la liste dédiée des nouveaux ouvriers et leur gestion tarifaire.
+     */
+    public function newWorkers(Request $request)
+    {
+        $isAdmin = Auth::check() && Auth::user()->isAdmin();
+        $isRh = Auth::check() && Auth::user()->isRh();
+        $prefix = $isAdmin ? 'admin.' : ($isRh ? 'rh.' : '');
+
+        // Récupérer les ouvriers créés depuis moins de 60 jours ou explicitement marqués is_new = true
+        $cutoffDate = Carbon::now()->subDays(60);
+        $newWorkers = Worker::where(function ($q) use ($cutoffDate) {
+            $q->where('is_new', true)
+              ->orWhere('created_at', '>=', $cutoffDate);
+        })
+        ->orderBy('created_at', 'desc')
+        ->orderBy('last_name', 'asc')
+        ->get();
+
+        $defaultRate = PayrollService::getHourlyRate();
+        $defaultNewRate = PayrollService::getNewHourlyRate();
+
+        return view('admin.workers.new', compact('newWorkers', 'defaultRate', 'defaultNewRate', 'prefix'));
+    }
+
+    /**
+     * Modifie le statut d'un ouvrier (bascule entre nouveau/ancien ou personnalise son taux horaire).
+     */
+    public function updateWorkerStatus(Request $request, Worker $worker)
+    {
+        if (!$this->checkAuthorizedUser()) {
+            abort(403, "Action non autorisée.");
+        }
+
+        $validated = $request->validate([
+            'is_new' => 'nullable|boolean',
+            'hourly_rate' => 'nullable|integer|min:0|max:100000',
+        ]);
+
+        if ($request->has('is_new')) {
+            $worker->is_new = (bool) $validated['is_new'];
+        }
+
+        if ($request->has('hourly_rate')) {
+            $val = $validated['hourly_rate'];
+            $worker->hourly_rate = ($val !== null && $val > 0) ? (int) $val : null;
+        }
+
+        $worker->save();
+
+        return redirect()->back()->with('success', "Le profil de l'ouvrier {$worker->last_name} {$worker->first_name} a été mis à jour.");
+    }
+
+    /**
+     * Génère et télécharge la fiche de paie mensuelle au format PDF pour émargement.
+     * REMARQUE STRICTE (Audio 2) : La colonne du Taux Horaire est masquée pour préserver la confidentialité salariale.
      */
     public function pdf(Request $request)
     {

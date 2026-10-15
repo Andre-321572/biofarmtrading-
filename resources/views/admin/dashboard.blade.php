@@ -127,7 +127,7 @@
 
                 <!-- Colonne Droite : Formulaire interactif de modification du taux -->
                 <div class="md:col-span-7 bg-gray-50 rounded-2xl p-5 border border-gray-200/80 space-y-4">
-                    <form method="POST" action="{{ route('admin.salaries.update_rate') }}" class="space-y-4">
+                    <form method="POST" action="{{ Route::has('admin.salaries.update_rate') ? route('admin.salaries.update_rate') : url('/admin/salaires/taux-horaire') }}" class="space-y-4">
                         @csrf
                         <div>
                             <label class="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">

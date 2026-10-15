@@ -38,6 +38,9 @@
                         <x-nav-link :href="Route::has('admin.salaries.index') ? route('admin.salaries.index') : url('/admin/salaires')" :active="request()->routeIs('admin.salaries.*')">
                             {{ __('Salaires Ouvriers') }}
                         </x-nav-link>
+                        <x-nav-link :href="Route::has('admin.workers.new') ? route('admin.workers.new') : url('/admin/ouvriers/nouveaux')" :active="request()->routeIs('admin.workers.new')">
+                            {{ __('Nouveaux Ouvriers') }}
+                        </x-nav-link>
                     @endif
 
                     @if(Auth::user()->role === 'rh')
@@ -46,6 +49,9 @@
                         </x-nav-link>
                         <x-nav-link :href="Route::has('rh.salaries.index') ? route('rh.salaries.index') : url('/rh/salaires')" :active="request()->routeIs('rh.salaries.*')">
                             {{ __('Salaires Ouvriers') }}
+                        </x-nav-link>
+                        <x-nav-link :href="Route::has('rh.workers.new') ? route('rh.workers.new') : url('/rh/ouvriers/nouveaux')" :active="request()->routeIs('rh.workers.new')">
+                            {{ __('Nouveaux Ouvriers') }}
                         </x-nav-link>
                     @endif
 
@@ -147,6 +153,9 @@
                 <x-responsive-nav-link :href="Route::has('admin.salaries.index') ? route('admin.salaries.index') : url('/admin/salaires')" :active="request()->routeIs('admin.salaries.*')">
                     {{ __('Salaires Ouvriers') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="Route::has('admin.workers.new') ? route('admin.workers.new') : url('/admin/ouvriers/nouveaux')" :active="request()->routeIs('admin.workers.new')">
+                    {{ __('Nouveaux Ouvriers') }}
+                </x-responsive-nav-link>
             @endif
 
             @if(Auth::user()->role === 'rh')
@@ -155,6 +164,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="Route::has('rh.salaries.index') ? route('rh.salaries.index') : url('/rh/salaires')" :active="request()->routeIs('rh.salaries.*')">
                     {{ __('Salaires Ouvriers') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="Route::has('rh.workers.new') ? route('rh.workers.new') : url('/rh/ouvriers/nouveaux')" :active="request()->routeIs('rh.workers.new')">
+                    {{ __('Nouveaux Ouvriers') }}
                 </x-responsive-nav-link>
             @endif
 
