@@ -21,6 +21,12 @@
         @if(Auth::check() && Auth::user()->role === 'admin')
             <script src="{{ asset('js/admin-notifications.js') }}" defer></script>
         @endif
+        <style>
+            .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 9999px; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.6); }
+        </style>
     </head>
     <body class="font-sans antialiased bg-[#F8FAFC] flex h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
         <!-- Mobile Sidebar Overlay -->
@@ -77,7 +83,7 @@
                             </x-nav-link-custom>
                         </li>
 
-                        <li class="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Stocks & Pointage</li>
+                        <li class="pt-5 pb-1.5 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Stocks & Logistique</li>
                         <li>
                             <x-nav-link-custom href="{{ route('admin.stock.index') }}" :active="request()->routeIs('admin.stock.index')" icon="stock">
                                 {{ __('État du Stock') }}
@@ -93,6 +99,12 @@
                                 {{ __('Rapports Mensuels') }}
                             </x-nav-link-custom>
                         </li>
+
+                        <!-- Personnel & Postes Section -->
+                        <li class="pt-5 pb-1.5 px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center justify-between">
+                            <span>Personnel & Postes</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        </li>
                         <li>
                             <x-nav-link-custom href="{{ route('admin.job_positions.index') }}" :active="request()->routeIs('admin.job_positions.*')" icon="postes">
                                 {{ __('Postes & Fonctions') }}
@@ -103,6 +115,9 @@
                                 {{ __('Personnel BFT') }}
                             </x-nav-link-custom>
                         </li>
+
+                        <!-- Ouvriers Journaliers Section -->
+                        <li class="pt-5 pb-1.5 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Ouvriers Journaliers</li>
                         <li>
                             <x-nav-link-custom href="{{ route('admin.attendance.index') }}" :active="request()->routeIs('admin.attendance.index')" icon="attendance">
                                 {{ __('Pointage') }}
