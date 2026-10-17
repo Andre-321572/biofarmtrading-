@@ -163,7 +163,7 @@ class AttendanceController extends Controller
             $lastName = trim(mb_strtoupper($workerData['last_name']));
             $firstName = trim($workerData['first_name']);
 
-            Worker::firstOrCreate(
+            $worker = Worker::firstOrCreate(
                 [
                     'last_name' => $lastName,
                     'first_name' => $firstName,
@@ -194,6 +194,13 @@ class AttendanceController extends Controller
             'shift' => $request->shift,
         ]);
 
+        // Mettre à jour l'employé lié
+        if ($worker->employee) {
+            $worker->employee->first_name = $worker->first_name;
+            $worker->employee->last_name = $worker->last_name;
+            $worker->employee->save();
+        }
+
         return back()->with('success', 'Ouvrier mis à jour avec succès.');
     }
 
@@ -202,6 +209,9 @@ class AttendanceController extends Controller
      */
     public function destroyWorker(Worker $worker)
     {
+        if ($worker->employee) {
+            $worker->employee->delete();
+        }
         $worker->delete(); // Automatically deletes attendances if cascade is set, or we can do it manually
         return back()->with('success', 'Ouvrier supprimé avec succès.');
     }

@@ -214,12 +214,12 @@
                     <table class="w-full divide-y divide-gray-200">
                         <thead class="bg-slate-800 text-white">
                             <tr class="text-[10px] font-black uppercase tracking-wider text-left">
-                                <th class="px-3 py-3 w-[150px]">N° LOT *</th>
+                                <th class="px-3 py-3 whitespace-nowrap" style="min-width:160px; width:160px;">N° LOT *</th>
                                 <th class="px-3 py-3 w-[170px]">PRODUIT</th>
-                                <th class="px-3 py-3 w-[120px] text-right">DÉCLAYÉ (KG)</th>
+                                <th class="px-3 py-3 text-right" style="min-width:100px; width:100px;">DÉCLAYÉ (KG)</th>
                                 <th class="px-4 py-3 min-w-[500px] text-center">POIDS (KG) & SACHETS PAR FORMAT DE COUPE</th>
-                                <th class="px-3 py-3 w-[110px] text-right">DÉCHETS (KG)</th>
-                                <th class="px-3 py-3 w-[110px] text-right">QTÉ TTPM (KG)</th>
+                                <th class="px-3 py-3 text-right" style="min-width:150px; width:150px;">DÉCHETS (KG)</th>
+                                <th class="px-3 py-3 text-right" style="min-width:150px; width:150px;">QTÉ TTPM (KG)</th>
                                 <th class="px-2 py-3 w-10 text-center">ACTION</th>
                             </tr>
                         </thead>
@@ -227,9 +227,9 @@
                             <template x-for="(lot, index) in lots" :key="index">
                                 <tr class="hover:bg-slate-50/70 transition-colors">
                                     <!-- N° Lot -->
-                                    <td class="p-3 align-middle">
+                                    <td class="px-3 py-2 align-middle" style="min-width:160px; width:160px;">
                                         <input type="text" :name="'lots['+index+'][numero_lot]'" x-model="lot.numero_lot" required placeholder="ex: Lot 285/ANA"
-                                               class="w-full py-1.5 px-2.5 rounded-md border-gray-300 text-xs font-bold focus:border-emerald-500 focus:ring-emerald-500 bg-white">
+                                               class="w-full py-2 px-3 rounded-md border border-gray-300 text-sm font-bold focus:border-emerald-500 focus:ring-emerald-500 bg-white" style="min-width:136px;">
                                     </td>
 
                                     <!-- Type Produit -->
@@ -246,9 +246,9 @@
                                     </td>
 
                                     <!-- Qté Déclayée kg -->
-                                    <td class="p-3 align-middle">
+                                    <td class="p-3 align-middle" style="min-width:100px; width:100px;">
                                         <input type="number" step="0.01" min="0" :name="'lots['+index+'][quantite_declayee_kg]'" x-model="lot.quantite_declayee_kg" placeholder="0.00"
-                                               class="w-full py-1.5 px-2 rounded-md border-gray-300 text-xs font-bold text-right text-gray-900 focus:border-emerald-500 focus:ring-emerald-500 bg-white">
+                                               class="w-full py-2 px-3 rounded-md border border-gray-300 text-sm font-bold text-right text-gray-900 focus:border-emerald-500 focus:ring-emerald-500 bg-white">
                                     </td>
 
                                     <!-- Dynamic Inline Poids & Sachets par Coupe -->
@@ -413,16 +413,16 @@
                                     </td>
 
                                     <!-- Déchets kg -->
-                                    <td class="p-3 align-middle">
+                                    <td class="p-3 align-middle" style="min-width:150px; width:150px;">
                                         <input type="number" step="0.01" min="0" :name="'lots['+index+'][dechets_kg]'" x-model="lot.dechets_kg" placeholder="0.00"
-                                               class="w-full py-1.5 px-2 rounded-md border-gray-300 text-xs text-right text-rose-600 font-bold focus:border-emerald-500 focus:ring-emerald-500 bg-white">
+                                               class="w-full py-2 px-3 rounded-md border border-gray-300 text-sm text-right text-rose-600 font-bold focus:border-emerald-500 focus:ring-emerald-500 bg-white">
                                     </td>
 
                                     <!-- Qté TTPM kg -->
-                                    <td class="p-3 align-middle">
+                                    <td class="p-3 align-middle" style="min-width:150px; width:150px;">
                                         <input type="number" step="0.01" min="0" x-model="lot.cl_ttpm_kg" placeholder="0.00"
                                                :disabled="lot.type_produit === 'Papaye'"
-                                               class="w-full py-1.5 px-2 rounded-md border-gray-300 text-xs text-right text-teal-700 font-bold focus:border-emerald-500 focus:ring-emerald-500 bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                                               class="w-full py-2 px-3 rounded-md border border-gray-300 text-sm text-right text-teal-700 font-bold focus:border-emerald-500 focus:ring-emerald-500 bg-white disabled:bg-gray-100 disabled:text-gray-400">
                                     </td>
 
                                     <!-- Action Supprimer -->

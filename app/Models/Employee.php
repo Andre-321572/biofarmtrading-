@@ -11,6 +11,7 @@ class Employee extends Model
 
     protected $fillable = [
         'job_position_id',
+        'worker_id',
         'matricule',
         'first_name',
         'last_name',
@@ -54,6 +55,14 @@ class Employee extends Model
     public function jobPosition()
     {
         return $this->belongsTo(JobPosition::class, 'job_position_id');
+    }
+
+    /**
+     * Ouvrier de production associé (si applicable).
+     */
+    public function worker()
+    {
+        return $this->belongsTo(Worker::class, 'worker_id');
     }
 
     /**

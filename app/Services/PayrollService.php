@@ -17,7 +17,7 @@ class PayrollService
     public const HOURLY_RATE = 275.0;
 
     /**
-     * Taux horaire standard par défaut pour les nouveaux ouvriers en période d'essai de 14 jours (en FCFA).
+     * Taux horaire standard par défaut pour les nouveaux ouvriers en période d'essai de 15 jours (en FCFA).
      */
     public const DEFAULT_NEW_HOURLY_RATE = 218.75;
 
@@ -176,7 +176,7 @@ class PayrollService
     }
 
     /**
-     * Calcule le détail et le salaire d'un ouvrier pour ses présences chargées avec gestion journalière de la période d'essai (14 jours).
+     * Calcule le détail et le salaire d'un ouvrier pour ses présences chargées avec gestion journalière de la période d'essai (15 jours).
      *
      * @param Worker $worker
      * @param float|null $regularRate Taux horaire standard (anciens ouvriers)

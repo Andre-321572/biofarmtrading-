@@ -11,6 +11,7 @@ class Worker extends Model
         'first_name', 
         'last_name', 
         'position', 
+        'job_position_id',
         'shift',
         'hired_at',
         'is_new',
@@ -33,6 +34,16 @@ class Worker extends Model
         return $this->hasMany(WorkerBonus::class);
     }
 
+    public function jobPosition()
+    {
+        return $this->belongsTo(JobPosition::class, 'job_position_id');
+    }
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'worker_id');
+    }
+
     /**
      * Date d'embauche effective de l'ouvrier (ou date de création si non renseignée).
      */
@@ -50,7 +61,9 @@ class Worker extends Model
     }
 
     /**
-     * Date de fin de la période d'essai de 2 semaines (14 jours).
+     * Date de fin de la période d'essai de 15 jours.
+     * Exemple : un ouvrier embauché le 1er du mois a 15 jours d'essai (du 1er au 15 inclus).
+     * Dès le 16ème jour (J+16), il bascule automatiquement au statut ancien titularisé.
      */
     public function getTrialEndsAt(): Carbon
     {
@@ -58,7 +71,7 @@ class Worker extends Model
     }
 
     /**
-     * Vérifie si l'ouvrier était en période d'essai (14 jours) à une date précise.
+     * Vérifie si l'ouvrier était en période d'essai (15 jours) à une date précise.
      */
     public function isInTrialOnDate(Carbon|string $date): bool
     {
@@ -72,7 +85,7 @@ class Worker extends Model
             return true;
         }
 
-        // 3. Détection automatique : pendant les 14 jours suivant l'embauche
+        // 3. Détection automatique : pendant les 15 jours suivant l'embauche
         $dateCarbon = Carbon::parse($date)->startOfDay();
         $hiredAt = $this->getHiredAt();
         $trialEndsAt = $this->getTrialEndsAt();
@@ -89,7 +102,7 @@ class Worker extends Model
     }
 
     /**
-     * Nombre de jours restants dans la période d'essai de 14 jours (0 si terminée).
+     * Nombre de jours restants dans la période d'essai de 15 jours (0 si terminée).
      */
     public function getTrialDaysRemaining(): int
     {
@@ -101,7 +114,7 @@ class Worker extends Model
         $trialEnd = $this->getTrialEndsAt()->startOfDay();
 
         $diff = $now->diffInDays($trialEnd, false);
-        return max(0, (int) $diff);
+        return max(0, (int) $diff + 1);
     }
 
     /**
@@ -119,7 +132,7 @@ class Worker extends Model
             return false;
         }
 
-        // 3. Période d'essai automatique de 14 jours
+        // 3. Période d'essai automatique de 15 jours
         return $this->isCurrentlyInTrial();
     }
 
@@ -142,21 +155,29 @@ class Worker extends Model
     }
 
     /**
-     * Scope pour filtrer les nouveaux ouvriers (en cours d'essai ou flag is_new).
+     * Scope pour filtrer les ouvriers actuellement nouveaux (en cours des 15 jours d'essai ou flag is_new actif).
      */
     public function scopeNewWorkers($query)
     {
-        $cutoff = Carbon::now()->subDays(14);
+        $cutoff = Carbon::now()->subDays(14)->startOfDay();
 
-        return $query->where('is_new', true)
-            ->orWhere(function ($q) use ($cutoff) {
-                $q->where(function ($sub) use ($cutoff) {
-                    $sub->whereNotNull('hired_at')
-                        ->where('hired_at', '>=', $cutoff->toDateString());
-                })->orWhere(function ($sub) use ($cutoff) {
-                    $sub->whereNull('hired_at')
-                        ->where('created_at', '>=', $cutoff);
-                });
-            });
+        return $query->where(function ($q) use ($cutoff) {
+            $q->where('is_new', true)
+              ->orWhere(function ($sub) use ($cutoff) {
+                  $sub->whereNull('is_new')
+                      ->where(function ($dateSub) use ($cutoff) {
+                          $dateSub->where(function ($h) use ($cutoff) {
+                              $h->whereNotNull('hired_at')
+                                ->where('hired_at', '>=', $cutoff->toDateString());
+                          })->orWhere(function ($c) use ($cutoff) {
+                              $c->whereNull('hired_at')
+                                ->where('created_at', '>=', $cutoff);
+                          });
+                      });
+              });
+        })->where(function ($q) {
+            $q->where('is_new', '!=', false)
+              ->orWhereNull('is_new');
+        });
     }
 }

@@ -239,13 +239,17 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
 
-                    @if(isset($header))
+                    @if(isset($header) && !empty(trim((string)$header)))
                         <div class="truncate max-w-[200px] sm:max-w-none">
                             {{ $header }}
                         </div>
-                    @else
+                    @elseif(View::hasSection('header_title'))
                         <h1 class="text-base sm:text-xl font-bold text-gray-900 truncate uppercase tracking-tight">
-                            @yield('header_title', 'Dashboard')
+                            @yield('header_title')
+                        </h1>
+                    @elseif(request()->routeIs('*dashboard*'))
+                        <h1 class="text-base sm:text-xl font-bold text-gray-900 truncate uppercase tracking-tight">
+                            Dashboard
                         </h1>
                     @endif
                 </div>

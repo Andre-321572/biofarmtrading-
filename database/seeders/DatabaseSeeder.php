@@ -44,6 +44,9 @@ class DatabaseSeeder extends Seeder
         // Ouvriers Bio Farm (Jour & Nuit)
         $this->call(BioFarmWorkersSeeder::class);
 
+        // Personnel Permanent Bio Farm Trading (Distinct des ouvriers)
+        $this->call(BftPersonnelSeeder::class);
+
         // Shops
         \App\Models\Shop::firstOrCreate(
             ['name' => 'Boutique Cacaveli'],

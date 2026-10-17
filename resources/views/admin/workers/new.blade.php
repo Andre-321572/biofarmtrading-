@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="header"></x-slot>
     <div class="py-8 bg-slate-50 min-h-screen" x-data="{
         showNewRateModal: false,
         showEditWorkerModal: false,
@@ -63,7 +64,7 @@
                             Période d'Essai & <span class="text-purple-600">Nouveaux Ouvriers</span>
                         </h1>
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">
-                            Période d'essai automatique de 14 jours ({{ number_format($defaultNewRate, 2, ',', ' ') }} FCFA/h) &bull; Titularisation automatique dès J+15 ({{ number_format($defaultRate, 2, ',', ' ') }} FCFA/h)
+                            Période d'essai automatique de 15 jours ({{ number_format($defaultNewRate, 2, ',', ' ') }} FCFA/h) &bull; Titularisation automatique dès J+16 ({{ number_format($defaultRate, 2, ',', ' ') }} FCFA/h)
                         </p>
                     </div>
                 </div>
@@ -88,7 +89,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div class="bg-white rounded-3xl p-6 border-2 border-purple-300 shadow-xs relative overflow-hidden" style="background-color: #ffffff; border-color: #d8b4fe;">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-black uppercase tracking-wider text-purple-700" style="color: #7e22ce;">Taux Période d'Essai (14 jours)</span>
+                        <span class="text-xs font-black uppercase tracking-wider text-purple-700" style="color: #7e22ce;">Taux Période d'Essai (15 jours)</span>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200" style="background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff;">
                             Nouveaux
                         </span>
@@ -96,7 +97,7 @@
                     <div class="text-3xl font-black text-slate-900 mt-2" style="color: #0f172a;">
                         {{ number_format($defaultNewRate, 2, ',', ' ') }} <span class="text-lg font-bold text-purple-600" style="color: #9333ea;">FCFA / h</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2" style="color: #64748b;">Appliqué durant les 14 premiers jours d'intégration</p>
+                    <p class="text-[11px] text-slate-500 mt-2" style="color: #64748b;">Appliqué durant les 15 premiers jours d'intégration</p>
                 </div>
 
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
@@ -104,15 +105,15 @@
                     <div class="text-3xl font-black text-slate-800 mt-2">
                         {{ number_format($defaultRate, 2, ',', ' ') }} <span class="text-lg font-bold text-slate-400">FCFA / h</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2">Bascule automatique après les 14 jours d'essai sans action requise</p>
+                    <p class="text-[11px] text-slate-500 mt-2">Bascule automatique après les 15 jours d'essai sans action requise</p>
                 </div>
 
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Ouvriers Détectés Récemment</span>
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Ouvriers en Période d'Essai</span>
                     <div class="text-3xl font-black text-purple-600 mt-2">
                         {{ $newWorkers->count() }} <span class="text-lg font-bold text-slate-400">ouvrier(s)</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2">En période d'essai ou récemment embauchés</p>
+                    <p class="text-[11px] text-slate-500 mt-2">Actuellement en cours des 15 jours d'essai</p>
                 </div>
             </div>
 
@@ -121,7 +122,7 @@
                 <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
                         <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Suivi des Recrues & Évolution Période d'Essai</h2>
-                        <p class="text-xs text-slate-400">Contrôlez les dates d'embauche, les fins de période d'essai (14 jours) et les taux appliqués</p>
+                        <p class="text-xs text-slate-400">Contrôlez les dates d'embauche, les fins de période d'essai (15 jours) et les taux appliqués</p>
                     </div>
                 </div>
 
@@ -133,7 +134,7 @@
                                 <th class="py-4 px-6">Ouvrier</th>
                                 <th class="py-4 px-4 text-center">Équipe</th>
                                 <th class="py-4 px-4 text-center">Date Embauche</th>
-                                <th class="py-4 px-4 text-center">Fin Essai (14j)</th>
+                                <th class="py-4 px-4 text-center">Fin Essai (15j)</th>
                                 <th class="py-4 px-4 text-center">Taux Applicable</th>
                                 <th class="py-4 px-4 text-center">Statut Actuel</th>
                                 <th class="py-4 px-6 text-right">Actions</th>
@@ -186,16 +187,16 @@
                                         </span>
                                     </td>
 
-                                    <!-- Fin Essai (14j) -->
+                                    <!-- Fin Essai (15j) -->
                                     <td class="py-4 px-4 text-center text-xs">
                                         <span class="font-bold text-slate-800">{{ $trialEndsAt->format('d/m/Y') }}</span>
-                                        @if($inTrial)
+                                        @if($remainingDays > 0)
                                             <span class="block text-[10px] font-bold text-purple-600">
                                                 Reste {{ $remainingDays }} jour(s)
                                             </span>
                                         @else
-                                            <span class="block text-[10px] font-bold text-emerald-600">
-                                                Période achevée
+                                            <span class="block text-[10px] font-bold text-amber-600">
+                                                Dernier jour d'essai
                                             </span>
                                         @endif
                                     </td>
@@ -216,19 +217,11 @@
                                     <td class="py-4 px-4 text-center">
                                         @if($worker->is_new === true)
                                             <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
-                                                Essai forcé (RH)
-                                            </span>
-                                        @elseif($worker->is_new === false)
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                Titularisé (RH)
-                                            </span>
-                                        @elseif($inTrial)
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-300">
-                                                En essai ({{ $remainingDays }}j)
+                                                Essai maintenu (RH)
                                             </span>
                                         @else
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
-                                                Titularisé auto
+                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-300">
+                                                En essai ({{ $remainingDays }}j restants)
                                             </span>
                                         @endif
                                     </td>
@@ -260,9 +253,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="py-12 text-center text-slate-400">
-                                        <p class="font-bold text-base">Aucun ouvrier en période d'essai ou récemment embauché.</p>
-                                        <p class="text-xs mt-1">Tous les ouvriers ont achevé leurs 14 jours d'essai et sont rémunérés au tarif standard.</p>
+                                    <td colspan="8" class="py-16 text-center text-slate-400">
+                                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3 border border-emerald-100">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        </div>
+                                        <p class="font-black text-slate-700 text-sm uppercase tracking-wide">Aucun ouvrier actuellement en période d'essai</p>
+                                        <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+                                            Tous les ouvriers ont achevé leurs 15 jours d'essai et ont basculé automatiquement dans le groupe des anciens ouvriers au taux standard ({{ number_format($defaultRate, 2, ',', ' ') }} F/h).
+                                        </p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -286,7 +284,7 @@
                         <div class="px-6 py-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex justify-between items-center" style="background-color: #581c87; color: #ffffff;">
                             <div>
                                 <h3 class="text-base font-black uppercase tracking-tight">Paramétrer les Taux Horaires</h3>
-                                <p class="text-[11px] text-purple-200">Définir les tarifs par heure selon la période d'essai (14 jours)</p>
+                                <p class="text-[11px] text-purple-200">Définir les tarifs par heure selon la période d'essai (15 jours)</p>
                             </div>
                             <button type="button" @click="showNewRateModal = false" class="text-purple-300 hover:text-white p-1 rounded-xl">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -297,7 +295,7 @@
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="block text-xs font-black uppercase tracking-wider text-purple-700">
-                                        Taux Période d'Essai (14 premiers jours)
+                                        Taux Période d'Essai (15 premiers jours)
                                     </label>
                                     <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
                                         Défaut : 218.75 FCFA
@@ -393,7 +391,7 @@
                                        x-model="workerForm.hired_at" 
                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
                                 <p class="text-[11px] text-slate-400 mt-1">
-                                    La période d'essai de 14 jours démarre à cette date.
+                                    La période d'essai de 15 jours démarre à cette date.
                                 </p>
                             </div>
 
@@ -405,7 +403,7 @@
                                 <select name="is_new" 
                                         x-model="workerForm.is_new" 
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
-                                    <option value="null">Automatique (Période d'essai de 14 jours)</option>
+                                    <option value="null">Automatique (Période d'essai de 15 jours)</option>
                                     <option value="1">Forcer en Période d'Essai (Taux Nouveaux)</option>
                                     <option value="0">Titulariser immédiatement (Taux Anciens)</option>
                                 </select>

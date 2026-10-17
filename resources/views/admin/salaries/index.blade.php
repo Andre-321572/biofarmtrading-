@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="header"></x-slot>
     <style>
         [x-cloak] { display: none !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -12,6 +13,13 @@
         showModal: false,
         showRateModal: false,
         showBonusModal: false,
+        showCancelBonusModal: false,
+        cancelBonusId: null,
+        cancelBonusWorkerName: '',
+        cancelBonusAmount: 0,
+        cancelBonusOriginalReason: '',
+        cancelBonusReason: '',
+        cancelBonusUrlTemplate: '{{ route($prefix . 'salaries.bonuses.destroy', ['bonus' => '__BONUS_ID__']) }}',
         newHourlyRate: '{{ number_format($hourly_rate, 2, '.', '') }}',
         newRecruitsRate: '{{ number_format($new_hourly_rate ?? \App\Services\PayrollService::getNewHourlyRate(), 2, '.', '') }}',
         selectedWorkersForBonus: [],
@@ -25,6 +33,17 @@
         openBonusForWorker(workerId) {
             this.selectedWorkersForBonus = [workerId];
             this.showBonusModal = true;
+        },
+        openCancelBonus(bonusId, workerName, amount, originalReason) {
+            this.cancelBonusId = bonusId;
+            this.cancelBonusWorkerName = workerName;
+            this.cancelBonusAmount = amount;
+            this.cancelBonusOriginalReason = originalReason || '';
+            this.cancelBonusReason = '';
+            this.showCancelBonusModal = true;
+        },
+        getCancelBonusUrl() {
+            return this.cancelBonusUrlTemplate.replace('__BONUS_ID__', this.cancelBonusId);
         },
         toggleAllBonus(workerIds) {
             if (this.selectedWorkersForBonus.length === workerIds.length) {
@@ -78,32 +97,27 @@
 
             <!-- Controls & Header Section -->
             <div class="mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-6">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-2xl shadow-sm">
-                        <img src="{{ asset('images/biofarm_logo.jpg') }}" class="w-12 h-12 object-contain rounded-xl" onerror="this.src='/images/biofarm_logo.jpg'">
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            Gestion Salaires &bull; {{ number_format($hourly_rate, 2, ',', ' ') }} F/h (Anciens) &bull; {{ number_format($new_hourly_rate ?? 218.75, 2, ',', ' ') }} F/h (Essai 15j)
+                        </span>
+                        @if($canEditRate ?? true)
+                            <button type="button" 
+                                    @click="showRateModal = true"
+                                    class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 transition-all flex items-center gap-1 shadow-xs active:scale-95"
+                                    title="Modifier les taux horaires appliqués aux ouvriers">
+                                <svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                <span>Modifier Taux</span>
+                            </button>
+                        @endif
                     </div>
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                Gestion Salaires &bull; {{ number_format($hourly_rate, 2, ',', ' ') }} F/h (Anciens) &bull; {{ number_format($new_hourly_rate ?? 218.75, 2, ',', ' ') }} F/h (Essai 14j)
-                            </span>
-                            @if($canEditRate ?? true)
-                                <button type="button" 
-                                        @click="showRateModal = true"
-                                        class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 transition-all flex items-center gap-1 shadow-xs active:scale-95"
-                                        title="Modifier les taux horaires appliqués aux ouvriers">
-                                    <svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                    <span>Modifier Taux</span>
-                                </button>
-                            @endif
-                        </div>
-                        <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight mt-1">
-                            État des Salaires <span class="text-emerald-600">Bio Farm</span>
-                        </h2>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                            Période : <span class="text-slate-700">{{ $month->locale('fr')->translatedFormat('F Y') }}</span> (du {{ \Carbon\Carbon::parse($start_of_month)->format('d/m/Y') }} au {{ \Carbon\Carbon::parse($end_of_month)->format('d/m/Y') }})
-                        </p>
-                    </div>
+                    <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight mt-1">
+                        État des Salaires <span class="text-emerald-600">Bio Farm</span>
+                    </h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                        Période : <span class="text-slate-700">{{ $month->locale('fr')->translatedFormat('F Y') }}</span> (du {{ \Carbon\Carbon::parse($start_of_month)->format('d/m/Y') }} au {{ \Carbon\Carbon::parse($end_of_month)->format('d/m/Y') }})
+                    </p>
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-2.5">
@@ -163,11 +177,21 @@
                         </button>
                     @endif
 
-                    <!-- Bouton Télécharger PDF -->
+                    <!-- Bouton Télécharger Fiche d'Émargement (Sans Salaires pour ouvriers) -->
+                    <a href="{{ route($prefix . 'salaries.emargement', ['month' => $selectedMonth, 'shift' => $selectedShift]) }}" 
+                       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/25 transition-all flex items-center gap-2 active:scale-95"
+                       title="Télécharger la feuille d'émargement sans salaires pour faire émarger les ouvriers">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        <span>FICHE ÉMARGEMENT (SANS SALAIRES)</span>
+                    </a>
+
+                    <!-- Bouton Télécharger État Financier Global (Direction / Comptabilité) -->
                     <a href="{{ route($prefix . 'salaries.pdf', ['month' => $selectedMonth, 'shift' => $selectedShift]) }}" 
-                       class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/25 transition-all flex items-center gap-2 active:scale-95">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        <span>TÉLÉCHARGER PDF PAIE</span>
+                       class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-2.5 rounded-2xl font-black text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95"
+                       title="Télécharger l'état financier complet avec les montants pour la Direction et la Comptabilité">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <span class="hidden xl:inline">ÉTAT FINANCIER GLOBAL</span>
+                        <span class="xl:hidden">ÉTAT GLOBAL</span>
                     </a>
                 </div>
             </div>
@@ -397,7 +421,7 @@
                                     <td class="py-4 px-4 text-center">
                                         @if(!empty($item['is_split_rate']))
                                             <div class="inline-flex flex-col items-center gap-1">
-                                                <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200" title="Heures effectuées pendant la période d'essai de 14 jours">
+                                                <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200" title="Heures effectuées pendant la période d'essai de 15 jours">
                                                     {{ $item['trial_hours_formatted'] }} &bull; {{ number_format($item['trial_rate'], 2, ',', ' ') }} F
                                                 </span>
                                                 <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200" title="Heures effectuées après titularisation">
@@ -409,7 +433,7 @@
                                                 {{ number_format($item['hourly_rate'], 2, ',', ' ') }} F
                                             </span>
                                             <span class="block text-[9px] font-bold text-slate-400">
-                                                {{ $isNew ? '(Essai 14j)' : '/ heure' }}
+                                                {{ $isNew ? '(Essai 15j)' : '/ heure' }}
                                             </span>
                                         @endif
                                     </td>
@@ -422,12 +446,25 @@
                                     <!-- Prime (FCFA) -->
                                     <td class="py-4 px-4 text-right">
                                         @if($item['bonus_amount'] > 0)
-                                            <button type="button" 
-                                                    @click="openBonusForWorker({{ $w->id }})"
-                                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors shadow-xs"
-                                                    title="Modifier la prime de {{ $w->last_name }}">
-                                                +{{ number_format($item['bonus_amount'], 0, ',', ' ') }} F
-                                            </button>
+                                            @php
+                                                $activeBonus = $item['bonuses_list']->first();
+                                            @endphp
+                                            <div class="inline-flex items-center gap-1.5 justify-end">
+                                                <button type="button" 
+                                                        @click="openBonusForWorker({{ $w->id }})"
+                                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors shadow-xs"
+                                                        title="Modifier la prime de {{ $w->last_name }} ({{ $activeBonus?->reason ?? 'Prime' }})">
+                                                    +{{ number_format($item['bonus_amount'], 0, ',', ' ') }} F
+                                                </button>
+                                                @if($activeBonus)
+                                                    <button type="button" 
+                                                            @click="openCancelBonus({{ $activeBonus->id }}, '{{ addslashes($w->last_name . ' ' . $w->first_name) }}', {{ (int)$activeBonus->amount }}, '{{ addslashes($activeBonus->reason ?? 'Prime de rendement') }}')"
+                                                            class="p-1.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all"
+                                                            title="Résilier / Annuler cette prime">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         @else
                                             <button type="button" 
                                                     @click="openBonusForWorker({{ $w->id }})"
@@ -502,9 +539,19 @@
                                         {{ number_format($summary['total_salary'], 0, ',', ' ') }} FCFA
                                     </td>
                                     <td class="py-4 px-4 text-center">
-                                        <a href="{{ route($prefix . 'salaries.pdf', ['month' => $selectedMonth, 'shift' => $selectedShift]) }}" class="text-[10px] font-black uppercase text-emerald-600 hover:underline">
-                                            PDF
-                                        </a>
+                                        <div class="inline-flex items-center gap-1.5">
+                                            <a href="{{ route($prefix . 'salaries.emargement', ['month' => $selectedMonth, 'shift' => $selectedShift]) }}" 
+                                               class="text-[10px] font-black uppercase text-emerald-600 hover:underline"
+                                               title="Fiche d'émargement ouvriers (sans salaires)">
+                                                Émargement
+                                            </a>
+                                            <span class="text-slate-300">&bull;</span>
+                                            <a href="{{ route($prefix . 'salaries.pdf', ['month' => $selectedMonth, 'shift' => $selectedShift]) }}" 
+                                               class="text-[10px] font-black uppercase text-slate-500 hover:underline"
+                                               title="État financier complet (Direction)">
+                                                Compta
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -526,11 +573,16 @@
                         </p>
                     </div>
                 </div>
-                <div class="text-right">
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <a href="{{ route($prefix . 'salaries.emargement', ['month' => $selectedMonth, 'shift' => $selectedShift]) }}" 
+                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition-all active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        <span>Fiche d'Émargement (Sans Salaires)</span>
+                    </a>
                     <a href="{{ route($prefix . 'salaries.pdf', ['month' => $selectedMonth, 'shift' => $selectedShift]) }}" 
-                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs shadow-md transition-all">
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        <span>Fiche d'Émargement PDF</span>
+                        <span>État Financier</span>
                     </a>
                 </div>
             </div>
@@ -589,14 +641,14 @@
                                 </div>
                             </div>
 
-                            <!-- Taux Nouveaux Ouvriers (Période d'essai 14 jours) -->
+                            <!-- Taux Nouveaux Ouvriers (Période d'essai 15 jours) -->
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="block text-xs font-black uppercase tracking-wider text-purple-700">
                                         Taux Horaire d'ESSAI Nouveaux Ouvriers (FCFA / h)
                                     </label>
                                     <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
-                                        Période d'essai de 14 jours
+                                        Période d'essai de 15 jours
                                     </span>
                                 </div>
                                 <div class="relative">
@@ -612,7 +664,7 @@
                                     </span>
                                 </div>
                                 <p class="text-[11px] text-slate-500 mt-1.5">
-                                    Appliqué automatiquement durant les 14 premiers jours d'essai. Dès le 15ème jour, le taux bascule automatiquement au taux standard (275 FCFA/h).
+                                    Appliqué automatiquement durant les 15 premiers jours d'essai. Dès le 16ème jour, le taux bascule automatiquement au taux standard ({{ number_format($hourly_rate, 2, ',', ' ') }} FCFA/h).
                                 </p>
                             </div>
 
@@ -700,7 +752,7 @@
                                            x-model.number="bonusAmount" 
                                            min="1" 
                                            max="1000000" 
-                                           step="100" 
+                                           step="1" 
                                            required 
                                            class="w-full text-2xl font-black text-amber-700 px-4 py-3 bg-amber-50/50 border-2 border-amber-200 rounded-2xl focus:bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 text-center">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-amber-500">FCFA</span>
@@ -831,9 +883,17 @@
                                     <span class="text-[10px] font-black uppercase text-slate-400">Total Heures</span>
                                     <div class="text-lg font-black text-blue-600 mt-0.5" x-text="selectedWorker.hours_formatted"></div>
                                 </div>
-                                <div class="bg-white p-3 rounded-2xl border border-slate-200">
+                                <div class="bg-white p-3 rounded-2xl border border-slate-200 flex flex-col justify-between">
                                     <span class="text-[10px] font-black uppercase text-slate-400">Prime Reçue</span>
                                     <div class="text-lg font-black text-amber-600 mt-0.5" x-text="'+' + (selectedWorker.bonus_amount || 0).toLocaleString('fr-FR') + ' F'"></div>
+                                    <template x-if="selectedWorker.bonus_amount > 0 && selectedWorker.bonuses_list && selectedWorker.bonuses_list.length > 0">
+                                        <button type="button" 
+                                                @click="openCancelBonus(selectedWorker.bonuses_list[0].id, selectedWorker.worker.last_name + ' ' + selectedWorker.worker.first_name, selectedWorker.bonus_amount, selectedWorker.bonuses_list[0].reason)"
+                                                class="mt-1 text-[10px] font-black text-red-600 hover:text-red-700 hover:underline flex items-center justify-center gap-1 transition-colors">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            <span>Résilier prime</span>
+                                        </button>
+                                    </template>
                                 </div>
                                 <div class="bg-white p-3 rounded-2xl border border-slate-200">
                                     <span class="text-[10px] font-black uppercase text-slate-400">Net Total</span>
@@ -876,6 +936,116 @@
                             </div>
                         </div>
                     </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MODAL 4 : RÉSILIER / SUPPRIMER UNE PRIME   -->
+        <!-- (Justification obligatoire par les RH)    -->
+        <!-- ========================================== -->
+        <div x-show="showCancelBonusModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+                     @click="showCancelBonusModal = false"></div>
+
+                <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl border border-slate-200 relative z-10">
+                    <form method="POST" :action="getCancelBonusUrl()">
+                        @csrf
+                        @method('DELETE')
+
+                        <!-- Modal Header -->
+                        <div class="px-6 py-5 bg-gradient-to-r from-red-600 to-rose-700 text-white flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-white">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-black uppercase tracking-tight">Résilier la Prime</h3>
+                                    <p class="text-[11px] font-bold text-red-100">
+                                        Période : {{ $month->locale('fr')->translatedFormat('F Y') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" @click="showCancelBonusModal = false" class="text-red-200 hover:text-white p-1 rounded-xl hover:bg-white/10 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="p-6 space-y-5">
+                            <!-- Worker & Bonus recap card -->
+                            <div class="p-4 rounded-2xl bg-red-50/70 border border-red-200/80 flex items-center justify-between">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-red-600 block">Bénéficiaire</span>
+                                    <span class="font-black text-sm text-slate-800 uppercase" x-text="cancelBonusWorkerName"></span>
+                                    <span class="block text-xs text-slate-500 font-medium mt-0.5" x-show="cancelBonusOriginalReason" x-text="'Motif initial : ' + cancelBonusOriginalReason"></span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-red-600 block">Montant à annuler</span>
+                                    <span class="text-lg font-black text-red-700" x-text="'-' + (cancelBonusAmount || 0).toLocaleString('fr-FR') + ' F'"></span>
+                                </div>
+                            </div>
+
+                            <!-- Reason field -->
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                                    Motif de la résiliation <span class="text-red-500">*</span>
+                                </label>
+                                <textarea name="cancellation_reason" 
+                                          x-model="cancelBonusReason" 
+                                          rows="3" 
+                                          required 
+                                          minlength="3" 
+                                          placeholder="Précisez pourquoi cette prime est retirée (ex : Erreur d'attribution, absence injustifiée, instruction direction...)" 
+                                          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"></textarea>
+                                
+                                <!-- Suggestions de motifs rapides -->
+                                <div class="mt-2.5">
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                                        Motifs fréquents (cliquez pour sélectionner) :
+                                    </span>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <template x-for="presetReason in [
+                                            'Erreur de saisie / d\'attribution',
+                                            'Absence injustifiée après attribution',
+                                            'Non-respect des consignes de production',
+                                            'Objectifs de rendement non atteints',
+                                            'Annulation sur instruction de la Direction',
+                                            'Doublon / Régularisation de paie'
+                                        ]" :key="presetReason">
+                                            <button type="button" 
+                                                    @click="cancelBonusReason = presetReason"
+                                                    class="px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all text-left"
+                                                    :class="cancelBonusReason === presetReason ? 'bg-red-600 text-white border-red-600 shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'">
+                                                <span x-text="presetReason"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200/80 text-[11px] text-amber-800 flex items-start gap-2">
+                                <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <span>La prime sera immédiatement retirée du calcul du salaire net. Ce motif restera consigné pour l'audit RH.</span>
+                            </div>
+
+                            <!-- Footer Actions -->
+                            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                                <button type="button" 
+                                        @click="showCancelBonusModal = false" 
+                                        class="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+                                    Annuler
+                                </button>
+                                <button type="submit" 
+                                        :disabled="!cancelBonusReason || cancelBonusReason.trim().length < 3"
+                                        class="px-6 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-black text-xs shadow-lg shadow-red-600/20 transition-all flex items-center gap-2 active:scale-95">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    <span>Confirmer la Résiliation</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

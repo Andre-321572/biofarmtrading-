@@ -187,21 +187,37 @@ class SalaryController extends Controller
     }
 
     /**
-     * Supprime une prime mensuelle d'un ouvrier.
+     * Supprime / résilie une prime mensuelle d'un ouvrier avec justification obligatoire.
      */
-    public function destroyBonus(WorkerBonus $bonus)
+    public function destroyBonus(Request $request, WorkerBonus $bonus)
     {
         if (!$this->checkAuthorizedUser()) {
             abort(403, "Action non autorisée.");
         }
 
+        $validated = $request->validate([
+            'cancellation_reason' => 'required|string|min:3|max:500',
+        ], [
+            'cancellation_reason.required' => 'Veuillez préciser le motif de résiliation/suppression de la prime.',
+            'cancellation_reason.min' => 'Le motif de résiliation doit comporter au moins 3 caractères.',
+        ]);
+
+        $workerName = $bonus->worker ? ($bonus->worker->last_name . ' ' . $bonus->worker->first_name) : 'l\'ouvrier';
+        $amountFormatted = number_format($bonus->amount, 0, ',', ' ');
+        $reason = trim($validated['cancellation_reason']);
+
+        $bonus->cancellation_reason = $reason;
+        $bonus->cancelled_by = Auth::id();
+        $bonus->cancelled_at = now();
+        $bonus->save();
         $bonus->delete();
 
-        return redirect()->back()->with('success', "La prime a été supprimée avec succès.");
+        return redirect()->back()->with('success', "La prime de {$amountFormatted} FCFA de {$workerName} a été résiliée avec succès. Motif : « {$reason} ».");
     }
 
     /**
-     * Affiche la liste dédiée des nouveaux ouvriers et leur gestion tarifaire.
+     * Affiche la liste dédiée des nouveaux ouvriers en période d'essai (14 jours).
+     * Dès que les 2 semaines d'essai sont achevées, l'ouvrier bascule automatiquement dans les anciens et ne s'affiche plus ici.
      */
     public function newWorkers(Request $request)
     {
@@ -209,21 +225,17 @@ class SalaryController extends Controller
         $isRh = Auth::check() && Auth::user()->isRh();
         $prefix = $isAdmin ? 'admin.' : ($isRh ? 'rh.' : '');
 
-        // Récupérer les ouvriers : en cours d'essai, explicitement is_new ou embauchés depuis moins de 60 jours
-        $cutoffDate = Carbon::now()->subDays(60);
-        $newWorkers = Worker::where(function ($q) use ($cutoffDate) {
-            $q->where('is_new', true)
-              ->orWhere('hired_at', '>=', $cutoffDate->toDateString())
-              ->orWhere(function ($sub) use ($cutoffDate) {
-                  $sub->whereNull('hired_at')
-                      ->where('created_at', '>=', $cutoffDate);
-              });
-        })
-        ->orderByRaw('CASE WHEN is_new = 1 THEN 0 ELSE 1 END')
-        ->orderBy('hired_at', 'desc')
-        ->orderBy('created_at', 'desc')
-        ->orderBy('last_name', 'asc')
-        ->get();
+        // Récupérer STRICTEMENT les ouvriers actuellement en période d'essai (14 jours)
+        // Les ouvriers ayant achevé leurs 2 semaines d'essai basculent automatiquement dans les anciens et sont exclus.
+        $newWorkers = Worker::query()
+            ->orderBy('hired_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('last_name', 'asc')
+            ->get()
+            ->filter(function ($worker) {
+                return $worker->isNew();
+            })
+            ->values();
 
         $defaultRate = PayrollService::getHourlyRate();
         $defaultNewRate = PayrollService::getNewHourlyRate();
@@ -255,7 +267,7 @@ class SalaryController extends Controller
         if ($request->has('is_new')) {
             $val = $request->input('is_new');
             if ($val === '' || $val === 'null' || is_null($val)) {
-                $worker->is_new = null; // Détection automatique 14 jours
+                $worker->is_new = null; // Détection automatique 15 jours
             } else {
                 $worker->is_new = filter_var($val, FILTER_VALIDATE_BOOLEAN);
             }
@@ -276,11 +288,14 @@ class SalaryController extends Controller
     }
 
     /**
-     * Génère et télécharge la fiche de paie mensuelle au format PDF pour émargement.
-     * REMARQUE STRICTE (Audio 2) : La colonne du Taux Horaire est masquée pour préserver la confidentialité salariale.
+     * Génère et télécharge l'état financier complet des salaires (Direction / Comptabilité).
      */
     public function pdf(Request $request)
     {
+        if (!$this->checkAuthorizedUser()) {
+            abort(403, "Action non autorisée.");
+        }
+
         $monthInput = $request->input('month', Carbon::now()->format('Y-m'));
 
         try {
@@ -304,7 +319,45 @@ class SalaryController extends Controller
         ]))->setPaper('a4', 'landscape');
 
         $monthName = $monthCarbon->locale('fr')->translatedFormat('F_Y');
-        $fileName = 'Etat_Salaires_Ouvriers_' . $monthName . '.pdf';
+        $fileName = 'Etat_Financier_Salaires_' . $monthName . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
+    /**
+     * Génère et télécharge la feuille d'émargement officielle des ouvriers.
+     * REMARQUE STRICTE (Audio 4) : Les salaires, primes et montants en FCFA sont 100% masqués pour préserver la confidentialité lors de l'émargement collectif.
+     */
+    public function emargementPdf(Request $request)
+    {
+        if (!$this->checkAuthorizedUser()) {
+            abort(403, "Action non autorisée.");
+        }
+
+        $monthInput = $request->input('month', Carbon::now()->format('Y-m'));
+
+        try {
+            $monthCarbon = Carbon::createFromFormat('Y-m', $monthInput);
+        } catch (\Exception $e) {
+            $monthCarbon = Carbon::now();
+        }
+
+        $shift = $request->input('shift', 'all');
+
+        $payrollData = $this->payrollService->getMonthlyPayroll($monthCarbon, $shift);
+
+        $dayItems = $payrollData['items']->where('shift', 'day');
+        $nightItems = $payrollData['items']->where('shift', 'night');
+
+        $pdf = Pdf::loadView('admin.salaries.emargement', array_merge($payrollData, [
+            'dayItems' => $dayItems,
+            'nightItems' => $nightItems,
+            'generationDate' => Carbon::now(),
+        ]))->setPaper('a4', 'landscape');
+
+        $monthName = $monthCarbon->locale('fr')->translatedFormat('F_Y');
+        $shiftSuffix = $shift !== 'all' ? '_' . ucfirst($shift) : '';
+        $fileName = 'Fiche_Emargement_Ouvriers_' . $monthName . $shiftSuffix . '.pdf';
 
         return $pdf->download($fileName);
     }

@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\JobPosition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PDF;
 
 class EmployeeController extends Controller
 {
@@ -24,7 +25,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Liste du personnel de Bio Farm Trading.
+     * Liste du personnel de Bio Farm Trading (exclut strictement les ouvriers).
      */
     public function index(Request $request)
     {
@@ -33,7 +34,9 @@ class EmployeeController extends Controller
         $status = $request->input('status');
         $contractType = $request->input('contract_type');
 
-        $query = Employee::with('jobPosition')
+        // Répertoire exclusif du personnel permanent de Bio Farm Trading (hors ouvriers de production)
+        $query = Employee::whereNull('worker_id')
+            ->with('jobPosition')
             ->orderBy('last_name', 'asc')
             ->orderBy('first_name', 'asc');
 
@@ -59,16 +62,22 @@ class EmployeeController extends Controller
             $query->where('contract_type', $contractType);
         }
 
-        $employees = $query->paginate(20)->withQueryString();
+        $perPage = (int) $request->input('per_page', 50);
+        $employees = $query->paginate($perPage)->withQueryString();
 
-        // Statistiques globales
-        $totalStaff = Employee::count();
-        $activeStaff = Employee::where('status', 'actif')->count();
-        $onLeaveStaff = Employee::where('status', 'conge')->count();
-        $totalMonthlyPayroll = Employee::where('status', 'actif')->sum('monthly_salary') ?? 0;
+        // Statistiques globales du personnel BFT (hors ouvriers)
+        $totalStaff = Employee::whereNull('worker_id')->count();
+        $activeStaff = Employee::whereNull('worker_id')->where('status', 'actif')->count();
+        $onLeaveStaff = Employee::whereNull('worker_id')->where('status', 'conge')->count();
+        $totalMonthlyPayroll = Employee::whereNull('worker_id')->where('status', 'actif')->sum('monthly_salary') ?? 0;
 
-        // Postes disponibles pour les filtres et attributions
-        $positions = JobPosition::active()->orderBy('title', 'asc')->get();
+        // Postes disponibles pour les filtres et attributions avec nombre d'employés permanents
+        $positions = JobPosition::active()
+            ->withCount(['employees' => function ($q) {
+                $q->whereNull('worker_id');
+            }])
+            ->orderBy('title', 'asc')
+            ->get();
 
         $prefix = $this->getRoutePrefix();
 
@@ -85,6 +94,59 @@ class EmployeeController extends Controller
             'contractType',
             'prefix'
         ));
+    }
+
+    /**
+     * Exporte la liste officielle du personnel BFT au format PDF avec en-tête et logo (hors ouvriers).
+     */
+    public function exportPdf(Request $request)
+    {
+        $query = Employee::whereNull('worker_id')
+            ->with('jobPosition')
+            ->orderBy('last_name', 'asc')
+            ->orderBy('first_name', 'asc');
+
+        if ($request->filled('position_id')) {
+            $query->where('job_position_id', $request->input('position_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('contract_type')) {
+            $query->where('contract_type', $request->input('contract_type'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('matricule', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $employees = $query->get();
+
+        $totalStaff = $employees->count();
+        $activeStaff = $employees->where('status', 'actif')->count();
+        $onLeaveStaff = $employees->where('status', 'conge')->count();
+        $totalMonthlyPayroll = $employees->where('status', 'actif')->sum('monthly_salary') ?? 0;
+
+        $pdf = \PDF::loadView('admin.employees.pdf', compact(
+            'employees',
+            'totalStaff',
+            'activeStaff',
+            'onLeaveStaff',
+            'totalMonthlyPayroll'
+        ))->setPaper('a4', 'landscape');
+
+        $fileName = 'Liste_Personnel_BioFarmTrading_' . now()->format('d_m_Y') . '.pdf';
+
+        return $pdf->download($fileName);
     }
 
     /**
@@ -196,6 +258,21 @@ class EmployeeController extends Controller
 
         return redirect()->route($prefix . 'employees.index')
             ->with('success', "Le dossier de {$personnel->full_name} a été mis à jour avec succès.");
+    }
+
+    /**
+     * Modification rapide du poste d'un membre du personnel depuis la liste.
+     */
+    public function updatePosition(Request $request, Employee $personnel)
+    {
+        $validated = $request->validate([
+            'job_position_id' => 'required|exists:job_positions,id',
+        ]);
+
+        $personnel->job_position_id = $validated['job_position_id'];
+        $personnel->save();
+
+        return redirect()->back()->with('success', "Le poste de {$personnel->full_name} a été mis à jour : {$personnel->jobPosition->title}.");
     }
 
     /**

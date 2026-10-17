@@ -73,6 +73,7 @@ Route::middleware('auth')->group(function () {
         // Worker Salaries & Bonuses Management
         Route::get('/salaires', [\App\Http\Controllers\SalaryController::class, 'index'])->name('salaries.index');
         Route::get('/salaires/pdf', [\App\Http\Controllers\SalaryController::class, 'pdf'])->name('salaries.pdf');
+        Route::get('/salaires/emargement', [\App\Http\Controllers\SalaryController::class, 'emargementPdf'])->name('salaries.emargement');
         Route::post('/salaires/taux-horaire', [\App\Http\Controllers\SalaryController::class, 'updateRate'])->name('salaries.update_rate');
         Route::post('/salaires/primes', [\App\Http\Controllers\SalaryController::class, 'storeBonus'])->name('salaries.bonuses.store');
         Route::delete('/salaires/primes/{bonus}', [\App\Http\Controllers\SalaryController::class, 'destroyBonus'])->name('salaries.bonuses.destroy');
@@ -80,7 +81,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/ouvriers/{worker}/statut', [\App\Http\Controllers\SalaryController::class, 'updateWorkerStatus'])->name('workers.update_status');
 
         // Postes et Personnel Permanent (Admin)
+        Route::patch('/personnel/{personnel}/poste', [\App\Http\Controllers\EmployeeController::class, 'updatePosition'])->name('employees.update_position');
         Route::resource('postes', \App\Http\Controllers\JobPositionController::class)->names('job_positions');
+        // Export PDF du personnel complet
+        Route::get('personnel/pdf', [\App\Http\Controllers\EmployeeController::class, 'exportPdf'])->name('employees.pdf');
         Route::resource('personnel', \App\Http\Controllers\EmployeeController::class)->names('employees');
 
         Route::get('/run-migrations', function() {
@@ -140,6 +144,7 @@ Route::middleware('auth')->group(function () {
         // Worker Salaries & Bonuses Management (RH)
         Route::get('/salaires', [\App\Http\Controllers\SalaryController::class, 'index'])->name('salaries.index');
         Route::get('/salaires/pdf', [\App\Http\Controllers\SalaryController::class, 'pdf'])->name('salaries.pdf');
+        Route::get('/salaires/emargement', [\App\Http\Controllers\SalaryController::class, 'emargementPdf'])->name('salaries.emargement');
         Route::post('/salaires/taux-horaire', [\App\Http\Controllers\SalaryController::class, 'updateRate'])->name('salaries.update_rate');
         Route::post('/salaires/primes', [\App\Http\Controllers\SalaryController::class, 'storeBonus'])->name('salaries.bonuses.store');
         Route::delete('/salaires/primes/{bonus}', [\App\Http\Controllers\SalaryController::class, 'destroyBonus'])->name('salaries.bonuses.destroy');
@@ -147,7 +152,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/ouvriers/{worker}/statut', [\App\Http\Controllers\SalaryController::class, 'updateWorkerStatus'])->name('workers.update_status');
 
         // Postes et Personnel Permanent (RH)
+        Route::patch('/personnel/{personnel}/poste', [\App\Http\Controllers\EmployeeController::class, 'updatePosition'])->name('employees.update_position');
         Route::resource('postes', \App\Http\Controllers\JobPositionController::class)->names('job_positions');
+        // Export PDF du personnel complet (RH)
+        Route::get('personnel/pdf', [\App\Http\Controllers\EmployeeController::class, 'exportPdf'])->name('employees.pdf');
         Route::resource('personnel', \App\Http\Controllers\EmployeeController::class)->names('employees');
     });
 
@@ -166,6 +174,17 @@ Route::get('/offline', function () {
 
 Route::get('/system/cache-flush', function () {
     \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+
+    // Nettoyage préventif des ouvriers dans la table employees sur le serveur de prod
+    if (\Illuminate\Support\Facades\Schema::hasTable('employees') && \Illuminate\Support\Facades\Schema::hasColumn('employees', 'worker_id')) {
+        \App\Models\Employee::whereNotNull('worker_id')->delete();
+    }
+
+    // Initialisation du personnel BFT permanent si la table est vide
+    if (\Illuminate\Support\Facades\Schema::hasTable('employees') && \App\Models\Employee::whereNull('worker_id')->count() === 0) {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'BftPersonnelSeeder', '--force' => true]);
+    }
+
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
     $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? null;
     $source = public_path('.htaccess');

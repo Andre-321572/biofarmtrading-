@@ -172,4 +172,60 @@ class EmployeeAndJobPositionTest extends TestCase
         $response2 = $this->get(route('rh.employees.index'));
         $response2->assertRedirect();
     }
+
+    public function test_admin_can_update_employee_job_position()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($admin);
+
+        $employee = Employee::create([
+            'first_name' => 'Paul',
+            'last_name' => 'Kone',
+            'contract_type' => 'CDI',
+            'status' => 'actif',
+        ]);
+
+        $newPosition = JobPosition::create([
+            'title' => 'Chef d\'équipe',
+            'department' => 'Production & Usine',
+        ]);
+
+        $response = $this->patch(route('admin.employees.update_position', $employee->id), [
+            'job_position_id' => $newPosition->id,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('employees', [
+            'id' => $employee->id,
+            'job_position_id' => $newPosition->id,
+        ]);
+    }
+
+    public function test_admin_can_export_personnel_pdf_without_workers()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($admin);
+
+        // Création d'un membre du personnel permanent
+        Employee::create([
+            'matricule' => 'BFT-DIR-TEST',
+            'first_name' => 'Directeur',
+            'last_name' => 'Test',
+            'contract_type' => 'CDI',
+            'monthly_salary' => 500000,
+            'status' => 'actif',
+        ]);
+
+        // Création d'un ouvrier (qui ne doit pas être inclus)
+        \App\Models\Worker::create([
+            'first_name' => 'Ouvrier',
+            'last_name' => 'Fabrique',
+            'shift' => 'day',
+        ]);
+
+        $response = $this->get(route('admin.employees.pdf'));
+        $response->assertStatus(200);
+        $this->assertStringContainsString('application/pdf', $response->headers->get('Content-Type'));
+    }
 }
+

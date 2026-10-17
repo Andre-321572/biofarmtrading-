@@ -43,9 +43,9 @@ class WorkerSalaryRateTest extends TestCase
         $this->assertEquals(218.75, PayrollService::getNewHourlyRate());
     }
 
-    public function test_automatic_14_day_trial_period_and_rate_transition()
+    public function test_automatic_15_day_trial_period_and_rate_transition()
     {
-        // 1. Worker hired 5 days ago -> currently in 14-day trial
+        // 1. Worker hired 5 days ago -> currently in 15-day trial
         $trialWorker = Worker::create([
             'first_name' => 'Ablan',
             'last_name' => 'KOUDOU',
@@ -78,7 +78,7 @@ class WorkerSalaryRateTest extends TestCase
         Setting::set('worker_new_hourly_rate', 218.75, 'float');
 
         // Worker hired on October 1st, 2026
-        // 14-day trial period: Oct 1st to Oct 15th
+        // 15-day trial period: Oct 1st to Oct 15th
         // From Oct 16th onward: Regular rate (275 FCFA)
         $worker = Worker::create([
             'first_name' => 'Jean',
@@ -188,13 +188,129 @@ class WorkerSalaryRateTest extends TestCase
         $this->assertEquals('application/pdf', $response->headers->get('content-type'));
     }
 
-    public function test_rh_can_access_new_workers_management_view()
+    public function test_rh_and_admin_can_cancel_bonus_with_mandatory_reason()
     {
         $rhUser = User::factory()->create(['role' => 'rh']);
         $this->actingAs($rhUser);
 
+        $worker = Worker::create(['first_name' => 'Koffi', 'last_name' => 'MENSAH', 'shift' => 'day']);
+        $month = Carbon::now()->format('Y-m');
+
+        $bonus = WorkerBonus::create([
+            'worker_id' => $worker->id,
+            'month' => $month,
+            'amount' => 5000,
+            'reason' => 'Prime de présence',
+            'created_by' => $rhUser->id,
+        ]);
+
+        $response = $this->delete(route('rh.salaries.bonuses.destroy', $bonus), [
+            'cancellation_reason' => 'Erreur de saisie lors de la sélection des ouvriers',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        // Vérifier que la prime est bien soft-deleted avec la justification et l'auteur
+        $this->assertSoftDeleted('worker_bonuses', [
+            'id' => $bonus->id,
+            'cancellation_reason' => 'Erreur de saisie lors de la sélection des ouvriers',
+            'cancelled_by' => $rhUser->id,
+        ]);
+
+        // Vérifier que la paie mensuelle recalculée exclut cette prime annulée
+        $payrollService = app(\App\Services\PayrollService::class);
+        $payroll = $payrollService->getMonthlyPayroll(Carbon::now());
+        $workerItem = collect($payroll['items'])->firstWhere('worker.id', $worker->id);
+        $this->assertEquals(0, $workerItem['bonus_amount']);
+    }
+
+    public function test_cancellation_reason_is_strictly_required_to_cancel_bonus()
+    {
+        $rhUser = User::factory()->create(['role' => 'rh']);
+        $this->actingAs($rhUser);
+
+        $worker = Worker::create(['first_name' => 'Ablam', 'last_name' => 'KOUDOU', 'shift' => 'day']);
+        $month = Carbon::now()->format('Y-m');
+
+        $bonus = WorkerBonus::create([
+            'worker_id' => $worker->id,
+            'month' => $month,
+            'amount' => 10000,
+            'reason' => 'Prime exceptionnelle',
+            'created_by' => $rhUser->id,
+        ]);
+
+        // Tentative sans motif
+        $response = $this->delete(route('rh.salaries.bonuses.destroy', $bonus), [
+            'cancellation_reason' => '',
+        ]);
+
+        $response->assertSessionHasErrors(['cancellation_reason']);
+
+        // La prime ne doit PAS être supprimée
+        $this->assertDatabaseHas('worker_bonuses', [
+            'id' => $bonus->id,
+            'deleted_at' => null,
+        ]);
+    }
+
+    public function test_new_workers_page_strictly_excludes_workers_past_15_days_trial()
+    {
+        $rhUser = User::factory()->create(['role' => 'rh']);
+        $this->actingAs($rhUser);
+
+        // Ouvrier 1 : embauché il y a 3 jours (en cours des 15 jours d'essai)
+        $trialWorker = Worker::create([
+            'first_name' => 'Paul',
+            'last_name' => 'EN_ESSAI',
+            'shift' => 'day',
+            'hired_at' => Carbon::now()->subDays(3)->toDateString(),
+        ]);
+
+        // Ouvrier 2 : embauché il y a 20 jours (essai 15j terminé -> ancien)
+        $ancienWorker = Worker::create([
+            'first_name' => 'Jean',
+            'last_name' => 'ANCIEN_TITULARISE',
+            'shift' => 'day',
+            'hired_at' => Carbon::now()->subDays(20)->toDateString(),
+        ]);
+
         $response = $this->get(route('rh.workers.new'));
         $response->assertStatus(200);
-        $response->assertSee('Nouveaux Ouvriers');
+
+        // L'ouvrier en cours d'essai DOIT être affiché
+        $response->assertSee('EN_ESSAI');
+
+        // L'ouvrier ayant fini ses 15 jours d'essai NE DOIT PLUS être affiché
+        $response->assertDontSee('ANCIEN_TITULARISE');
+    }
+
+    public function test_rh_and_admin_can_export_emargement_pdf_without_salaries()
+    {
+        $rhUser = User::factory()->create(['role' => 'rh']);
+        $this->actingAs($rhUser);
+
+        Worker::create([
+            'first_name' => 'Paul',
+            'last_name' => 'KOUDOU',
+            'shift' => 'day',
+            'hired_at' => Carbon::now()->subDays(10)->toDateString(),
+        ]);
+
+        $response = $this->get(route('rh.salaries.emargement'));
+        $response->assertStatus(200);
+        $this->assertEquals('application/pdf', $response->headers->get('content-type'));
+
+        // Vérifier également pour l'admin
+        $adminUser = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($adminUser);
+
+        $adminResponse = $this->get(route('admin.salaries.emargement'));
+        $adminResponse->assertStatus(200);
+        $this->assertEquals('application/pdf', $adminResponse->headers->get('content-type'));
     }
 }
+
+
+
