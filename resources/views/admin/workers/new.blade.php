@@ -10,6 +10,7 @@
             id: null,
             name: '',
             hired_at: '',
+            tenured_at: '',
             is_new: 'null',
             hourly_rate: ''
         },
@@ -18,6 +19,7 @@
             this.workerForm.id = worker.id;
             this.workerForm.name = worker.last_name + ' ' + worker.first_name;
             this.workerForm.hired_at = worker.hired_at_raw || '';
+            this.workerForm.tenured_at = worker.tenured_at_raw || '';
             this.workerForm.is_new = worker.is_new_raw === null ? 'null' : (worker.is_new_raw ? '1' : '0');
             this.workerForm.hourly_rate = worker.hourly_rate_raw || '';
             this.showEditWorkerModal = true;
@@ -83,9 +85,7 @@
                         <span>État des Salaires</span>
                     </a>
                 </div>
-            </div>
-
-            <!-- Grille d'information des taux & automatisation -->
+            </d            <!-- Grille d'information des taux & automatisation -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div class="bg-white rounded-3xl p-6 border-2 border-purple-300 shadow-xs relative overflow-hidden" style="background-color: #ffffff; border-color: #d8b4fe;">
                     <div class="flex items-center justify-between">
@@ -119,12 +119,70 @@
 
             <!-- Tableau des Recrues et Suivi de Période d'Essai -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                <!-- En-tête avec Titre, Onglets et Recherche -->
+                <div class="px-6 py-5 border-b border-slate-100 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Suivi des Recrues & Évolution Période d'Essai</h2>
-                        <p class="text-xs text-slate-400">Contrôlez les dates d'embauche, les fins de période d'essai (15 jours) et les taux appliqués</p>
+                        <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Suivi des Ouvriers & Périodes d'Essai</h2>
+                        <p class="text-xs text-slate-400">
+                            Paiement en deux temps : période d'essai (15j à {{ number_format($defaultNewRate, 2, ',', ' ') }} F/h) puis ancienneté ({{ number_format($defaultRate, 2, ',', ' ') }} F/h)
+                        </p>
                     </div>
+
+                    <!-- Barre de recherche -->
+                    <form method="GET" action="{{ route($prefix . 'workers.new') }}" class="w-full lg:w-auto flex items-center gap-2">
+                        <input type="hidden" name="tab" value="{{ $tab ?? 'trial' }}">
+                        <div class="relative w-full lg:w-64">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ $search ?? '' }}" 
+                                   placeholder="Rechercher par nom..." 
+                                   class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        @if(!empty($search))
+                            <a href="{{ route($prefix . 'workers.new', ['tab' => $tab ?? 'trial']) }}" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all">
+                                Effacer
+                            </a>
+                        @endif
+                    </form>
                 </div>
+
+                <!-- Onglets de filtrage avec compteurs clairs -->
+                <div class="px-6 py-3 bg-slate-50/70 border-b border-slate-100 flex flex-wrap items-center gap-2">
+                    <a href="{{ route($prefix . 'workers.new', ['tab' => 'trial', 'search' => $search ?? '']) }}" 
+                       class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 {{ ($tab ?? 'trial') === 'trial' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200' }}">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>En Période d'Essai (Nouveaux)</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black {{ ($tab ?? 'trial') === 'trial' ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800' }}">
+                            {{ $newWorkers->count() }}
+                        </span>
+                    </a>
+
+                    <a href="{{ route($prefix . 'workers.new', ['tab' => 'tenured', 'search' => $search ?? '']) }}" 
+                       class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 {{ ($tab ?? 'trial') === 'tenured' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200' }}">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>Titularisés (Anciens)</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black {{ ($tab ?? 'trial') === 'tenured' ? 'bg-emerald-700 text-white' : 'bg-emerald-100 text-emerald-800' }}">
+                            {{ $tenuredWorkers->count() }}
+                        </span>
+                    </a>
+
+                    <a href="{{ route($prefix . 'workers.new', ['tab' => 'all', 'search' => $search ?? '']) }}" 
+                       class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 {{ ($tab ?? 'trial') === 'all' ? 'bg-slate-800 text-white shadow-sm' : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200' }}">
+                        <span>Tous les Ouvriers</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black {{ ($tab ?? 'trial') === 'all' ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-700' }}">
+                            {{ $allWorkers->count() }}
+                        </span>
+                    </a>
+                </div>
+
+                @php
+                    $displayWorkers = match($tab ?? 'trial') {
+                        'tenured' => $tenuredWorkers,
+                        'all' => $allWorkers,
+                        default => $newWorkers,
+                    };
+                @endphp
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -141,7 +199,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
-                            @forelse($newWorkers as $index => $worker)
+                            @forelse($displayWorkers as $index => $worker)
                                 @php
                                     $hiredAt = $worker->getHiredAt();
                                     $trialEndsAt = $worker->getTrialEndsAt();
@@ -155,6 +213,7 @@
                                         'first_name' => $worker->first_name,
                                         'last_name' => $worker->last_name,
                                         'hired_at_raw' => $worker->hired_at ? $worker->hired_at->format('Y-m-d') : ($worker->created_at ? $worker->created_at->format('Y-m-d') : ''),
+                                        'tenured_at_raw' => $worker->tenured_at ? $worker->tenured_at->format('Y-m-d') : '',
                                         'is_new_raw' => $worker->is_new,
                                         'hourly_rate_raw' => $worker->hourly_rate,
                                     ];
@@ -190,13 +249,19 @@
                                     <!-- Fin Essai (15j) -->
                                     <td class="py-4 px-4 text-center text-xs">
                                         <span class="font-bold text-slate-800">{{ $trialEndsAt->format('d/m/Y') }}</span>
-                                        @if($remainingDays > 0)
-                                            <span class="block text-[10px] font-bold text-purple-600">
-                                                Reste {{ $remainingDays }} jour(s)
-                                            </span>
+                                        @if($worker->isNew())
+                                            @if($remainingDays > 0)
+                                                <span class="block text-[10px] font-bold text-purple-600">
+                                                    Reste {{ $remainingDays }} jour(s)
+                                                </span>
+                                            @else
+                                                <span class="block text-[10px] font-bold text-amber-600">
+                                                    Dernier jour d'essai
+                                                </span>
+                                            @endif
                                         @else
-                                            <span class="block text-[10px] font-bold text-amber-600">
-                                                Dernier jour d'essai
+                                            <span class="block text-[10px] font-semibold text-emerald-600">
+                                                Essai terminé
                                             </span>
                                         @endif
                                     </td>
@@ -207,7 +272,7 @@
                                         @if($hasCustomRate)
                                             <span class="block text-[10px] font-bold text-blue-600">Taux personnalisé</span>
                                         @elseif($worker->isNew())
-                                            <span class="block text-[10px] font-bold text-purple-600">Taux Essai</span>
+                                            <span class="block text-[10px] font-bold text-purple-600">Taux Essai (15j)</span>
                                         @else
                                             <span class="block text-[10px] font-bold text-emerald-600">Taux Titularisé</span>
                                         @endif
@@ -215,14 +280,25 @@
 
                                     <!-- Statut Actuel -->
                                     <td class="py-4 px-4 text-center">
-                                        @if($worker->is_new === true)
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
-                                                Essai maintenu (RH)
-                                            </span>
+                                        @if($worker->isNew())
+                                            @if($worker->is_new === true)
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
+                                                    Essai maintenu (RH)
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-300">
+                                                    En essai ({{ $remainingDays }}j restants)
+                                                </span>
+                                            @endif
                                         @else
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-300">
-                                                En essai ({{ $remainingDays }}j restants)
+                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                Titularisé (Ancien)
                                             </span>
+                                            @if($worker->tenured_at)
+                                                <span class="block text-[9px] font-medium text-slate-400 mt-0.5">
+                                                    depuis le {{ $worker->tenured_at->format('d/m/Y') }}
+                                                </span>
+                                            @endif
                                         @endif
                                     </td>
 
@@ -232,34 +308,62 @@
                                             <!-- Bouton Modifier profil et date d'embauche -->
                                             <button type="button" 
                                                     @click="openEditWorker({{ json_encode($workerData) }})"
-                                                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-100 hover:bg-purple-50 hover:text-purple-700 text-slate-700 border border-slate-200 hover:border-purple-200 flex items-center gap-1">
+                                                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-100 hover:bg-purple-50 hover:text-purple-700 text-slate-700 border border-slate-200 hover:border-purple-200 flex items-center gap-1 shadow-xs">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                                 <span>Ajuster</span>
                                             </button>
 
-                                            <!-- Bascule rapide -->
-                                            <form method="POST" action="{{ route($prefix . 'workers.update_status', $worker->id) }}">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="is_new" value="{{ $worker->isNew() ? '0' : '1' }}">
-                                                <button type="submit" 
-                                                        class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border {{ $worker->isNew() ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200' }}"
-                                                        title="{{ $worker->isNew() ? 'Titulariser immédiatement' : 'Remettre en période d\'essai' }}">
-                                                    {{ $worker->isNew() ? 'Titulariser' : 'Mettre Essai' }}
-                                                </button>
-                                            </form>
+                                            @if($worker->isNew())
+                                                <!-- Titulariser directement -->
+                                                <form method="POST" action="{{ route($prefix . 'workers.update_status', $worker->id) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="action" value="titulariser">
+                                                    <button type="submit" 
+                                                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200 flex items-center gap-1 shadow-xs"
+                                                            title="Titulariser immédiatement (passe au taux Ancien 275 F tout en conservant ses 15 jours d'essai à 218,75 F)">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                                        <span>Titulariser</span>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <!-- Remettre en période d'essai (Remédier à une erreur) -->
+                                                <form method="POST" action="{{ route($prefix . 'workers.update_status', $worker->id) }}" onsubmit="return confirm('Confirmez-vous la remise en période d\'essai pour cet ouvrier (taux 218,75 F/h) ?');">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="action" value="revert_trial">
+                                                    <button type="submit" 
+                                                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all border bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200 flex items-center gap-1 shadow-xs"
+                                                            title="Annuler une titularisation par erreur et remettre l'ouvrier en période d'essai (taux 218,75 F/h)">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                                                        <span>Remettre Essai</span>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="8" class="py-16 text-center text-slate-400">
-                                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3 border border-emerald-100">
+                                        <div class="w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3 border border-slate-200">
                                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                         </div>
-                                        <p class="font-black text-slate-700 text-sm uppercase tracking-wide">Aucun ouvrier actuellement en période d'essai</p>
+                                        <p class="font-black text-slate-700 text-sm uppercase tracking-wide">
+                                            @if(($tab ?? 'trial') === 'trial')
+                                                Aucun ouvrier actuellement en période d'essai
+                                            @elseif(($tab ?? 'trial') === 'tenured')
+                                                Aucun ouvrier titularisé trouvé
+                                            @else
+                                                Aucun ouvrier trouvé
+                                            @endif
+                                        </p>
                                         <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-                                            Tous les ouvriers ont achevé leurs 15 jours d'essai et ont basculé automatiquement dans le groupe des anciens ouvriers au taux standard ({{ number_format($defaultRate, 2, ',', ' ') }} F/h).
+                                            @if(($tab ?? 'trial') === 'trial')
+                                                Tous les ouvriers ont achevé leurs 15 jours d'essai et sont passés dans le statut ancien ({{ number_format($defaultRate, 2, ',', ' ') }} F/h).
+                                            @else
+                                                Utilisez la recherche ci-dessus pour retrouver un ouvrier par nom ou prénom.
+                                            @endif
                                         </p>
                                     </td>
                                 </tr>
@@ -267,6 +371,7 @@
                         </tbody>
                     </table>
                 </div>
+            </div> </div>
             </div>
 
         </div>
@@ -366,14 +471,14 @@
                 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="showEditWorkerModal = false"></div>
 
                 <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl border border-slate-200 relative z-10">
-                    <form method="POST" :action="'{{ url($prefix . 'workers') }}/' + workerForm.id + '/status'">
+                    <form method="POST" :action="'{{ url(trim($prefix, '.')) }}/ouvriers/' + workerForm.id + '/statut'">
                         @csrf
                         @method('PATCH')
 
                         <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-purple-950 text-white flex justify-between items-center" style="background-color: #0f172a; color: #ffffff;">
                             <div>
                                 <h3 class="text-base font-black uppercase tracking-tight" x-text="workerForm.name"></h3>
-                                <p class="text-[11px] text-purple-200">Date d'embauche & Conditions salariales</p>
+                                <p class="text-[11px] text-purple-200">Date d'embauche, titularisation & conditions salariales</p>
                             </div>
                             <button type="button" @click="showEditWorkerModal = false" class="text-slate-400 hover:text-white p-1 rounded-xl">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -381,6 +486,17 @@
                         </div>
 
                         <div class="p-6 space-y-4">
+                            <!-- Information règle de paie -->
+                            <div class="p-3.5 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 text-xs">
+                                <p class="font-bold flex items-center gap-1.5 text-purple-800">
+                                    <svg class="w-4 h-4 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Paiement en deux temps (Bio Farm)</span>
+                                </p>
+                                <p class="text-[11px] text-purple-700 mt-1">
+                                    Les 15 premiers jours d'essai restent comptabilisés à <strong>{{ number_format($defaultNewRate, 2, ',', ' ') }} FCFA/h</strong>. La titularisation applique le taux de <strong>{{ number_format($defaultRate, 2, ',', ' ') }} FCFA/h</strong> uniquement pour les jours postérieurs.
+                                </p>
+                            </div>
+
                             <!-- Date d'embauche -->
                             <div>
                                 <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
@@ -395,6 +511,20 @@
                                 </p>
                             </div>
 
+                            <!-- Date de titularisation -->
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Date effective de titularisation (optionnel)
+                                </label>
+                                <input type="date" 
+                                       name="tenured_at" 
+                                       x-model="workerForm.tenured_at" 
+                                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
+                                <p class="text-[11px] text-slate-400 mt-1">
+                                    À partir de cette date, l'ouvrier est rémunéré au taux standard ({{ number_format($defaultRate, 2, ',', ' ') }} F/h).
+                                </p>
+                            </div>
+
                             <!-- Statut de l'ouvrier -->
                             <div>
                                 <label class="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
@@ -403,9 +533,9 @@
                                 <select name="is_new" 
                                         x-model="workerForm.is_new" 
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20">
-                                    <option value="null">Automatique (Période d'essai de 15 jours)</option>
-                                    <option value="1">Forcer en Période d'Essai (Taux Nouveaux)</option>
-                                    <option value="0">Titulariser immédiatement (Taux Anciens)</option>
+                                    <option value="null">Automatique (15 jours d'essai à {{ number_format($defaultNewRate, 2, ',', ' ') }} F puis titularisation à {{ number_format($defaultRate, 2, ',', ' ') }} F)</option>
+                                    <option value="1">Maintenir en Période d'Essai (Taux Nouveaux)</option>
+                                    <option value="0">Titulariser (Passer Ancien)</option>
                                 </select>
                             </div>
 

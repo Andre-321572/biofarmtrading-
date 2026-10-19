@@ -14,12 +14,14 @@ class Worker extends Model
         'job_position_id',
         'shift',
         'hired_at',
+        'tenured_at',
         'is_new',
         'hourly_rate',
     ];
 
     protected $casts = [
         'hired_at' => 'date',
+        'tenured_at' => 'date',
         'is_new' => 'boolean',
         'hourly_rate' => 'float',
     ];
@@ -72,25 +74,42 @@ class Worker extends Model
 
     /**
      * Vérifie si l'ouvrier était en période d'essai (15 jours) à une date précise.
+     * Règle métier :
+     * Les nouveaux ouvriers sont payés en deux temps :
+     * 1. Pendant les 15 premiers jours d'essai à compter de l'embauche -> taux d'essai (218,75 FCFA).
+     * 2. Dès le 16ème jour (ou à partir de la date de titularisation) -> taux standard des anciens (275 FCFA).
+     * Titulariser un ouvrier comme ancien NE DOIT JAMAIS recalculer rétroactivement sa période d'essai passée !
      */
     public function isInTrialOnDate(Carbon|string $date): bool
     {
-        // 1. Si titularisé explicitement (is_new = false)
-        if ($this->is_new === false || $this->is_new === 0 || $this->is_new === '0') {
+        $dateCarbon = Carbon::parse($date)->startOfDay();
+        $hiredAt = $this->getHiredAt();
+
+        // 1. Avant la date d'embauche, pas d'essai
+        if ($dateCarbon->lessThan($hiredAt)) {
             return false;
         }
 
-        // 2. Si forcé en nouveau (is_new = true)
+        $trialEndsAt = $this->getTrialEndsAt();
+
+        // 2. Si une date de titularisation explicite existe (tenured_at) :
+        // Dès le jour de titularisation, l'ouvrier n'est plus en essai
+        if ($this->tenured_at) {
+            $tenuredAt = Carbon::parse($this->tenured_at)->startOfDay();
+            if ($dateCarbon->greaterThanOrEqualTo($tenuredAt)) {
+                return false;
+            }
+            return $dateCarbon->lessThanOrEqualTo($trialEndsAt);
+        }
+
+        // 3. Si le flag is_new a été explicitement forcé à true par la RH (maintien de l'essai)
         if ($this->is_new === true || $this->is_new === 1 || $this->is_new === '1') {
             return true;
         }
 
-        // 3. Détection automatique : pendant les 15 jours suivant l'embauche
-        $dateCarbon = Carbon::parse($date)->startOfDay();
-        $hiredAt = $this->getHiredAt();
-        $trialEndsAt = $this->getTrialEndsAt();
-
-        return $dateCarbon->lessThanOrEqualTo($trialEndsAt) && $dateCarbon->greaterThanOrEqualTo($hiredAt);
+        // 4. Détection automatique : pendant les 15 premiers jours à compter de l'embauche
+        // (même si is_new = false a été coché, la période d'essai effectuée reste payée au taux d'essai)
+        return $dateCarbon->lessThanOrEqualTo($trialEndsAt);
     }
 
     /**
@@ -98,7 +117,19 @@ class Worker extends Model
      */
     public function isCurrentlyInTrial(): bool
     {
-        return $this->isInTrialOnDate(Carbon::now());
+        if ($this->tenured_at && Carbon::parse($this->tenured_at)->startOfDay()->lessThanOrEqualTo(Carbon::now()->startOfDay())) {
+            return false;
+        }
+
+        if ($this->is_new === false || $this->is_new === 0 || $this->is_new === '0') {
+            return false;
+        }
+
+        $now = Carbon::now()->startOfDay();
+        $hiredAt = $this->getHiredAt();
+        $trialEndsAt = $this->getTrialEndsAt();
+
+        return $now->greaterThanOrEqualTo($hiredAt) && $now->lessThanOrEqualTo($trialEndsAt);
     }
 
     /**
@@ -127,7 +158,11 @@ class Worker extends Model
             return true;
         }
 
-        // 2. Si le flag is_new est explicitement à false -> Ancien (titularisé)
+        // 2. Si titularisé explicitement (tenured_at défini ou is_new === false)
+        if ($this->tenured_at && Carbon::parse($this->tenured_at)->startOfDay()->lessThanOrEqualTo(Carbon::now()->startOfDay())) {
+            return false;
+        }
+
         if ($this->is_new === false || $this->is_new === 0 || $this->is_new === '0') {
             return false;
         }
@@ -165,6 +200,7 @@ class Worker extends Model
             $q->where('is_new', true)
               ->orWhere(function ($sub) use ($cutoff) {
                   $sub->whereNull('is_new')
+                      ->whereNull('tenured_at')
                       ->where(function ($dateSub) use ($cutoff) {
                           $dateSub->where(function ($h) use ($cutoff) {
                               $h->whereNotNull('hired_at')
@@ -178,6 +214,6 @@ class Worker extends Model
         })->where(function ($q) {
             $q->where('is_new', '!=', false)
               ->orWhereNull('is_new');
-        });
+        })->whereNull('tenured_at');
     }
 }

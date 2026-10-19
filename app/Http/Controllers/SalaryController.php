@@ -216,8 +216,8 @@ class SalaryController extends Controller
     }
 
     /**
-     * Affiche la liste dédiée des nouveaux ouvriers en période d'essai (14 jours).
-     * Dès que les 2 semaines d'essai sont achevées, l'ouvrier bascule automatiquement dans les anciens et ne s'affiche plus ici.
+     * Affiche la liste dédiée des ouvriers : en période d'essai (15 jours), titularisés, et tous ouvriers.
+     * Permet à la RH de titulariser ou de remédier immédiatement à une titularisation par erreur.
      */
     public function newWorkers(Request $request)
     {
@@ -225,26 +225,42 @@ class SalaryController extends Controller
         $isRh = Auth::check() && Auth::user()->isRh();
         $prefix = $isAdmin ? 'admin.' : ($isRh ? 'rh.' : '');
 
-        // Récupérer STRICTEMENT les ouvriers actuellement en période d'essai (14 jours)
-        // Les ouvriers ayant achevé leurs 2 semaines d'essai basculent automatiquement dans les anciens et sont exclus.
-        $newWorkers = Worker::query()
+        $tab = $request->get('tab', 'trial'); // 'trial', 'tenured', 'all'
+        $search = trim($request->get('search', ''));
+
+        $query = Worker::query()
             ->orderBy('hired_at', 'desc')
             ->orderBy('created_at', 'desc')
-            ->orderBy('last_name', 'asc')
-            ->get()
-            ->filter(function ($worker) {
-                return $worker->isNew();
-            })
-            ->values();
+            ->orderBy('last_name', 'asc');
+
+        if ($search !== '') {
+            $searchTerm = '%' . $search . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('last_name', 'like', $searchTerm)
+                  ->orWhere('first_name', 'like', $searchTerm);
+            });
+        }
+
+        $allWorkers = $query->get();
+
+        // 1. Ouvriers actuellement en période d'essai (Nouveaux)
+        $newWorkers = $allWorkers->filter(function ($worker) {
+            return $worker->isNew();
+        })->values();
+
+        // 2. Ouvriers titularisés (Anciens avec date de titularisation ou is_new = false)
+        $tenuredWorkers = $allWorkers->filter(function ($worker) {
+            return !$worker->isNew();
+        })->values();
 
         $defaultRate = PayrollService::getHourlyRate();
         $defaultNewRate = PayrollService::getNewHourlyRate();
 
-        return view('admin.workers.new', compact('newWorkers', 'defaultRate', 'defaultNewRate', 'prefix'));
+        return view('admin.workers.new', compact('newWorkers', 'tenuredWorkers', 'allWorkers', 'tab', 'search', 'defaultRate', 'defaultNewRate', 'prefix'));
     }
 
     /**
-     * Modifie le profil d'un ouvrier (statut essai/titularisé, date d'embauche ou taux personnalisé).
+     * Modifie le statut d'un ouvrier (titularisation, annulation d'erreur / remise en essai, date d'embauche, taux personnalisé).
      */
     public function updateWorkerStatus(Request $request, Worker $worker)
     {
@@ -259,18 +275,64 @@ class SalaryController extends Controller
         }
 
         $validated = $request->validate([
+            'action' => 'nullable|string|in:titulariser,revert_trial',
             'is_new' => 'nullable|in:0,1,true,false,null',
             'hired_at' => 'nullable|date',
+            'tenured_at' => 'nullable|date',
             'hourly_rate' => 'nullable|numeric|min:0|max:100000',
         ]);
 
+        $action = $request->input('action');
+
+        // Cas 1 : Annulation d'une titularisation par erreur -> Remise en période d'essai
+        if ($action === 'revert_trial' || ($request->has('is_new') && in_array($request->input('is_new'), ['1', 'true', true], true))) {
+            $worker->is_new = ($request->input('is_new') === '1' || $request->input('is_new') === true) ? true : null;
+            $worker->tenured_at = null;
+            $worker->save();
+
+            return redirect()->back()->with('success', "L'ouvrier {$worker->last_name} {$worker->first_name} a été remis en période d'essai (taux 218,75 FCFA/h). L'erreur a été annulée avec succès.");
+        }
+
+        // Cas 2 : Titularisation directe
+        if ($action === 'titulariser' || ($request->has('is_new') && in_array($request->input('is_new'), ['0', 'false', false], true))) {
+            $worker->is_new = false;
+
+            if ($request->filled('tenured_at')) {
+                $worker->tenured_at = $request->input('tenured_at');
+            } else {
+                // Si les 15 jours d'essai sont déjà écoulés, titularisation à J+16
+                // Sinon, titularisation effective à la date du jour
+                $worker->tenured_at = $worker->getTrialEndsAt()->isPast() 
+                    ? $worker->getTrialEndsAt()->copy()->addDay()->toDateString() 
+                    : now()->toDateString();
+            }
+
+            $worker->save();
+
+            return redirect()->back()->with('success', "L'ouvrier {$worker->last_name} {$worker->first_name} a été titularisé (taux standard 275 FCFA/h). Les heures effectuées en période d'essai restent comptabilisées à 218,75 FCFA/h.");
+        }
+
+        // Cas 3 : Formulaire complet / modification générique
         if ($request->has('is_new')) {
             $val = $request->input('is_new');
             if ($val === '' || $val === 'null' || is_null($val)) {
                 $worker->is_new = null; // Détection automatique 15 jours
+                $worker->tenured_at = null;
             } else {
-                $worker->is_new = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+                $isNewBool = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+                $worker->is_new = $isNewBool;
+                if (!$isNewBool && !$worker->tenured_at) {
+                    $worker->tenured_at = $worker->getTrialEndsAt()->isPast()
+                        ? $worker->getTrialEndsAt()->copy()->addDay()->toDateString()
+                        : now()->toDateString();
+                } elseif ($isNewBool) {
+                    $worker->tenured_at = null;
+                }
             }
+        }
+
+        if ($request->has('tenured_at')) {
+            $worker->tenured_at = !empty($validated['tenured_at']) ? $validated['tenured_at'] : null;
         }
 
         if ($request->has('hired_at')) {

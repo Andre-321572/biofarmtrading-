@@ -170,6 +170,7 @@ class AttendanceController extends Controller
                 ],
                 [
                     'shift' => $workerData['shift'],
+                    'hired_at' => now()->toDateString(),
                 ]
             );
         }

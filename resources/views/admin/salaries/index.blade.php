@@ -380,16 +380,36 @@
                                         </div>
                                     </td>
 
-                                    <!-- Statut Nouveau / Ancien -->
+                                    <!-- Statut Nouveau / Ancien & Action Rapide -->
                                     <td class="py-4 px-3 text-center">
                                         @if($isNew)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
                                                 Nouveau
                                             </span>
+                                            <form method="POST" action="{{ route($prefix . 'workers.update_status', $w->id) }}" class="mt-1">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="action" value="titulariser">
+                                                <button type="submit" 
+                                                        class="px-2 py-0.5 rounded-lg text-[9px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors shadow-2xs"
+                                                        title="Titulariser immédiatement cet ouvrier (taux 275 F/h tout en maintenant ses jours d'essai à 218,75 F)">
+                                                    Titulariser
+                                                </button>
+                                            </form>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
                                                 Ancien
                                             </span>
+                                            <form method="POST" action="{{ route($prefix . 'workers.update_status', $w->id) }}" class="mt-1" onsubmit="return confirm('Confirmez-vous la remise en période d\'essai pour cet ouvrier (taux 218,75 F/h) ?');">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="action" value="revert_trial">
+                                                <button type="submit" 
+                                                        class="px-2 py-0.5 rounded-lg text-[9px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-colors shadow-2xs"
+                                                        title="Annuler une titularisation faite par erreur et remettre l'ouvrier en période d'essai (taux 218,75 F/h)">
+                                                    Remettre essai
+                                                </button>
+                                            </form>
                                         @endif
                                     </td>
 
@@ -901,6 +921,24 @@
                                 </div>
                             </div>
 
+                            <!-- Two-tier banner if split rate -->
+                            <div x-show="selectedWorker && selectedWorker.is_split_rate" class="mx-6 mt-4 p-3.5 rounded-2xl bg-purple-50 border border-purple-200 text-xs">
+                                <div class="font-bold text-purple-900 flex items-center gap-2 mb-1">
+                                    <svg class="w-4 h-4 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Paiement en deux temps (Période d'essai + Titularisation)</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-purple-800">
+                                    <div class="bg-white/80 p-2 rounded-xl border border-purple-100">
+                                        <span class="block font-bold text-purple-900">1. Période d'Essai (15 jours) :</span>
+                                        <span x-text="selectedWorker ? (selectedWorker.trial_hours_formatted + ' au taux essai (' + Number(selectedWorker.trial_rate).toLocaleString('fr-FR', {minimumFractionDigits: 2}) + ' F/h)') : ''"></span>
+                                    </div>
+                                    <div class="bg-white/80 p-2 rounded-xl border border-purple-100">
+                                        <span class="block font-bold text-purple-900">2. Titularisé (Ancien) :</span>
+                                        <span x-text="selectedWorker ? (selectedWorker.regular_hours_formatted + ' au taux normal (' + Number(selectedWorker.regular_rate).toLocaleString('fr-FR', {minimumFractionDigits: 2}) + ' F/h)') : ''"></span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Daily Breakdown List -->
                             <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
                                 <h4 class="text-xs font-black uppercase text-slate-500 tracking-wider mb-3">Relevé quotidien des pointages du mois</h4>
@@ -918,10 +956,18 @@
                                                           x-text="day.arrival_time ? (day.arrival_time + ' → ' + day.departure_time + ' (Pause -' + day.pause_minutes + 'm)') : (selectedWorker.shift === 'night' ? 'Forfait Nuit 4h' : 'Pointage standard')"></span>
                                                 </div>
                                             </div>
-                                            <div class="text-right">
+                                            <div class="text-right flex flex-col items-end gap-0.5">
                                                 <span class="font-black text-sm text-slate-900" x-text="day.net_hours_text"></span>
-                                                <span class="block text-[10px] font-bold text-emerald-600" x-show="day.status === 'present'">Présent</span>
-                                                <span class="block text-[10px] font-bold text-red-500" x-show="day.status !== 'present'">Absent</span>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200" x-show="day.is_trial && day.status === 'present'">
+                                                        Essai (218,75 F)
+                                                    </span>
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200" x-show="!day.is_trial && day.status === 'present'">
+                                                        Titularisé (275 F)
+                                                    </span>
+                                                    <span class="block text-[10px] font-bold text-emerald-600" x-show="day.status === 'present'">Présent</span>
+                                                    <span class="block text-[10px] font-bold text-red-500" x-show="day.status !== 'present'">Absent</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </template>

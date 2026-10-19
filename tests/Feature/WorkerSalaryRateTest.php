@@ -310,6 +310,133 @@ class WorkerSalaryRateTest extends TestCase
         $adminResponse->assertStatus(200);
         $this->assertEquals('application/pdf', $adminResponse->headers->get('content-type'));
     }
+
+    public function test_titularisation_does_not_retroactively_alter_trial_period_rates()
+    {
+        // Mois d'octobre 2026
+        $month = Carbon::create(2026, 10, 1);
+        Setting::set('worker_hourly_rate', 275.0, 'float');
+        Setting::set('worker_new_hourly_rate', 218.75, 'float');
+
+        // Ouvrier embauché le 1er octobre 2026
+        // Période d'essai : 1er au 15 octobre inclus
+        // Titularisé comme Ancien après sa période d'essai (ou par la RH)
+        $worker = Worker::create([
+            'first_name' => 'Komi',
+            'last_name' => 'TITULARISE_APRES_ESSAI',
+            'shift' => 'night', // 4h/j
+            'hired_at' => '2026-10-01',
+            'tenured_at' => '2026-10-16',
+            'is_new' => false, // Titularisé comme Ancien
+        ]);
+
+        // 10 jours de travail pendant la période d'essai (1er au 10 oct) = 40h
+        for ($day = 1; $day <= 10; $day++) {
+            Attendance::create([
+                'worker_id' => $worker->id,
+                'date' => sprintf('2026-10-%02d', $day),
+                'status' => 'present',
+            ]);
+        }
+
+        // 5 jours de travail après la période d'essai (20 au 24 oct) = 20h
+        for ($day = 20; $day <= 24; $day++) {
+            Attendance::create([
+                'worker_id' => $worker->id,
+                'date' => sprintf('2026-10-%02d', $day),
+                'status' => 'present',
+            ]);
+        }
+
+        $payrollService = app(PayrollService::class);
+        $payroll = $payrollService->getMonthlyPayroll($month);
+        $item = $payroll['items']->firstWhere('worker.id', $worker->id);
+
+        $this->assertNotNull($item);
+        // Les 40 heures d'essai doivent STRICTEMENT rester au taux d'essai 218.75 FCFA
+        $this->assertEquals(2400, $item['trial_minutes']); // 40h
+        $this->assertEquals(1200, $item['regular_minutes']); // 20h
+        $this->assertTrue($item['is_split_rate']);
+
+        // Salaire période d'essai = 40 * 218.75 = 8 750 FCFA
+        // Salaire titularisé = 20 * 275.0 = 5 500 FCFA
+        // Salaire total de base = 14 250 FCFA (et NON 60 * 275 = 16 500 FCFA)
+        $this->assertEquals(14250, $item['base_salary']);
+        $this->assertEquals(14250, $item['salary']);
+    }
+
+    public function test_rh_can_revert_mistaken_titularisation_back_to_trial()
+    {
+        $rhUser = User::factory()->create(['role' => 'rh']);
+        $this->actingAs($rhUser);
+
+        // Ouvrier embauché il y a 5 jours
+        $worker = Worker::create([
+            'first_name' => 'Ablan',
+            'last_name' => 'ERREUR_TITULARISATION',
+            'shift' => 'day',
+            'hired_at' => Carbon::now()->subDays(5)->toDateString(),
+            'is_new' => null,
+        ]);
+
+        $this->assertTrue($worker->isNew());
+
+        // 1. La RH titularise par erreur cet ouvrier
+        $response1 = $this->patch(route('rh.workers.update_status', $worker->id), [
+            'action' => 'titulariser',
+        ]);
+        $response1->assertRedirect();
+        $response1->assertSessionHas('success');
+
+        $worker->refresh();
+        $this->assertFalse($worker->isNew());
+        $this->assertNotNull($worker->tenured_at);
+
+        // 2. La RH s'aperçoit de l'erreur et clique pour remédier (remettre en période d'essai)
+        $response2 = $this->patch(route('rh.workers.update_status', $worker->id), [
+            'action' => 'revert_trial',
+        ]);
+        $response2->assertRedirect();
+        $response2->assertSessionHas('success');
+
+        $worker->refresh();
+        // L'ouvrier doit immédiatement redevenir en période d'essai
+        $this->assertTrue($worker->isNew());
+        $this->assertTrue($worker->isCurrentlyInTrial());
+        $this->assertNull($worker->tenured_at);
+    }
+
+    public function test_tenured_tab_on_new_workers_page_displays_tenured_workers()
+    {
+        $rhUser = User::factory()->create(['role' => 'rh']);
+        $this->actingAs($rhUser);
+
+        // Ouvrier titularisé
+        $ancien = Worker::create([
+            'first_name' => 'Koffi',
+            'last_name' => 'WORKER_CONFIRME',
+            'shift' => 'day',
+            'hired_at' => Carbon::now()->subDays(30)->toDateString(),
+            'is_new' => false,
+        ]);
+
+        // Ouvrier en essai
+        $essai = Worker::create([
+            'first_name' => 'Abla',
+            'last_name' => 'WORKER_EN_ESSAI',
+            'shift' => 'day',
+            'hired_at' => Carbon::now()->subDays(5)->toDateString(),
+        ]);
+
+        // Sur l'onglet 'trial', on ne voit que l'ouvrier en essai
+        $responseTrial = $this->get(route('rh.workers.new', ['tab' => 'trial']));
+        $responseTrial->assertSee('WORKER_EN_ESSAI');
+        $responseTrial->assertDontSee('WORKER_CONFIRME');
+
+        // Sur l'onglet 'tenured', on voit l'ouvrier confirmé
+        $responseTenured = $this->get(route('rh.workers.new', ['tab' => 'tenured']));
+        $responseTenured->assertSee('WORKER_CONFIRME');
+    }
 }
 
 
