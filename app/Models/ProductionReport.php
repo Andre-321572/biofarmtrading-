@@ -45,6 +45,40 @@ class ProductionReport extends Model
         return $this->hasMany(ProductionReportLot::class);
     }
 
+    /**
+     * Génère une référence unique pour un rapport de production pour une date donnée.
+     * Format: PROD-YYYYMMDD-XXX
+     */
+    public static function generateUniqueReference(?string $date = null): string
+    {
+        $dateStr = date('Ymd', strtotime($date ?: 'today'));
+        $prefix = 'PROD-' . $dateStr . '-';
+
+        // Récupère toutes les références existantes pour ce préfixe de date
+        $existingReferences = self::where('reference', 'like', $prefix . '%')
+            ->pluck('reference')
+            ->toArray();
+
+        $maxNumber = 0;
+        foreach ($existingReferences as $ref) {
+            $seqPart = substr($ref, strlen($prefix));
+            if (is_numeric($seqPart)) {
+                $maxNumber = max($maxNumber, (int) $seqPart);
+            }
+        }
+
+        $nextNumber = $maxNumber + 1;
+        $reference = $prefix . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+
+        // Garantie supplémentaire de non-collision
+        while (in_array($reference, $existingReferences, true) || self::where('reference', $reference)->exists()) {
+            $nextNumber++;
+            $reference = $prefix . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+        }
+
+        return $reference;
+    }
+
     public function getTotalDeclayeAttribute(): float
     {
         return (float) $this->lots->sum('quantite_declayee_kg');

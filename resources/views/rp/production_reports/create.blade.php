@@ -39,7 +39,7 @@
             </div>
         @endif
 
-        <form action="{{ route('rp.production-reports.store') }}" method="POST">
+        <form action="{{ route('rp.production-reports.store') }}" method="POST" @submit="submitting = true">
             @csrf
 
             <!-- Section 1: Informations Générales du Jour -->
@@ -451,8 +451,13 @@
                 <a href="{{ route('rp.production-reports.index') }}" class="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-bold text-xs hover:bg-gray-50 transition-colors">
                     Annuler
                 </a>
-                <button type="submit" class="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-check"></i> Enregistrer & Générer le Rapport
+                <button type="submit" :disabled="submitting" class="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-black text-xs shadow-md transition-all flex items-center gap-2">
+                    <span x-show="!submitting" class="flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i> Enregistrer & Générer le Rapport
+                    </span>
+                    <span x-show="submitting" class="flex items-center gap-2" style="display: none;">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Enregistrement en cours...
+                    </span>
                 </button>
             </div>
         </form>
@@ -463,6 +468,7 @@
 <script>
 function productionForm() {
     return {
+        submitting: false,
         lots: [
             { 
                 numero_lot: 'Lot 285/ANA', 

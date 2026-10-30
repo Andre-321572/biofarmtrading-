@@ -9,6 +9,7 @@ use App\Exports\ProductionReportExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 
@@ -94,58 +95,74 @@ class ProductionReportController extends Controller
             'lots.*.notes' => 'nullable|string',
         ]);
 
-        // Auto-generate reference code PROD-YYYYMMDD-XXXX
-        $dateStr = date('Ymd', strtotime($validated['date_rapport']));
-        $countToday = ProductionReport::whereDate('date_rapport', $validated['date_rapport'])->count() + 1;
-        $reference = 'PROD-' . $dateStr . '-' . str_pad($countToday, 3, '0', STR_PAD_LEFT);
+        $maxRetries = 5;
+        $report = null;
 
-        $report = ProductionReport::create([
-            'reference' => $reference,
-            'date_rapport' => $validated['date_rapport'],
-            'nombre_ouvriers' => $validated['nombre_ouvriers'],
-            'nombre_ouvriers_absents' => $validated['nombre_ouvriers_absents'] ?? 0,
-            'nombre_ouvriers_repos' => $validated['nombre_ouvriers_repos'] ?? 0,
-            'nombre_couteaux_debut' => $validated['nombre_couteaux_debut'] ?? 0,
-            'nombre_couteaux_fin' => $validated['nombre_couteaux_fin'] ?? 0,
-            'nombre_ciseaux_debut' => $validated['nombre_ciseaux_debut'] ?? 0,
-            'nombre_ciseaux_fin' => $validated['nombre_ciseaux_fin'] ?? 0,
-            'lots_peles' => $validated['lots_peles'] ?? null,
-            'user_id' => Auth::id(),
-            'notes' => $validated['notes'] ?? null,
-        ]);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $report = DB::transaction(function () use ($validated) {
+                    $reference = ProductionReport::generateUniqueReference($validated['date_rapport']);
 
-        foreach ($validated['lots'] as $lotData) {
-            $report->lots()->create([
-                'numero_lot' => $lotData['numero_lot'],
-                'type_produit' => $lotData['type_produit'] ?? 'Ananas',
-                'quantite_declayee_kg' => $lotData['quantite_declayee_kg'] ?? 0,
-                'poids_rcl_kg' => $lotData['poids_rcl_kg'] ?? 0,
-                'poids_mcl_kg' => $lotData['poids_mcl_kg'] ?? 0,
-                'poids_rps_kg' => $lotData['poids_rps_kg'] ?? 0,
-                'poids_mps_kg' => $lotData['poids_mps_kg'] ?? 0,
-                'poids_lpa_kg' => $lotData['poids_lpa_kg'] ?? 0,
-                'sachets_2kg' => $lotData['sachets_2kg'] ?? 0,
-                'sachets_1kg' => $lotData['sachets_1kg'] ?? 0,
-                'sachets_500g' => $lotData['sachets_500g'] ?? 0,
-                'sachets_rcl_2kg' => $lotData['sachets_rcl_2kg'] ?? 0,
-                'sachets_rcl_1kg' => $lotData['sachets_rcl_1kg'] ?? 0,
-                'sachets_mcl_2kg' => $lotData['sachets_mcl_2kg'] ?? 0,
-                'sachets_mcl_1kg' => $lotData['sachets_mcl_1kg'] ?? 0,
-                'sachets_rps_2kg' => $lotData['sachets_rps_2kg'] ?? 0,
-                'sachets_rps_1kg' => $lotData['sachets_rps_1kg'] ?? 0,
-                'sachets_mps_2kg' => $lotData['sachets_mps_2kg'] ?? 0,
-                'sachets_mps_1kg' => $lotData['sachets_mps_1kg'] ?? 0,
-                'sachets_lpa_2kg' => $lotData['sachets_lpa_2kg'] ?? 0,
-                'sachets_lpa_1kg' => $lotData['sachets_lpa_1kg'] ?? 0,
-                'sachets_lpa_100g' => $lotData['sachets_lpa_100g'] ?? 0,
-                'sachets_ttpm_1kg' => $lotData['sachets_ttpm_1kg'] ?? 0,
-                'type_coupe' => $lotData['type_coupe'] ?? null,
-                'dechets_kg' => $lotData['dechets_kg'] ?? 0,
-                'cl_ttpm_kg' => $lotData['cl_ttpm_kg'] ?? 0,
-                'pa_kg' => $lotData['pa_kg'] ?? 0,
-                'pelage_info' => $lotData['pelage_info'] ?? null,
-                'notes' => $lotData['notes'] ?? null,
-            ]);
+                    $newReport = ProductionReport::create([
+                        'reference' => $reference,
+                        'date_rapport' => $validated['date_rapport'],
+                        'nombre_ouvriers' => $validated['nombre_ouvriers'],
+                        'nombre_ouvriers_absents' => $validated['nombre_ouvriers_absents'] ?? 0,
+                        'nombre_ouvriers_repos' => $validated['nombre_ouvriers_repos'] ?? 0,
+                        'nombre_couteaux_debut' => $validated['nombre_couteaux_debut'] ?? 0,
+                        'nombre_couteaux_fin' => $validated['nombre_couteaux_fin'] ?? 0,
+                        'nombre_ciseaux_debut' => $validated['nombre_ciseaux_debut'] ?? 0,
+                        'nombre_ciseaux_fin' => $validated['nombre_ciseaux_fin'] ?? 0,
+                        'lots_peles' => $validated['lots_peles'] ?? null,
+                        'user_id' => Auth::id(),
+                        'notes' => $validated['notes'] ?? null,
+                    ]);
+
+                    foreach ($validated['lots'] as $lotData) {
+                        $newReport->lots()->create([
+                            'numero_lot' => $lotData['numero_lot'],
+                            'type_produit' => $lotData['type_produit'] ?? 'Ananas',
+                            'quantite_declayee_kg' => $lotData['quantite_declayee_kg'] ?? 0,
+                            'poids_rcl_kg' => $lotData['poids_rcl_kg'] ?? 0,
+                            'poids_mcl_kg' => $lotData['poids_mcl_kg'] ?? 0,
+                            'poids_rps_kg' => $lotData['poids_rps_kg'] ?? 0,
+                            'poids_mps_kg' => $lotData['poids_mps_kg'] ?? 0,
+                            'poids_lpa_kg' => $lotData['poids_lpa_kg'] ?? 0,
+                            'sachets_2kg' => $lotData['sachets_2kg'] ?? 0,
+                            'sachets_1kg' => $lotData['sachets_1kg'] ?? 0,
+                            'sachets_500g' => $lotData['sachets_500g'] ?? 0,
+                            'sachets_rcl_2kg' => $lotData['sachets_rcl_2kg'] ?? 0,
+                            'sachets_rcl_1kg' => $lotData['sachets_rcl_1kg'] ?? 0,
+                            'sachets_mcl_2kg' => $lotData['sachets_mcl_2kg'] ?? 0,
+                            'sachets_mcl_1kg' => $lotData['sachets_mcl_1kg'] ?? 0,
+                            'sachets_rps_2kg' => $lotData['sachets_rps_2kg'] ?? 0,
+                            'sachets_rps_1kg' => $lotData['sachets_rps_1kg'] ?? 0,
+                            'sachets_mps_2kg' => $lotData['sachets_mps_2kg'] ?? 0,
+                            'sachets_mps_1kg' => $lotData['sachets_mps_1kg'] ?? 0,
+                            'sachets_lpa_2kg' => $lotData['sachets_lpa_2kg'] ?? 0,
+                            'sachets_lpa_1kg' => $lotData['sachets_lpa_1kg'] ?? 0,
+                            'sachets_lpa_100g' => $lotData['sachets_lpa_100g'] ?? 0,
+                            'sachets_ttpm_1kg' => $lotData['sachets_ttpm_1kg'] ?? 0,
+                            'type_coupe' => $lotData['type_coupe'] ?? null,
+                            'dechets_kg' => $lotData['dechets_kg'] ?? 0,
+                            'cl_ttpm_kg' => $lotData['cl_ttpm_kg'] ?? 0,
+                            'pa_kg' => $lotData['pa_kg'] ?? 0,
+                            'pelage_info' => $lotData['pelage_info'] ?? null,
+                            'notes' => $lotData['notes'] ?? null,
+                        ]);
+                    }
+
+                    return $newReport;
+                });
+
+                break;
+            } catch (\Illuminate\Database\QueryException $e) {
+                if (in_array($e->getCode(), [23000, '23000']) && $attempt < $maxRetries) {
+                    usleep(50000); // 50ms pause before retrying with a new unique reference
+                    continue;
+                }
+                throw $e;
+            }
         }
 
         return redirect()->route('rp.production-reports.show', $report)
@@ -209,55 +226,57 @@ class ProductionReportController extends Controller
             'lots.*.notes' => 'nullable|string',
         ]);
 
-        $productionReport->update([
-            'date_rapport' => $validated['date_rapport'],
-            'nombre_ouvriers' => $validated['nombre_ouvriers'],
-            'nombre_ouvriers_absents' => $validated['nombre_ouvriers_absents'] ?? 0,
-            'nombre_ouvriers_repos' => $validated['nombre_ouvriers_repos'] ?? 0,
-            'nombre_couteaux_debut' => $validated['nombre_couteaux_debut'] ?? 0,
-            'nombre_couteaux_fin' => $validated['nombre_couteaux_fin'] ?? 0,
-            'nombre_ciseaux_debut' => $validated['nombre_ciseaux_debut'] ?? 0,
-            'nombre_ciseaux_fin' => $validated['nombre_ciseaux_fin'] ?? 0,
-            'lots_peles' => $validated['lots_peles'] ?? null,
-            'notes' => $validated['notes'] ?? null,
-        ]);
-
-        // Re-create lots
-        $productionReport->lots()->delete();
-
-        foreach ($validated['lots'] as $lotData) {
-            $productionReport->lots()->create([
-                'numero_lot' => $lotData['numero_lot'],
-                'type_produit' => $lotData['type_produit'] ?? 'Ananas',
-                'quantite_declayee_kg' => $lotData['quantite_declayee_kg'] ?? 0,
-                'poids_rcl_kg' => $lotData['poids_rcl_kg'] ?? 0,
-                'poids_mcl_kg' => $lotData['poids_mcl_kg'] ?? 0,
-                'poids_rps_kg' => $lotData['poids_rps_kg'] ?? 0,
-                'poids_mps_kg' => $lotData['poids_mps_kg'] ?? 0,
-                'poids_lpa_kg' => $lotData['poids_lpa_kg'] ?? 0,
-                'sachets_2kg' => $lotData['sachets_2kg'] ?? 0,
-                'sachets_1kg' => $lotData['sachets_1kg'] ?? 0,
-                'sachets_500g' => $lotData['sachets_500g'] ?? 0,
-                'sachets_rcl_2kg' => $lotData['sachets_rcl_2kg'] ?? 0,
-                'sachets_rcl_1kg' => $lotData['sachets_rcl_1kg'] ?? 0,
-                'sachets_mcl_2kg' => $lotData['sachets_mcl_2kg'] ?? 0,
-                'sachets_mcl_1kg' => $lotData['sachets_mcl_1kg'] ?? 0,
-                'sachets_rps_2kg' => $lotData['sachets_rps_2kg'] ?? 0,
-                'sachets_rps_1kg' => $lotData['sachets_rps_1kg'] ?? 0,
-                'sachets_mps_2kg' => $lotData['sachets_mps_2kg'] ?? 0,
-                'sachets_mps_1kg' => $lotData['sachets_mps_1kg'] ?? 0,
-                'sachets_lpa_2kg' => $lotData['sachets_lpa_2kg'] ?? 0,
-                'sachets_lpa_1kg' => $lotData['sachets_lpa_1kg'] ?? 0,
-                'sachets_lpa_100g' => $lotData['sachets_lpa_100g'] ?? 0,
-                'sachets_ttpm_1kg' => $lotData['sachets_ttpm_1kg'] ?? 0,
-                'type_coupe' => $lotData['type_coupe'] ?? null,
-                'dechets_kg' => $lotData['dechets_kg'] ?? 0,
-                'cl_ttpm_kg' => $lotData['cl_ttpm_kg'] ?? 0,
-                'pa_kg' => $lotData['pa_kg'] ?? 0,
-                'pelage_info' => $lotData['pelage_info'] ?? null,
-                'notes' => $lotData['notes'] ?? null,
+        DB::transaction(function () use ($productionReport, $validated) {
+            $productionReport->update([
+                'date_rapport' => $validated['date_rapport'],
+                'nombre_ouvriers' => $validated['nombre_ouvriers'],
+                'nombre_ouvriers_absents' => $validated['nombre_ouvriers_absents'] ?? 0,
+                'nombre_ouvriers_repos' => $validated['nombre_ouvriers_repos'] ?? 0,
+                'nombre_couteaux_debut' => $validated['nombre_couteaux_debut'] ?? 0,
+                'nombre_couteaux_fin' => $validated['nombre_couteaux_fin'] ?? 0,
+                'nombre_ciseaux_debut' => $validated['nombre_ciseaux_debut'] ?? 0,
+                'nombre_ciseaux_fin' => $validated['nombre_ciseaux_fin'] ?? 0,
+                'lots_peles' => $validated['lots_peles'] ?? null,
+                'notes' => $validated['notes'] ?? null,
             ]);
-        }
+
+            // Re-create lots
+            $productionReport->lots()->delete();
+
+            foreach ($validated['lots'] as $lotData) {
+                $productionReport->lots()->create([
+                    'numero_lot' => $lotData['numero_lot'],
+                    'type_produit' => $lotData['type_produit'] ?? 'Ananas',
+                    'quantite_declayee_kg' => $lotData['quantite_declayee_kg'] ?? 0,
+                    'poids_rcl_kg' => $lotData['poids_rcl_kg'] ?? 0,
+                    'poids_mcl_kg' => $lotData['poids_mcl_kg'] ?? 0,
+                    'poids_rps_kg' => $lotData['poids_rps_kg'] ?? 0,
+                    'poids_mps_kg' => $lotData['poids_mps_kg'] ?? 0,
+                    'poids_lpa_kg' => $lotData['poids_lpa_kg'] ?? 0,
+                    'sachets_2kg' => $lotData['sachets_2kg'] ?? 0,
+                    'sachets_1kg' => $lotData['sachets_1kg'] ?? 0,
+                    'sachets_500g' => $lotData['sachets_500g'] ?? 0,
+                    'sachets_rcl_2kg' => $lotData['sachets_rcl_2kg'] ?? 0,
+                    'sachets_rcl_1kg' => $lotData['sachets_rcl_1kg'] ?? 0,
+                    'sachets_mcl_2kg' => $lotData['sachets_mcl_2kg'] ?? 0,
+                    'sachets_mcl_1kg' => $lotData['sachets_mcl_1kg'] ?? 0,
+                    'sachets_rps_2kg' => $lotData['sachets_rps_2kg'] ?? 0,
+                    'sachets_rps_1kg' => $lotData['sachets_rps_1kg'] ?? 0,
+                    'sachets_mps_2kg' => $lotData['sachets_mps_2kg'] ?? 0,
+                    'sachets_mps_1kg' => $lotData['sachets_mps_1kg'] ?? 0,
+                    'sachets_lpa_2kg' => $lotData['sachets_lpa_2kg'] ?? 0,
+                    'sachets_lpa_1kg' => $lotData['sachets_lpa_1kg'] ?? 0,
+                    'sachets_lpa_100g' => $lotData['sachets_lpa_100g'] ?? 0,
+                    'sachets_ttpm_1kg' => $lotData['sachets_ttpm_1kg'] ?? 0,
+                    'type_coupe' => $lotData['type_coupe'] ?? null,
+                    'dechets_kg' => $lotData['dechets_kg'] ?? 0,
+                    'cl_ttpm_kg' => $lotData['cl_ttpm_kg'] ?? 0,
+                    'pa_kg' => $lotData['pa_kg'] ?? 0,
+                    'pelage_info' => $lotData['pelage_info'] ?? null,
+                    'notes' => $lotData['notes'] ?? null,
+                ]);
+            }
+        });
 
         return redirect()->route('rp.production-reports.show', $productionReport)
             ->with('success', 'Rapport journalier de production mis à jour avec succès.');
