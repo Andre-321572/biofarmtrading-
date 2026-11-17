@@ -223,7 +223,7 @@ class SalaryController extends Controller
     {
         $isAdmin = Auth::check() && Auth::user()->isAdmin();
         $isRh = Auth::check() && Auth::user()->isRh();
-        $prefix = $isAdmin ? 'admin.' : ($isRh ? 'rh.' : '');
+        $prefix = ($isAdmin || $request->is('admin/*')) ? 'admin.' : (($isRh || $request->is('rh/*')) ? 'rh.' : 'admin.');
 
         $tab = $request->get('tab', 'trial'); // 'trial', 'tenured', 'all'
         $search = trim($request->get('search', ''));

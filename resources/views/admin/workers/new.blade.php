@@ -1,5 +1,6 @@
 <x-app-layout>
     <x-slot name="header"></x-slot>
+
     <div class="py-8 bg-slate-50 min-h-screen" x-data="{
         showNewRateModal: false,
         showEditWorkerModal: false,
@@ -28,8 +29,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Error Messages -->
-            @if($errors->any())
-                <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 shadow-xs space-y-1">
+            @if(isset($errors) && $errors->any())
+                <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 shadow-sm space-y-1">
                     <div class="flex items-center gap-2 font-black text-xs uppercase tracking-wider text-rose-900">
                         <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>Erreur de saisie</span>
@@ -42,7 +43,7 @@
 
             <!-- Flash Success Messages -->
             @if(session('success'))
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between shadow-xs">
+                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span class="text-sm font-bold">{{ session('success') }}</span>
@@ -50,9 +51,9 @@
                 </div>
             @endif
 
-            <!-- Header Section -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div class="flex items-center gap-4">
+            <!-- En-tête Principal de la page -->
+            <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+                <div class="flex items-start sm:items-center gap-4">
                     <div class="w-14 h-14 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-700 shadow-sm flex-shrink-0">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                     </div>
@@ -65,13 +66,13 @@
                         <h1 class="text-2xl font-black text-slate-800 tracking-tight mt-1">
                             Période d'Essai & <span class="text-purple-600">Nouveaux Ouvriers</span>
                         </h1>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">
-                            Période d'essai automatique de 15 jours ({{ number_format($defaultNewRate, 2, ',', ' ') }} FCFA/h) &bull; Titularisation automatique dès J+16 ({{ number_format($defaultRate, 2, ',', ' ') }} FCFA/h)
+                        <p class="text-xs font-semibold text-slate-500 mt-1">
+                            Période d'essai automatique de 15 jours (<span class="font-bold text-purple-700">{{ number_format($defaultNewRate, 2, ',', ' ') }} FCFA/h</span>) &bull; Titularisation dès J+16 (<span class="font-bold text-emerald-700">{{ number_format($defaultRate, 2, ',', ' ') }} FCFA/h</span>)
                         </p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <button type="button" 
                             @click="showNewRateModal = true"
                             class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black text-xs shadow-md shadow-purple-600/20 transition-all flex items-center gap-2 active:scale-95">
@@ -79,51 +80,75 @@
                         <span>CONFIGURER LES TAUX</span>
                     </button>
 
-                    <a href="{{ route($prefix . 'salaries.index') }}" 
+                    <a href="{{ Route::has($prefix . 'salaries.index') ? route($prefix . 'salaries.index') : (Route::has('admin.salaries.index') ? route('admin.salaries.index') : url('/admin/salaires')) }}" 
                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold text-xs border border-slate-200 transition-all flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         <span>État des Salaires</span>
                     </a>
                 </div>
-            </d            <!-- Grille d'information des taux & automatisation -->
+            </div>
+
+            <!-- Grille d'information des taux & automatisation (3 Cartes KPIs) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div class="bg-white rounded-3xl p-6 border-2 border-purple-300 shadow-xs relative overflow-hidden" style="background-color: #ffffff; border-color: #d8b4fe;">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-black uppercase tracking-wider text-purple-700" style="color: #7e22ce;">Taux Période d'Essai (15 jours)</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200" style="background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff;">
+                <!-- Carte 1: Taux Essai -->
+                <div class="bg-white rounded-3xl p-6 border-2 border-purple-200 shadow-sm relative overflow-hidden transition-all hover:border-purple-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-purple-700">Taux Période d'Essai (15 jours)</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
                             Nouveaux
                         </span>
                     </div>
-                    <div class="text-3xl font-black text-slate-900 mt-2" style="color: #0f172a;">
-                        {{ number_format($defaultNewRate, 2, ',', ' ') }} <span class="text-lg font-bold text-purple-600" style="color: #9333ea;">FCFA / h</span>
+                    <div class="text-3xl font-black text-slate-900 mt-2">
+                        {{ number_format($defaultNewRate, 2, ',', ' ') }} <span class="text-lg font-bold text-purple-600">FCFA / h</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2" style="color: #64748b;">Appliqué durant les 15 premiers jours d'intégration</p>
+                    <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        Appliqué durant les 15 premiers jours d'intégration
+                    </p>
                 </div>
 
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Taux Titularisé (Anciens)</span>
-                    <div class="text-3xl font-black text-slate-800 mt-2">
-                        {{ number_format($defaultRate, 2, ',', ' ') }} <span class="text-lg font-bold text-slate-400">FCFA / h</span>
+                <!-- Carte 2: Taux Titularisé -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative overflow-hidden transition-all hover:border-slate-300">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-slate-500">Taux Titularisé (Anciens)</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            Automatique J+16
+                        </span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2">Bascule automatique après les 15 jours d'essai sans action requise</p>
+                    <div class="text-3xl font-black text-slate-900 mt-2">
+                        {{ number_format($defaultRate, 2, ',', ' ') }} <span class="text-lg font-bold text-slate-500">FCFA / h</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Bascule automatique après les 15 jours d'essai sans action requise
+                    </p>
                 </div>
 
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-400">Ouvriers en Période d'Essai</span>
-                    <div class="text-3xl font-black text-purple-600 mt-2">
+                <!-- Carte 3: Ouvriers en Période d'Essai -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative overflow-hidden transition-all hover:border-slate-300">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-slate-500">Ouvriers en Période d'Essai</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                            Actifs
+                        </span>
+                    </div>
+                    <div class="text-3xl font-black text-purple-700 mt-2">
                         {{ $newWorkers->count() }} <span class="text-lg font-bold text-slate-400">ouvrier(s)</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2">Actuellement en cours des 15 jours d'essai</p>
+                    <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+                        Actuellement en cours des 15 jours d'essai
+                    </p>
                 </div>
             </div>
 
             <!-- Tableau des Recrues et Suivi de Période d'Essai -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <!-- En-tête avec Titre, Onglets et Recherche -->
+                <!-- En-tête avec Titre et Recherche -->
                 <div class="px-6 py-5 border-b border-slate-100 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Suivi des Ouvriers & Périodes d'Essai</h2>
-                        <p class="text-xs text-slate-400">
+                        <p class="text-xs text-slate-400 mt-0.5">
                             Paiement en deux temps : période d'essai (15j à {{ number_format($defaultNewRate, 2, ',', ' ') }} F/h) puis ancienneté ({{ number_format($defaultRate, 2, ',', ' ') }} F/h)
                         </p>
                     </div>
@@ -131,16 +156,16 @@
                     <!-- Barre de recherche -->
                     <form method="GET" action="{{ route($prefix . 'workers.new') }}" class="w-full lg:w-auto flex items-center gap-2">
                         <input type="hidden" name="tab" value="{{ $tab ?? 'trial' }}">
-                        <div class="relative w-full lg:w-64">
+                        <div class="relative w-full lg:w-72">
                             <input type="text" 
                                    name="search" 
                                    value="{{ $search ?? '' }}" 
                                    placeholder="Rechercher par nom..." 
-                                   class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
+                                   class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
                         @if(!empty($search))
-                            <a href="{{ route($prefix . 'workers.new', ['tab' => $tab ?? 'trial']) }}" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all">
+                            <a href="{{ route($prefix . 'workers.new', ['tab' => $tab ?? 'trial']) }}" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all">
                                 Effacer
                             </a>
                         @endif
@@ -148,7 +173,7 @@
                 </div>
 
                 <!-- Onglets de filtrage avec compteurs clairs -->
-                <div class="px-6 py-3 bg-slate-50/70 border-b border-slate-100 flex flex-wrap items-center gap-2">
+                <div class="px-6 py-3.5 bg-slate-50/80 border-b border-slate-100 flex flex-wrap items-center gap-2">
                     <a href="{{ route($prefix . 'workers.new', ['tab' => 'trial', 'search' => $search ?? '']) }}" 
                        class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 {{ ($tab ?? 'trial') === 'trial' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200' }}">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -222,8 +247,15 @@
                                     <td class="py-4 px-6 font-bold text-slate-400 text-xs">{{ $index + 1 }}</td>
                                     
                                     <td class="py-4 px-6">
-                                        <div class="font-black text-slate-900 uppercase">{{ $worker->last_name }}</div>
-                                        <div class="text-xs text-slate-500">{{ $worker->first_name }}</div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-full flex items-center justify-center font-black text-xs text-white {{ $worker->isNew() ? 'bg-gradient-to-br from-purple-500 to-indigo-600' : 'bg-gradient-to-br from-emerald-500 to-teal-600' }}">
+                                                {{ strtoupper(substr($worker->last_name, 0, 1) . substr($worker->first_name, 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <div class="font-black text-slate-900 uppercase">{{ $worker->last_name }}</div>
+                                                <div class="text-xs text-slate-500">{{ $worker->first_name }}</div>
+                                            </div>
+                                        </div>
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
@@ -371,7 +403,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div> </div>
             </div>
 
         </div>
@@ -386,7 +417,7 @@
                 <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl border border-slate-200 relative z-10">
                     <form method="POST" action="{{ route($prefix . 'salaries.update_rate') }}">
                         @csrf
-                        <div class="px-6 py-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex justify-between items-center" style="background-color: #581c87; color: #ffffff;">
+                        <div class="px-6 py-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex justify-between items-center">
                             <div>
                                 <h3 class="text-base font-black uppercase tracking-tight">Paramétrer les Taux Horaires</h3>
                                 <p class="text-[11px] text-purple-200">Définir les tarifs par heure selon la période d'essai (15 jours)</p>
@@ -426,7 +457,7 @@
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-700">
-                                        Taux Standard (Anciens ouvriers dès J+15)
+                                        Taux Standard (Anciens ouvriers dès J+16)
                                     </label>
                                     <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
                                         Défaut : 275.00 FCFA
@@ -475,7 +506,7 @@
                         @csrf
                         @method('PATCH')
 
-                        <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-purple-950 text-white flex justify-between items-center" style="background-color: #0f172a; color: #ffffff;">
+                        <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-purple-950 text-white flex justify-between items-center">
                             <div>
                                 <h3 class="text-base font-black uppercase tracking-tight" x-text="workerForm.name"></h3>
                                 <p class="text-[11px] text-purple-200">Date d'embauche, titularisation & conditions salariales</p>
